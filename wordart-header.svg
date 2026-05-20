@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 240" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="topPink" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffc4dc"/>
+      <stop offset="45%" stop-color="#ff70a8"/>
+      <stop offset="100%" stop-color="#d8266d"/>
+    </linearGradient>
+  </defs>
+  <g font-family="'Arial Black', 'Helvetica Black', Impact, sans-serif" font-weight="900" font-size="115" text-anchor="middle" stroke-linejoin="round">
+    <g transform="translate(650 170) skewX(-14)">
+      <text x="0" y="0" fill="#380019" stroke="#380019" stroke-width="6" transform="translate(14 14)">andreasevc.github.io</text>
+      <text x="0" y="0" fill="#520026" stroke="#520026" stroke-width="6" transform="translate(12 12)">andreasevc.github.io</text>
+      <text x="0" y="0" fill="#6c0034" stroke="#6c0034" stroke-width="6" transform="translate(10 10)">andreasevc.github.io</text>
+      <text x="0" y="0" fill="#860043" stroke="#860043" stroke-width="6" transform="translate(8 8)">andreasevc.github.io</text>
+      <text x="0" y="0" fill="#a00052" stroke="#a00052" stroke-width="6" transform="translate(6 6)">andreasevc.github.io</text>
+      <text x="0" y="0" fill="#b8005f" stroke="#b8005f" stroke-width="6" transform="translate(4 4)">andreasevc.github.io</text>
+      <text x="0" y="0" fill="#d0006e" stroke="#d0006e" stroke-width="6" transform="translate(2 2)">andreasevc.github.io</text>
+      <text x="0" y="0" fill="url(#topPink)" stroke="#5a0030" stroke-width="3">andreasevc.github.io</text>
+    </g>
+  </g>
+</svg>
