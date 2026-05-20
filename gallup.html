@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallup Analysis | Andrea Ševčovičová</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --dark-green: #b43f82;
+            --accent-green: #746cf0;
+            --projects-accent: #f3eef1;
+            --link-green: #d6589d;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --border: #30363d;
+            --mono: 'JetBrains Mono', monospace;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+
+            --d-exec: #b388ff;
+            --d-infl: #ff9966;
+            --d-rel:  #64b5f6;
+            --d-stra: #81c784;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: var(--accent-green);
+            z-index: 2000; width: 0%;
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .dna-sidebar {
+            position: fixed; left: 10px; top: 0; bottom: 0;
+            width: 20px; font-family: var(--mono); font-size: 20px;
+            color: var(--dark-green); opacity: 0.3; overflow: hidden;
+            user-select: none; pointer-events: none; z-index: 0;
+            writing-mode: vertical-rl; text-orientation: upright;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: radial-gradient(
+                800px circle at var(--mouse-x) var(--mouse-y),
+                rgba(189, 63, 178, 0.096),
+                transparent 85%
+            ), var(--bg);
+            background-attachment: fixed;
+        }
+
+        a {
+            color: var(--link-green);
+            text-decoration: none;
+            transition: 0.2s;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+        }
+        a:hover { color: var(--text-main); text-decoration: underline; }
+
+        header {
+            padding: 80px 8% 60px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+
+        .code-snippet {
+            font-family: var(--mono);
+            color: var(--accent-green);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        h1 { font-size: 2.6rem; font-weight: 600; letter-spacing: -1px; }
+
+        main { padding: 60px 8%; position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+
+        h2 {
+            font-family: var(--mono);
+            font-size: 1.3rem;
+            color: var(--accent-green);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+        }
+        h2::before { content: "> "; }
+
+        .section-block { margin-bottom: 70px; }
+
+        .lead {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            max-width: 760px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 12px 24px;
+            border: 1px solid var(--accent-green);
+            border-radius: 4px;
+            background: rgba(116, 108, 240, 0.05);
+            color: var(--accent-green);
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: lowercase;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+        }
+        .stat {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .stat .num { font-family: var(--mono); font-size: 2rem; color: var(--accent-green); display: block; line-height: 1.1; }
+        .stat .label { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; display: block; }
+
+        /* Theme bars */
+        .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 22px; font-family: var(--mono); font-size: 0.78rem; color: var(--text-muted); }
+        .legend .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+        .swatch.d-Executing             { background: var(--d-exec); }
+        .swatch.d-Influencing           { background: var(--d-infl); }
+        .swatch.d-RelationshipBuilding  { background: var(--d-rel); }
+        .swatch.d-StrategicThinking     { background: var(--d-stra); }
+
+        .bar-chart { display: grid; gap: 6px; }
+        .bar-row { display: grid; grid-template-columns: 170px 1fr 40px; align-items: center; gap: 14px; }
+        .bar-label { font-family: var(--mono); font-size: 0.8rem; color: var(--text-main); text-align: right; }
+        .bar-track { background: rgba(255,255,255,0.04); height: 16px; border-radius: 2px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0; transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .bar-value { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); text-align: right; }
+
+        .d-Executing            .bar-fill { background: var(--d-exec); }
+        .d-Influencing          .bar-fill { background: var(--d-infl); }
+        .d-RelationshipBuilding .bar-fill { background: var(--d-rel); }
+        .d-StrategicThinking    .bar-fill { background: var(--d-stra); }
+
+        /* Domain balance */
+        .domain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .domain-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 22px; }
+        .domain-card .name { font-family: var(--mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+        .domain-card .pct { font-size: 2.4rem; font-weight: 600; font-family: var(--mono); line-height: 1; }
+        .domain-card .base { font-size: 0.72rem; color: var(--text-muted); font-family: var(--mono); margin-top: 10px; }
+        .domain-card .meter { height: 6px; background: rgba(255,255,255,0.06); margin-top: 14px; border-radius: 2px; overflow: hidden; }
+        .domain-card .meter > div { height: 100%; width: 0; transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+        /* Coverage */
+        .coverage-block { margin-bottom: 26px; }
+        .coverage-block h4 { font-family: var(--mono); font-size: 0.9rem; color: var(--text-main); margin-bottom: 12px; font-weight: 500; }
+        .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+        .pill { font-family: var(--mono); font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; border: 1px solid currentColor; background: rgba(255,255,255,0.02); }
+        .empty-note { color: var(--text-muted); font-family: var(--mono); font-size: 0.82rem; }
+
+        /* Team grid */
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+        .team-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px 22px; }
+        .team-card h4 { font-family: var(--mono); font-size: 0.92rem; color: var(--accent-green); margin-bottom: 4px; font-weight: 500; }
+        .team-card .count { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); margin-bottom: 14px; }
+        .team-themes { list-style: none; padding: 0; margin: 0; }
+        .team-themes li { font-family: var(--mono); font-size: 0.85rem; padding: 8px 0; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .team-themes li:last-child { border-bottom: none; }
+        .team-themes .theme { font-weight: 500; }
+        .team-themes .meta-rank { color: var(--text-muted); font-size: 0.72rem; }
+
+        /* Roster */
+        .roster-wrap { overflow-x: auto; }
+        .roster { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.8rem; }
+        .roster th, .roster td { padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .roster th { color: var(--text-muted); text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.05em; font-weight: 500; }
+        .roster td.nickname { color: var(--text-main); font-weight: 500; }
+        .roster tr.you td.nickname { color: var(--accent-green); }
+        .roster tr.you { background: rgba(116, 108, 240, 0.04); }
+        .chip { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 0.72rem; margin: 2px 4px 2px 0; border: 1px solid; background: rgba(255,255,255,0.02); }
+
+        footer {
+            padding: 30px 8%;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-family: var(--mono);
+        }
+
+        @media (max-width: 700px) {
+            .bar-row { grid-template-columns: 120px 1fr 36px; gap: 10px; }
+            .bar-label { font-size: 0.72rem; }
+            h1 { font-size: 1.9rem; }
+        }
+
+        /* PCA plot */
+        #pca-plot {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        #pca-plot svg { display: block; }
+        .footnote {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 14px;
+            max-width: 760px;
+        }
+
+        /* Pair picker */
+        .picker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+            margin-bottom: 6px;
+            max-width: 720px;
+        }
+        .picker-grid label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .picker-grid select {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .picker-grid select:focus { outline: 1px solid var(--accent-green); }
+
+        .pair-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+        .pair-card h4 {
+            font-family: var(--mono);
+            font-size: 1rem;
+            color: var(--accent-green);
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+        .pair-section { margin-bottom: 22px; }
+        .pair-section:last-child { margin-bottom: 0; }
+        .pair-section .label {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+        .chip .contrib {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            margin-left: 5px;
+            opacity: 0.85;
+        }
+        .domain-bar {
+            display: grid;
+            grid-template-columns: 170px 1fr 36px;
+            gap: 12px;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .domain-bar .dname { font-family: var(--mono); font-size: 0.78rem; }
+        .domain-bar .dtrack { background: rgba(255,255,255,0.04); height: 13px; border-radius: 2px; overflow: hidden; }
+        .domain-bar .dfill { height: 100%; transition: width 0.5s ease; }
+        .domain-bar .dval { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); text-align: right; }
+
+        /* Top pairs table */
+        .pairs-table-wrap { overflow-x: auto; }
+        .pairs-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.8rem; }
+        .pairs-table th, .pairs-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .pairs-table th {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.68rem;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+        .pairs-table td.users { color: var(--text-main); font-weight: 500; white-space: nowrap; }
+        .pairs-table td.score { color: var(--accent-green); white-space: nowrap; }
+
+        /* Complementarities list */
+        .complement-list { list-style: none; padding: 0; margin: 0; }
+        .complement-list li {
+            display: grid;
+            grid-template-columns: 150px 1fr auto;
+            align-items: center;
+            gap: 14px;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-family: var(--mono);
+            font-size: 0.82rem;
+        }
+        .complement-list li:last-child { border-bottom: none; }
+        .complement-list .talent { font-weight: 500; }
+        .complement-list .ranks { color: var(--text-muted); font-size: 0.78rem; }
+        .complement-list .gap-val {
+            color: var(--accent-green);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        @media (max-width: 600px) {
+            .complement-list li {
+                grid-template-columns: 1fr;
+                gap: 4px;
+                padding: 12px 0;
+            }
+        }
+
+        /* Filled chip variant (used when all members share a talent) */
+        .chip.filled {
+            background: currentColor;
+            border-color: currentColor;
+        }
+        .chip.filled .chip-text { color: var(--bg); font-weight: 500; }
+        .chip.filled .contrib { color: var(--bg); opacity: 0.6; }
+
+        /* Top-pairs navigation */
+        .pairs-nav {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .nav-arrow {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--accent-green);
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .nav-arrow:hover:not(:disabled) {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 12px rgba(116, 108, 240, 0.25);
+        }
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .pairs-counter {
+            color: var(--text-muted);
+            font-family: var(--mono);
+            font-size: 0.8rem;
+        }
+
+        /* Best combinations for selected user */
+        .combo-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            margin: 28px 0 14px;
+        }
+        .combo-title:first-child { margin-top: 0; }
+        .combo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px;
+            counter-reset: combo;
+        }
+        .combo-list > li {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px 16px 56px;
+            margin-bottom: 10px;
+            position: relative;
+            counter-increment: combo;
+        }
+        .combo-list > li::before {
+            content: counter(combo);
+            position: absolute;
+            left: 22px;
+            top: 18px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        .combo-list .combo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .combo-list .combo-partners {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .combo-list .combo-stats {
+            font-family: var(--mono);
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            white-space: nowrap;
+        }
+        .combo-list .combo-chips {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .combo-gaps {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+        }
+        .combo-gaps-title {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        .combo-gaps .complement-list li {
+            padding: 6px 0;
+            font-size: 0.78rem;
+        }
+    </style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+<div class="dna-sidebar">10011010111110011111001101011111001111100110101111100111110011010111110011111001101011111001111</div>
+
+<header>
+    <div class="code-snippet">$ cd ./projects/gallup_strengths/</div>
+    <h1>Gallup Strengths Analysis</h1>
+    <div class="code-snippet" style="margin-top: 10px; opacity: 0.9;">
+        <span style="color:#f6d365;">print</span>(<span style="color:#43e97b;">"Static analysis of 23 CliftonStrengths assessments from the Internal audit department."</span>)
+    </div>
+    <a href="index.html" class="download-btn">
+        <i class="fa fa-arrow-left"></i> back to home
+    </a>
+</header>
+
+<main>
+
+<section class="section-block">
+    <h2>overview.json</h2>
+    <p class="lead">23 colleagues, each ranked across all 34 Gallup CliftonStrengths talents. The 34 talents are grouped into four domains &mdash; <span style="color: var(--d-exec)">Executing</span>, <span style="color: var(--d-infl)">Influencing</span>, <span style="color: var(--d-rel)">Relationship Building</span>, and <span style="color: var(--d-stra)">Strategic Thinking</span>. Names are anonymised; each person is identified by a numeric user ID.</p>
+    <div class="stats-grid" id="overview"></div>
+</section>
+
+<section class="section-block">
+    <h2>talent_frequency.bar</h2>
+    <p class="lead">For each talent, how many of the 23 people have it inside their top 5 signature strengths. Bars are coloured by domain, sorted descending.</p>
+    <div class="legend">
+        <span><span class="swatch d-Executing"></span>Executing</span>
+        <span><span class="swatch d-Influencing"></span>Influencing</span>
+        <span><span class="swatch d-RelationshipBuilding"></span>Relationship Building</span>
+        <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
+    </div>
+    <div id="theme-bars" class="bar-chart"></div>
+</section>
+
+<section class="section-block">
+    <h2>domain_balance.json</h2>
+    <p class="lead">Out of all top-5 slots in the department, what share lands in each domain? The <em>baseline</em> is what we'd expect if the 34 talents were drawn uniformly.</p>
+    <div class="domain-grid" id="domain-cards"></div>
+</section>
+
+<section class="section-block">
+    <h2>pca.svg</h2>
+    <p class="lead">Two-dimensional projection of each person's full 34-talent rank profile, computed via principal component analysis. Points that sit close together have similar strength profiles overall; distance reflects difference across all talents &mdash; not just top 5. Each dot is colored by its owner's dominant top-5 domain; my own dot (<span style="color: var(--accent-green); font-family: var(--mono);">User33</span>) is outlined.</p>
+    <div class="legend">
+        <span><span class="swatch d-Executing"></span>Executing</span>
+        <span><span class="swatch d-Influencing"></span>Influencing</span>
+        <span><span class="swatch d-RelationshipBuilding"></span>Relationship Building</span>
+        <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
+    </div>
+    <div id="pca-plot"></div>
+    <p class="footnote">Computed in-browser: each row is centered, the n&times;n Gram matrix is formed, and the top two eigenvectors are extracted by power iteration with deflation. The 2D coordinates are the corresponding singular-value-scaled scores. No external linear-algebra library.</p>
+</section>
+
+<section class="section-block">
+    <h2>coverage.log</h2>
+    <p class="lead">Talents that no one in the department has in their top 5 &mdash; and top 10. Useful to flag when assembling a team for a project that needs those strengths.</p>
+    <div id="coverage-output"></div>
+</section>
+
+<section class="section-block">
+    <h2>by_team.md</h2>
+    <p class="lead">Per-team collective strengths. For each unit, talents ranked by average rank across its members &mdash; lower average = stronger collective signal.</p>
+    <div class="team-grid" id="team-output"></div>
+</section>
+
+<section class="section-block">
+    <h2>pair_picker.js</h2>
+    <p class="lead">Pick two or three people to see their combined signature strengths, how the four domains split across the group, and which talents none of them have in their top 10 &mdash; useful when staffing an engagement and you want to check who's bringing what.</p>
+    <div class="picker-grid">
+        <div><label>Person A</label><select id="pick-a"></select></div>
+        <div><label>Person B</label><select id="pick-b"></select></div>
+        <div><label>Person C (optional)</label><select id="pick-c"></select></div>
+    </div>
+    <div id="pair-output"></div>
+</section>
+
+<section class="section-block">
+    <h2>best_combinations.json</h2>
+    <p class="lead">For one selected person, the top five most complementary 2-person staffing combinations &mdash; with the specific talents that complement each other inside each pairing. Pool is limited to operational team members; managers and the methodology owner (User01, User02, User04) are excluded. Filled chips mean both members have that talent in their own top 5.</p>
+    <div class="picker-grid" style="max-width: 360px;">
+        <div><label>Selected person</label><select id="best-for-user"></select></div>
+    </div>
+    <div id="best-combos-output"></div>
+</section>
+
+<section class="section-block">
+    <h2>top_complementary_pairs.csv</h2>
+    <p class="lead">All 253 possible pairs ranked by how many <em>unique</em> talents appear in their combined top 5 (max 10 if no overlap). Filled chips mean both members have that talent in their own top 5. Use the arrows to scroll through the ranking.</p>
+    <div class="pairs-nav">
+        <button class="nav-arrow" id="pairs-prev" aria-label="previous page"><i class="fa fa-arrow-left"></i></button>
+        <button class="nav-arrow" id="pairs-next" aria-label="next page"><i class="fa fa-arrow-right"></i></button>
+        <span class="pairs-counter" id="pairs-counter"></span>
+    </div>
+    <div class="pairs-table-wrap"><table class="pairs-table" id="top-pairs"></table></div>
+</section>
+
+<section class="section-block">
+    <h2>roster.tsv</h2>
+    <p class="lead">Each person's top five talents. My own row (<span style="color: var(--accent-green); font-family: var(--mono);">User33</span>) is highlighted.</p>
+    <div class="roster-wrap"><table class="roster" id="roster"></table></div>
+</section>
+
+</main>
+
+<footer>
+    <p>Source data: anonymised departmental CliftonStrengths results. Analysis computed client-side in vanilla JavaScript &mdash; no external libraries.</p>
+</footer>
+
+<script>
+const themes = ['Achiever','Arranger','Belief','Consistency','Deliberative','Discipline','Focus','Responsibility','Restorative','Activator','Command','Communication','Competition','Maximizer','Self-Assurance','Significance','Woo','Adaptability','Connectedness','Developer','Empathy','Harmony','Includer','Individualization','Positivity','Relator','Analytical','Context','Futuristic','Ideation','Input','Intellection','Learner','Strategic'];
+
+const domains = {
+    'Executing': ['Achiever','Arranger','Belief','Consistency','Deliberative','Discipline','Focus','Responsibility','Restorative'],
+    'Influencing': ['Activator','Command','Communication','Competition','Maximizer','Self-Assurance','Significance','Woo'],
+    'Relationship Building': ['Adaptability','Connectedness','Developer','Empathy','Harmony','Includer','Individualization','Positivity','Relator'],
+    'Strategic Thinking': ['Analytical','Context','Futuristic','Ideation','Input','Intellection','Learner','Strategic']
+};
+
+const themeDomain = {};
+Object.entries(domains).forEach(([d, ts]) => ts.forEach(t => themeDomain[t] = d));
+
+const domainClass = {
+    'Executing': 'd-Executing',
+    'Influencing': 'd-Influencing',
+    'Relationship Building': 'd-RelationshipBuilding',
+    'Strategic Thinking': 'd-StrategicThinking'
+};
+const domainVar = {
+    'Executing': '--d-exec',
+    'Influencing': '--d-infl',
+    'Relationship Building': '--d-rel',
+    'Strategic Thinking': '--d-stra'
+};
+
+const rows = [
+    ['User01','general_manager',2,3,21,27,13,26,10,7,11,9,24,6,16,23,18,19,20,34,28,31,29,12,22,5,30,1,4,25,14,17,32,33,8,15],
+    ['User02','dep1_manager',18,14,12,33,32,26,24,13,30,23,28,25,29,4,19,31,20,34,8,6,16,15,27,1,11,2,10,7,21,5,17,9,3,22],
+    ['User04','methodology',2,16,14,21,18,3,4,9,27,23,29,33,8,11,22,7,30,28,34,1,10,5,32,6,13,17,26,25,15,31,24,19,12,20],
+    ['User11','dep1_team1',33,25,12,4,7,18,28,6,11,34,31,24,30,17,29,19,22,5,21,8,3,1,26,13,27,2,16,9,14,20,15,10,23,32],
+    ['User12','dep1_team1',3,7,10,31,30,23,4,5,18,21,16,6,25,1,14,19,12,20,33,17,28,32,26,8,27,13,15,34,22,11,29,24,2,9],
+    ['User13','dep1_team1',2,12,11,3,26,13,16,10,8,34,29,32,24,17,30,28,31,27,21,1,7,9,14,19,15,5,4,25,33,20,23,22,6,18],
+    ['User14','dep1_team1',25,12,10,7,8,4,23,6,14,19,18,32,30,28,11,15,34,21,22,9,24,1,27,3,33,2,5,13,16,31,20,26,17,29],
+    ['User21','dep1_team2',34,4,13,29,25,23,18,6,1,22,30,9,10,32,28,27,3,33,21,14,20,24,5,7,8,17,26,16,11,2,12,31,19,15],
+    ['User22','dep1_team2',12,29,1,14,15,5,16,17,19,33,28,26,13,21,7,31,32,20,2,6,10,9,34,18,30,3,11,4,8,27,25,23,24,22],
+    ['User23','dep1_team2',3,20,17,8,13,1,7,4,24,22,30,28,31,29,15,27,12,34,33,11,16,10,23,18,14,25,9,6,5,32,19,21,2,26],
+    ['User24','dep1_team2',8,26,3,16,4,28,11,1,22,27,24,23,32,34,29,31,33,12,25,14,19,5,15,20,30,17,6,9,10,13,21,18,2,7],
+    ['User31','dep1_team3',6,11,16,20,21,33,14,15,24,27,31,13,28,5,19,25,7,9,10,23,30,17,32,18,26,4,3,12,34,22,2,8,1,29],
+    ['User32','dep1_team3',21,25,4,29,10,28,16,11,27,26,24,32,20,2,22,19,34,23,8,12,31,13,33,14,18,3,6,9,30,7,15,1,5,17],
+    ['User33','dep1_team3',1,7,14,22,23,21,4,6,30,18,28,26,9,25,19,12,31,32,33,17,13,27,29,15,24,2,16,34,3,11,10,20,8,5],
+    ['User41','dep2_team1',7,26,22,2,8,13,14,4,19,34,33,31,16,17,29,12,30,9,25,10,15,3,28,24,27,1,11,21,5,32,18,6,23,20],
+    ['User42','dep2_team1',3,2,28,33,32,30,14,23,17,11,21,6,27,22,9,18,12,20,26,10,25,31,29,4,13,15,16,34,19,7,8,24,1,5],
+    ['User43','dep2_team1',33,20,3,24,26,18,17,5,30,29,27,25,31,23,9,21,22,19,28,7,12,11,8,2,13,1,16,15,4,6,34,32,10,14],
+    ['User44','dep2_team1',22,34,9,2,14,13,26,8,25,24,31,28,21,12,33,30,16,3,4,20,15,1,11,19,10,18,29,6,7,23,17,5,27,32],
+    ['User45','dep2_team1',33,27,17,1,6,11,21,13,29,19,26,25,32,14,31,30,20,18,7,8,9,3,34,24,12,5,16,15,2,22,10,28,23,4],
+    ['User51','dep2_team2',9,3,33,34,22,26,6,13,16,19,23,17,8,28,12,7,20,18,27,14,30,29,31,1,24,2,21,25,15,10,11,32,4,5],
+    ['User52','dep2_team2',13,27,21,32,18,28,23,25,19,22,24,14,11,31,26,20,30,7,9,2,1,16,34,3,5,4,15,33,29,8,17,6,10,12],
+    ['User53','dep2_team2',29,14,17,30,34,33,28,15,10,4,24,8,19,13,16,27,3,7,32,9,6,20,18,21,5,1,23,31,12,2,22,25,11,26],
+    ['User54','dep2_team2',18,20,17,5,7,16,19,11,10,14,13,24,32,34,27,22,28,12,26,8,2,3,30,9,31,1,4,6,33,25,23,15,29,21]
+];
+
+const people = rows.map(r => {
+    const ranks = {};
+    themes.forEach((t, i) => { ranks[t] = r[2 + i]; });
+    const ordered = themes.slice().sort((a, b) => ranks[a] - ranks[b]);
+    return { nickname: r[0], team: r[1], ranks, ordered };
+});
+
+const N = people.length;
+const TOP = 5;
+
+/* ---------- overview ---------- */
+const teams = [...new Set(people.map(p => p.team))];
+document.getElementById('overview').innerHTML = [
+    [N, 'members'],
+    [teams.length, 'units'],
+    [4, 'domains']
+].map(([n, l]) => `<div class="stat"><span class="num">${n}</span><span class="label">${l}</span></div>`).join('');
+
+/* ---------- theme frequency ---------- */
+const freq = {};
+themes.forEach(t => freq[t] = 0);
+people.forEach(p => themes.forEach(t => { if (p.ranks[t] <= TOP) freq[t]++; }));
+const sortedThemes = themes.slice().sort((a, b) => freq[b] - freq[a]);
+const maxF = Math.max(...Object.values(freq));
+
+document.getElementById('theme-bars').innerHTML = sortedThemes.map(t => {
+    const w = maxF === 0 ? 0 : (freq[t] / maxF) * 100;
+    return `<div class="bar-row ${domainClass[themeDomain[t]]}">
+        <span class="bar-label">${t}</span>
+        <div class="bar-track"><div class="bar-fill" data-w="${w}"></div></div>
+        <span class="bar-value">${freq[t]}</span>
+    </div>`;
+}).join('');
+
+/* ---------- domain balance ---------- */
+const totalSlots = N * TOP;
+const domainCounts = { 'Executing': 0, 'Influencing': 0, 'Relationship Building': 0, 'Strategic Thinking': 0 };
+people.forEach(p => themes.forEach(t => { if (p.ranks[t] <= TOP) domainCounts[themeDomain[t]]++; }));
+
+const baseline = { 'Executing': 9/34, 'Influencing': 8/34, 'Relationship Building': 9/34, 'Strategic Thinking': 8/34 };
+
+document.getElementById('domain-cards').innerHTML = Object.keys(domains).map(d => {
+    const pct = domainCounts[d] / totalSlots;
+    const base = baseline[d];
+    const cssVar = domainVar[d];
+    const delta = ((pct - base) * 100);
+    const deltaTxt = (delta >= 0 ? '+' : '') + delta.toFixed(1) + ' pp vs baseline';
+    return `<div class="domain-card">
+        <div class="name" style="color: var(${cssVar})">${d}</div>
+        <div class="pct" style="color: var(${cssVar})">${(pct*100).toFixed(1)}%</div>
+        <div class="base">${domainCounts[d]} / ${totalSlots} slots &nbsp;·&nbsp; baseline ${(base*100).toFixed(1)}% &nbsp;·&nbsp; ${deltaTxt}</div>
+        <div class="meter"><div data-w="${(pct*100).toFixed(2)}" style="background: var(${cssVar});"></div></div>
+    </div>`;
+}).join('');
+
+/* ---------- coverage gaps ---------- */
+const missingAt = (n) => themes.filter(t => !people.some(p => p.ranks[t] <= n));
+const renderPills = (arr) => arr.length === 0
+    ? `<span class="empty-note">&mdash; every talent is represented &mdash;</span>`
+    : arr.map(t => `<span class="pill" style="color: var(${domainVar[themeDomain[t]]})">${t}</span>`).join('');
+
+const m5 = missingAt(5);
+const m10 = missingAt(10);
+document.getElementById('coverage-output').innerHTML = `
+    <div class="coverage-block">
+        <h4>No one has these in their top 5 &nbsp;(${m5.length} of 34)</h4>
+        <div class="pills">${renderPills(m5)}</div>
+    </div>
+    <div class="coverage-block">
+        <h4>No one has these in their top 10 &nbsp;(${m10.length} of 34)</h4>
+        <div class="pills">${renderPills(m10)}</div>
+    </div>
+`;
+
+/* ---------- by team ---------- */
+const teamGroups = [
+    { name: 'management & methodology', teams: ['general_manager', 'dep1_manager', 'methodology'] },
+    { name: 'dep1_team1', teams: ['dep1_team1'] },
+    { name: 'dep1_team2', teams: ['dep1_team2'] },
+    { name: 'dep1_team3', teams: ['dep1_team3'] },
+    { name: 'dep2_team1', teams: ['dep2_team1'] },
+    { name: 'dep2_team2', teams: ['dep2_team2'] }
+];
+document.getElementById('team-output').innerHTML = teamGroups.map(group => {
+    const members = people.filter(p => group.teams.includes(p.team));
+    if (members.length === 0) return '';
+    const sumRank = {};
+    themes.forEach(t => sumRank[t] = members.reduce((s, p) => s + p.ranks[t], 0));
+    const top = themes.slice().sort((a, b) => sumRank[a] - sumRank[b]).slice(0, 5);
+    return `<div class="team-card">
+        <h4>${group.name}</h4>
+        <div class="count">${members.length} member${members.length === 1 ? '' : 's'} &middot; ${members.map(m => m.nickname).join(', ')}</div>
+        <ul class="team-themes">
+            ${top.map(t => {
+                const avg = (sumRank[t] / members.length).toFixed(1);
+                return `<li><span class="theme" style="color: var(${domainVar[themeDomain[t]]})">${t}</span><span class="meta-rank">avg rank ${avg}</span></li>`;
+            }).join('')}
+        </ul>
+    </div>`;
+}).join('');
+
+/* ---------- roster ---------- */
+document.getElementById('roster').innerHTML = `
+    <thead>
+        <tr><th>User</th><th>Top 5 talents (rank 1 &rarr; 5)</th></tr>
+    </thead>
+    <tbody>
+        ${people.map(p => {
+            const isYou = p.nickname === 'User33';
+            const top = p.ordered.slice(0, 5);
+            return `<tr${isYou ? ' class="you"' : ''}>
+                <td class="nickname">${p.nickname}${isYou ? ' &nbsp;(me)' : ''}</td>
+                <td>${top.map(t => `<span class="chip" style="color: var(${domainVar[themeDomain[t]]})">${t}</span>`).join('')}</td>
+            </tr>`;
+        }).join('')}
+    </tbody>
+`;
+
+/* ---------- animate bars in ---------- */
+requestAnimationFrame(() => {
+    document.querySelectorAll('[data-w]').forEach(el => {
+        el.style.width = el.dataset.w + '%';
+    });
+});
+
+/* ---------- PCA (vanilla JS, power iteration on Gram matrix) ---------- */
+function matvec(M, v) { return M.map(r => r.reduce((s, x, j) => s + x*v[j], 0)); }
+function transposeM(A) { return A[0].map((_, j) => A.map(r => r[j])); }
+function matmulM(A, B) {
+    const m = A.length, k = B.length, n = B[0].length;
+    const C = Array.from({length: m}, () => Array(n).fill(0));
+    for (let i = 0; i < m; i++)
+        for (let l = 0; l < k; l++) {
+            const a = A[i][l];
+            for (let j = 0; j < n; j++) C[i][j] += a * B[l][j];
+        }
+    return C;
+}
+function powerIter(M, maxIter = 500, tol = 1e-12) {
+    const n = M.length;
+    let v = Array.from({length: n}, (_, i) => Math.sin(i * 1.13 + 0.41));
+    const norm0 = Math.sqrt(v.reduce((s, x) => s + x*x, 0));
+    v = v.map(x => x / norm0);
+    let lam = 0;
+    for (let it = 0; it < maxIter; it++) {
+        const w = matvec(M, v);
+        const wn = Math.sqrt(w.reduce((s, x) => s + x*x, 0));
+        if (wn < 1e-15) break;
+        const vNew = w.map(x => x / wn);
+        const newLam = w.reduce((s, x, j) => s + x * v[j], 0);
+        if (Math.abs(newLam - lam) < tol) { v = vNew; lam = newLam; break; }
+        v = vNew; lam = newLam;
+    }
+    // Sign convention: largest |coord| is positive (so plot is stable across runs)
+    const maxI = v.reduce((mi, x, i) => Math.abs(x) > Math.abs(v[mi]) ? i : mi, 0);
+    if (v[maxI] < 0) v = v.map(x => -x);
+    return { vec: v, val: lam };
+}
+
+// Feature matrix: invert rank so higher = stronger (rank 1 -> 34, rank 34 -> 1)
+const Xraw = people.map(p => themes.map(t => 35 - p.ranks[t]));
+const colMeans = themes.map((_, j) => Xraw.reduce((s, r) => s + r[j], 0) / N);
+const Xc = Xraw.map(r => r.map((v, j) => v - colMeans[j]));
+
+// Gram matrix Xc * Xc^T  (N x N) -- eigenvectors give left singular vectors
+const Gram = matmulM(Xc, transposeM(Xc));
+const trGram = Gram.reduce((s, r, i) => s + r[i], 0);
+
+const pc1 = powerIter(Gram);
+// Deflate
+const G2 = Gram.map((r, i) => r.map((x, j) => x - pc1.val * pc1.vec[i] * pc1.vec[j]));
+const pc2 = powerIter(G2);
+
+const pcaScores = people.map((_, i) => [
+    pc1.vec[i] * Math.sqrt(Math.max(pc1.val, 0)),
+    pc2.vec[i] * Math.sqrt(Math.max(pc2.val, 0))
+]);
+const varExp1 = (pc1.val / trGram * 100).toFixed(1);
+const varExp2 = (pc2.val / trGram * 100).toFixed(1);
+
+function dominantDomain(p) {
+    const counts = { 'Executing': 0, 'Influencing': 0, 'Relationship Building': 0, 'Strategic Thinking': 0 };
+    p.ordered.slice(0, 5).forEach(t => counts[themeDomain[t]]++);
+    return Object.keys(counts).reduce((a, b) => counts[a] >= counts[b] ? a : b);
+}
+
+(function renderPCA() {
+    const xs = pcaScores.map(s => s[0]);
+    const ys = pcaScores.map(s => s[1]);
+    const xmin = Math.min(...xs), xmax = Math.max(...xs);
+    const ymin = Math.min(...ys), ymax = Math.max(...ys);
+    const W = 760, H = 460, PAD = 60;
+    const sx = v => PAD + (v - xmin) / (xmax - xmin || 1) * (W - 2*PAD);
+    const sy = v => H - PAD - (v - ymin) / (ymax - ymin || 1) * (H - 2*PAD);
+
+    const dots = people.map((p, i) => {
+        const d = dominantDomain(p);
+        const cssVar = domainVar[d];
+        const isYou = p.nickname === 'User33';
+        const cx = sx(xs[i]), cy = sy(ys[i]);
+        return `
+            <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isYou ? 8 : 5}" fill="var(${cssVar})" opacity="${isYou ? 1 : 0.78}"${isYou ? ' stroke="#746cf0" stroke-width="2"' : ''}>
+                <title>${p.nickname} — dominant: ${d}</title>
+            </circle>
+            <text x="${(cx + 10).toFixed(1)}" y="${(cy + 4).toFixed(1)}" fill="${isYou ? '#746cf0' : 'rgba(230,237,243,0.65)'}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="${isYou ? '600' : '400'}">${p.nickname}</text>
+        `;
+    }).join('');
+
+    document.getElementById('pca-plot').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width: ${W}px;">
+        <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD}" y2="${H-PAD}" stroke="rgba(255,255,255,0.12)"/>
+        <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H-PAD}" stroke="rgba(255,255,255,0.12)"/>
+        <text x="${W/2}" y="${H-12}" fill="rgba(230,237,243,0.6)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle">PC1 &nbsp;·&nbsp; ${varExp1}% variance</text>
+        <text x="20" y="${H/2}" fill="rgba(230,237,243,0.6)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" transform="rotate(-90 20 ${H/2})">PC2 &nbsp;·&nbsp; ${varExp2}% variance</text>
+        ${dots}
+    </svg>`;
+})();
+
+/* ---------- pair picker ---------- */
+const userOpts = people.map(p => `<option value="${p.nickname}">${p.nickname} (${p.team})</option>`).join('');
+['pick-a', 'pick-b', 'pick-c'].forEach((id, idx) => {
+    const el = document.getElementById(id);
+    const placeholder = idx === 2 ? '— none —' : '— pick —';
+    el.innerHTML = `<option value="">${placeholder}</option>${userOpts}`;
+});
+document.getElementById('pick-a').value = 'User33';
+document.getElementById('pick-b').value = 'User22';
+
+function renderPair() {
+    const ids = ['pick-a', 'pick-b', 'pick-c']
+        .map(id => document.getElementById(id).value)
+        .filter(Boolean);
+    const uniqueIds = [...new Set(ids)];
+    const out = document.getElementById('pair-output');
+    if (uniqueIds.length < 2) {
+        out.innerHTML = '<p class="empty-note" style="margin-top: 18px;">Pick at least two distinct people.</p>';
+        return;
+    }
+    const group = uniqueIds.map(id => people.find(p => p.nickname === id));
+
+    // Owners for top-5 and top-10 themes
+    const owners5 = {}, owners10 = {};
+    group.forEach(m => {
+        m.ordered.slice(0, 5).forEach(t => (owners5[t] = owners5[t] || []).push(m.nickname));
+        m.ordered.slice(0, 10).forEach(t => (owners10[t] = owners10[t] || []).push(m.nickname));
+    });
+    const combined5 = Object.keys(owners5);
+    const domSet5 = new Set(combined5.map(t => themeDomain[t]));
+    const missingDomains = Object.keys(domains).filter(d => !domSet5.has(d));
+
+    // Blind spots: 5 talents where even the best-ranked person in the group ranks them weakly
+    const blindspots = themes
+        .map(t => ({ talent: t, minRank: Math.min(...group.map(m => m.ranks[t])) }))
+        .sort((a, b) => b.minRank - a.minRank)
+        .slice(0, 5);
+
+    // Best complementarities: one member has the talent in top 5, another has it ranked much lower
+    const complementarities = themes
+        .map(t => {
+            const ranks = group.map(m => ({ name: m.nickname, rank: m.ranks[t] }));
+            ranks.sort((a, b) => a.rank - b.rank);
+            return { talent: t, ranks, gap: ranks[ranks.length - 1].rank - ranks[0].rank };
+        })
+        .filter(c => c.ranks[0].rank <= 5 && c.gap >= 15)
+        .sort((a, b) => b.gap - a.gap)
+        .slice(0, 5);
+
+    // Domain mix of combined top-5
+    const domCount = { 'Executing': 0, 'Influencing': 0, 'Relationship Building': 0, 'Strategic Thinking': 0 };
+    combined5.forEach(t => { domCount[themeDomain[t]] += owners5[t].length; });
+    const slotTotal = group.length * 5;
+
+    const orderByDomain = (arr) => arr.slice().sort((a, b) =>
+        Object.keys(domains).indexOf(themeDomain[a]) - Object.keys(domains).indexOf(themeDomain[b]) || a.localeCompare(b)
+    );
+
+    out.innerHTML = `
+        <div class="pair-card">
+            <h4>${uniqueIds.join('  +  ')}</h4>
+
+            <div class="pair-section">
+                <div class="label">Combined signature strengths &nbsp;·&nbsp; ${combined5.length} unique talents &nbsp;·&nbsp; ${domSet5.size} of 4 domains</div>
+                <div>${orderByDomain(combined5).map(t => {
+                    const own = owners5[t];
+                    const isAll = own.length === group.length;
+                    const tag = isAll ? ' all' : ' ' + own.map(n => n.replace('User','')).join('·');
+                    return `<span class="chip${isAll ? ' filled' : ''}" style="color: var(${domainVar[themeDomain[t]]})"><span class="chip-text">${t}</span><span class="contrib">${tag}</span></span>`;
+                }).join('')}</div>
+            </div>
+
+            <div class="pair-section">
+                <div class="label">Best complementarities &nbsp;·&nbsp; one person's top-5 strength is another's weak spot</div>
+                ${complementarities.length === 0
+                    ? '<span class="empty-note">— no strong contrasts to highlight in this combination (rank gaps under 15) —</span>'
+                    : `<ul class="complement-list">${complementarities.map(c => `
+                        <li>
+                            <span class="talent" style="color: var(${domainVar[themeDomain[c.talent]]})">${c.talent}</span>
+                            <span class="ranks">${c.ranks.map(r => `${r.name} #${r.rank}`).join(' &rarr; ')}</span>
+                            <span class="gap-val">gap ${c.gap}</span>
+                        </li>
+                    `).join('')}</ul>`}
+            </div>
+
+            <div class="pair-section">
+                <div class="label">Domain mix of the combined top 5 (${slotTotal} slots)</div>
+                ${Object.keys(domains).map(d => {
+                    const c = domCount[d];
+                    const pct = slotTotal === 0 ? 0 : (c / slotTotal * 100);
+                    return `<div class="domain-bar">
+                        <span class="dname" style="color: var(${domainVar[d]});">${d}</span>
+                        <div class="dtrack"><div class="dfill" style="width: ${pct.toFixed(1)}%; background: var(${domainVar[d]});"></div></div>
+                        <span class="dval">${c}</span>
+                    </div>`;
+                }).join('')}
+            </div>
+
+            <div class="pair-section">
+                <div class="label">${missingDomains.length === 0 ? 'Domain coverage' : 'Domains NOT in combined top 5 (' + missingDomains.length + ' of 4)'}</div>
+                ${missingDomains.length === 0
+                    ? '<span class="empty-note">All four domains are represented in the combined top 5.</span>'
+                    : '<div class="pills">' + missingDomains.map(d => `<span class="pill" style="color: var(${domainVar[d]})">${d}</span>`).join('') + '</div>'}
+            </div>
+
+            <div class="pair-section">
+                <div class="label">Blind spots &nbsp;·&nbsp; 5 weakest talents in this combination (best rank in the group shown)</div>
+                <div class="pills">${blindspots.map(b => `<span class="pill" style="color: var(${domainVar[themeDomain[b.talent]]})">${b.talent} <span style="opacity: 0.6;">·#${b.minRank}</span></span>`).join('')}</div>
+            </div>
+        </div>
+    `;
+}
+['pick-a', 'pick-b', 'pick-c'].forEach(id => document.getElementById(id).addEventListener('change', renderPair));
+renderPair();
+
+/* ---------- best combinations for selected user ---------- */
+const excludedTeams = new Set(['general_manager', 'dep1_manager', 'methodology']);
+const eligiblePool = people.filter(p => !excludedTeams.has(p.team));
+
+const bestForSel = document.getElementById('best-for-user');
+bestForSel.innerHTML = eligiblePool.map(p => `<option value="${p.nickname}">${p.nickname} (${p.team})</option>`).join('');
+bestForSel.value = eligiblePool.some(p => p.nickname === 'User33') ? 'User33' : eligiblePool[0].nickname;
+
+function renderBestCombos() {
+    const selectedNick = bestForSel.value;
+    const me = people.find(p => p.nickname === selectedNick);
+    if (!me) return;
+    const others = eligiblePool.filter(p => p.nickname !== selectedNick);
+    const myTop = new Set(me.ordered.slice(0, 5));
+
+    // 2-person combinations: me + each eligible partner
+    const bcPairs = others.map(p => {
+        const pTop = new Set(p.ordered.slice(0, 5));
+        const union = [...new Set([...myTop, ...pTop])];
+        const intersection = [...myTop].filter(t => pTop.has(t));
+        const doms = new Set(union.map(t => themeDomain[t]));
+
+        // Complementary gaps: one has the talent in top 5, the other ranks it much lower
+        const pair = [me, p];
+        const gaps = themes
+            .map(t => {
+                const ranks = pair.map(m => ({ name: m.nickname, rank: m.ranks[t] }));
+                ranks.sort((x, y) => x.rank - y.rank);
+                return { talent: t, ranks, gap: ranks[1].rank - ranks[0].rank };
+            })
+            .filter(g => g.ranks[0].rank <= 5 && g.gap >= 15)
+            .sort((x, y) => y.gap - x.gap)
+            .slice(0, 5);
+
+        return { partner: p.nickname, union, intersection, unique: union.length, domains: doms.size, gaps };
+    });
+    bcPairs.sort((a, b) => b.unique - a.unique || b.domains - a.domains);
+    const topPairs = bcPairs.slice(0, 5);
+
+    const sortByDomainOrder = (arr) => arr.slice().sort((x, y) =>
+        Object.keys(domains).indexOf(themeDomain[x]) - Object.keys(domains).indexOf(themeDomain[y]) || x.localeCompare(y)
+    );
+
+    const renderRow = (combo) => {
+        const sharedSet = new Set(combo.intersection);
+        return `<li>
+            <div class="combo-header">
+                <span class="combo-partners">${selectedNick} + ${combo.partner}</span>
+                <span class="combo-stats">${combo.unique}/10 unique &middot; ${combo.domains}/4 domains</span>
+            </div>
+            <div class="combo-chips">${sortByDomainOrder(combo.union).map(t => {
+                const filled = sharedSet.has(t);
+                return `<span class="chip${filled ? ' filled' : ''}" style="color: var(${domainVar[themeDomain[t]]})"><span class="chip-text">${t}</span></span>`;
+            }).join('')}</div>
+            ${combo.gaps.length > 0 ? `
+                <div class="combo-gaps">
+                    <div class="combo-gaps-title">Complementary gaps &nbsp;&middot;&nbsp; one is strong, the other is weak</div>
+                    <ul class="complement-list">${combo.gaps.map(g => `<li>
+                        <span class="talent" style="color: var(${domainVar[themeDomain[g.talent]]})">${g.talent}</span>
+                        <span class="ranks">${g.ranks.map(r => r.name + ' #' + r.rank).join(' &rarr; ')}</span>
+                        <span class="gap-val">gap ${g.gap}</span>
+                    </li>`).join('')}</ul>
+                </div>
+            ` : ''}
+        </li>`;
+    };
+
+    document.getElementById('best-combos-output').innerHTML =
+        `<ol class="combo-list">${topPairs.map(renderRow).join('')}</ol>`;
+}
+bestForSel.addEventListener('change', renderBestCombos);
+renderBestCombos();
+
+/* ---------- top complementary pairs ---------- */
+const allPairs = [];
+for (let i = 0; i < N; i++) {
+    for (let j = i + 1; j < N; j++) {
+        const a = people[i], b = people[j];
+        const aTop = a.ordered.slice(0, 5);
+        const bTop = b.ordered.slice(0, 5);
+        const bTopSet = new Set(bTop);
+        const union = [...new Set([...aTop, ...bTop])];
+        const intersection = aTop.filter(t => bTopSet.has(t));
+        const domSet = new Set(union.map(t => themeDomain[t]));
+        allPairs.push({
+            a: a.nickname, b: b.nickname,
+            unique: union.length,
+            domains: domSet.size,
+            union,
+            intersection
+        });
+    }
+}
+allPairs.sort((x, y) => y.unique - x.unique || y.domains - x.domains || x.a.localeCompare(y.a));
+
+const PAIRS_PER_PAGE = 10;
+let pairPage = 0;
+const totalPairPages = Math.ceil(allPairs.length / PAIRS_PER_PAGE);
+
+function renderPairsPage() {
+    const start = pairPage * PAIRS_PER_PAGE;
+    const end = Math.min(start + PAIRS_PER_PAGE, allPairs.length);
+    const slice = allPairs.slice(start, end);
+
+    document.getElementById('pairs-counter').textContent = `${start + 1}–${end} of ${allPairs.length}`;
+    document.getElementById('pairs-prev').disabled = pairPage === 0;
+    document.getElementById('pairs-next').disabled = pairPage >= totalPairPages - 1;
+
+    document.getElementById('top-pairs').innerHTML = `
+        <thead>
+            <tr>
+                <th style="width: 36px;">#</th>
+                <th>Pair</th>
+                <th style="width: 100px;">Unique talents</th>
+                <th style="width: 90px;">Domains</th>
+                <th>Combined top 5</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${slice.map((p, i) => `
+                <tr>
+                    <td style="color: var(--text-muted)">${start + i + 1}</td>
+                    <td class="users">${p.a} &times; ${p.b}</td>
+                    <td class="score">${p.unique} / 10</td>
+                    <td class="score">${p.domains} / 4</td>
+                    <td>${p.union.sort((x, y) =>
+                        Object.keys(domains).indexOf(themeDomain[x]) - Object.keys(domains).indexOf(themeDomain[y])
+                    ).map(t => {
+                        const filled = p.intersection.includes(t);
+                        return `<span class="chip${filled ? ' filled' : ''}" style="color: var(${domainVar[themeDomain[t]]})"><span class="chip-text">${t}</span></span>`;
+                    }).join('')}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    `;
+}
+
+document.getElementById('pairs-prev').addEventListener('click', () => {
+    if (pairPage > 0) { pairPage--; renderPairsPage(); }
+});
+document.getElementById('pairs-next').addEventListener('click', () => {
+    if (pairPage < totalPairPages - 1) { pairPage++; renderPairsPage(); }
+});
+
+renderPairsPage();
+
+/* ---------- scroll progress + mouse glow ---------- */
+window.onscroll = function() {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    document.getElementById("scroll-progress").style.width = ((winScroll / height) * 100) + "%";
+};
+window.addEventListener('mousemove', e => {
+    document.body.style.setProperty('--mouse-x', e.clientX + 'px');
+    document.body.style.setProperty('--mouse-y', e.clientY + 'px');
+});
+</script>
+
+</body>
+</html>

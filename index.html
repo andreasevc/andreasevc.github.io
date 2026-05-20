@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrea Ševčovičová | Portfolio</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --dark-green: #b43f82;
+            --accent-green: #746cf0;
+            --projects-accent: #f3eef1;
+            --link-green: #d6589d;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --border: #30363d;
+            --mono: 'JetBrains Mono', monospace;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+
+            --d-exec: #b388ff;
+            --d-infl: #ff9966;
+            --d-rel:  #64b5f6;
+            --d-stra: #81c784;
+        }
+
+
+        
+
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: var(--accent-green);
+            z-index: 2000; width: 0%;
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .dna-sidebar {
+            position: fixed; left: 10px; top: 0; bottom: 0;
+            width: 20px; font-family: var(--mono); font-size: 20px;
+            color: var(--dark-green); opacity: 0.3; overflow: hidden;
+            user-select: none; pointer-events: none; z-index: 0;
+            writing-mode: vertical-rl; text-orientation: upright;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: radial-gradient(
+                800px circle at var(--mouse-x) var(--mouse-y),
+                rgba(189, 63, 178, 0.096),
+                transparent 85%
+            ), var(--bg);
+            background-attachment: fixed;
+        }
+
+        a {
+            color: var(--link-green);
+            text-decoration: none;
+            transition: 0.2s;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+        }
+
+        a:hover {
+            color: var(--text-main);
+            text-decoration: underline;
+        }
+
+        header {
+            padding: 100px 10%;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+
+        .code-snippet {
+            font-family: var(--mono);
+            color: var(--accent-green);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .typewriter { font-family: var(--mono); color: var(--text-muted); min-height: 1.5em; }
+
+        h1 { font-size: 3rem; font-weight: 600; letter-spacing: -1px; }
+
+        .container { display: grid; grid-template-columns: 2fr 1fr; gap: 50px; padding: 60px 10%; position: relative; z-index: 1;}
+
+        h2 {
+            font-family: var(--mono);
+            font-size: 1.3rem;
+            color: var(--accent-green);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+        h2::before { content: "> "; }
+
+        .section-block { margin-bottom: 60px; }
+
+        .exp-item {
+            position: relative; padding: 20px; padding-left: 35px;
+            border-left: 1px solid var(--border); margin-bottom: 30px;
+            background: transparent; border-radius: 0 8px 8px 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .exp-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 1px solid var(--accent-green);
+            transform: translateX(10px);
+        }
+
+        .exp-item::before {
+            content: ""; position: absolute; left: -5px; top: 25px; width: 9px; height: 9px;
+            background: var(--accent-green); border-radius: 50%;
+            box-shadow: 0 0 0 rgba(226, 142, 194, 0.4);
+            transition: box-shadow 0.3s;
+        }
+
+        .exp-item:hover::before { box-shadow: 0 0 15px var(--accent-green); }
+
+        .exp-item h3 { font-size: 1.2rem; color: var(--text-main); margin-bottom: 4px; }
+        .exp-item .meta { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px; }
+
+        .tag {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 5px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .tag.lang  { border-color: #65B8FF; color: #65B8FF; }
+        .tag.bio   { border-color: #65CDCF; color: #65CDCF; }
+        .tag.ml    { border-color: #FDA4B6; color: #FDA4B6; }
+        .tag.infra { border-color: #6CD99D; color: #6CD99D; }
+
+        .tag.lang:hover  { background: #65B8FF; color: #000; box-shadow: 0 0 15px #65B8FF; }
+        .tag.bio:hover   { background: #65CDCF; color: #000; box-shadow: 0 0 15px #65CDCF; }
+        .tag.ml:hover    { background: #FDA4B6; color: #000; box-shadow: 0 0 15px #FDA4B6; }
+        .tag.infra:hover { background: #6CD99D; color: #000; box-shadow: 0 0 15px #6CD99D; }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 10px;
+            margin-top: 15px;
+        }
+
+        #contact { position: relative; height: 550px; width: 100%; border-top: 1px solid var(--border); margin-top: 50px; }
+        #map { height: 100%; width: 100%; filter: grayscale(1) invert(0.9) opacity(0.2); }
+        .contact-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 1000; background: rgba(48, 48, 48, 0.88); border: 1px solid var(--border);
+            padding: 30px; border-radius: 12px; display: flex; align-items: center;
+            gap: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); backdrop-filter: blur(15px); min-width: 450px;
+        }
+
+        .contact-photo { width: 110px; height: 110px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; }
+        .contact-info h4 { font-family: var(--mono); color: var(--accent-green); margin-bottom: 8px; }
+        .contact-info p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 4px; }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+            .contact-overlay { flex-direction: column; text-align: center; min-width: 90%; }
+        }
+
+        .typing-active::after {
+            content: "_";
+            animation: blink 1s infinite;
+            color: var(--accent-green);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 12px 24px;
+            border: 1px solid var(--accent-green);
+            border-radius: 4px;
+            background: rgba(101, 184, 255, 0.05);
+            color: var(--accent-green);
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: lowercase;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+        }
+
+        .contact-info .download-btn {
+            margin-top: 15px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+
+        .download-btn i {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div id="scroll-progress"></div>
+    <div class="dna-sidebar" id="dna">10011010111110011111001101011111001111100110101111100111110011010111110011111001101011111001111</div>
+
+
+    <header>
+        <div class="code-snippet">andrea = InternalAuditor(team_size=4, location="Bratislava")</div>
+        <h1>Andrea Ševčovičová</h1>
+
+        <div class="code-snippet" style="margin-top: 10px; font-size: 0.85rem; opacity: 0.9;">
+            <span style="color: #f6d365;">print</span>(<span style="color: #43e97b;">"<span id="typewriter"></span>"</span>)
+        </div>
+
+        <a href="CV_Sevcovicova.pdf" download class="download-btn">
+            <i class="fa fa-download"></i> ./CV_Sevcovicova.pdf
+        </a>
+    </header>
+
+    <div class="container">
+
+        <main>
+            <section class="section-block">
+                <h2>experience.log</h2>
+                <div class="exp-item">
+                    <div class="meta">JAN 2022 - PRESENT // BRATISLAVA, SK</div>
+                    <h3>Slovenská sporiteľňa, a.s.</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted);">Internal Auditor &amp; Data Analytics Team Lead in the IT and Strategic Risk Management Audit Department. Lead a team of four analysts building data-driven audit strategies in Oracle, MS SQL, and Snowflake, develop Power BI reports for senior management, and run data quality checks and anomaly detection across audit engagements.</p>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 8px;">Also host Python and SQL trainings locally and across the wider Erste Group audit team.</p>
+                </div>
+            </section>
+
+            <section class="section-block">
+                <h2>education.init</h2>
+                <div class="exp-item">
+                    <div class="meta">2022 - 2024 // MASTER'S DEGREE</div>
+                    <h3>Comenius University Bratislava</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 8px;">Faculty of Mathematics, Physics, and Informatics &mdash; Mathematics of Economy, Finance and Modeling. Graduated with honors.</p>
+                    <a href="https://opac.crzp.sk/?fn=docview2ChildU149HA&amp;record=90AD8DE72D6F932F56346B6889DF&amp;seo=CRZP-Prehliadanie-prác" target="_blank" rel="noopener"><i class="fa fa-file-pdf"></i> View Master's Thesis</a>
+                </div>
+                <div class="exp-item">
+                    <div class="meta">2019 - 2022 // BACHELOR'S DEGREE</div>
+                    <h3>Comenius University Bratislava</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 8px;">Mathematics of Economy and Finance.</p>
+                    <a href="https://opac.crzp.sk/?fn=docview2ChildG14GQV&record=62A48EA6D8C294D555C5B0542714&seo=CRZP-Prehliadanie-prác" target="_blank" rel="noopener"><i class="fa fa-file-pdf"></i> View Bachelor's Thesis</a>
+                </div>
+            </section>
+
+            <section class="section-block">
+                <h2>certificates.sh</h2>
+                <div class="exp-item">
+                    <div class="meta">NEXTERIA LEADERSHIP ACADEMY</div>
+                    <h3>Leadership Programme</h3>
+                </div>
+                <div class="exp-item">
+                    <div class="meta">GOETHE-INSTITUT</div>
+                    <h3>Großes Deutsches Sprachdiplom (GDS)</h3>
+                </div>
+            </section>
+        </main>
+
+        <aside>
+            <section class="section-block">
+                <h2>stack.json</h2>
+                <div class="tags">
+                    <span class="tag lang">Python</span>
+                    <span class="tag lang">R</span>
+                    <span class="tag lang">SQL</span>
+                    <span class="tag lang">SAS</span>
+
+                    <span class="tag bio">Power BI</span>
+                    <span class="tag bio">Snowflake</span>
+                    <span class="tag bio">Oracle</span>
+                    <span class="tag bio">MS SQL</span>
+
+                    <span class="tag ml">Excel</span>
+                    <span class="tag ml">PowerPoint</span>
+                    <span class="tag ml">Word</span>
+                    <span class="tag ml">Teams</span>
+
+                    <span class="tag infra">Linux</span>
+                    <span class="tag infra">Windows</span>
+                    <span class="tag infra">Jira</span>
+                    <span class="tag infra">SharePoint</span>
+                    <span class="tag infra">OneDrive</span>
+                    <span class="tag infra">Outlook</span>
+                </div>
+            </section>
+
+            <section class="section-block">
+                <h2>projects.md</h2>
+                <div class="exp-item" style="border: none; padding-left: 0;">
+                    <h3 style="color: var(--projects-accent)">GALLUP STRENGTHS ANALYSIS</h3>
+                    <div class="meta">INTERNAL AUDIT DEPARTMENT</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">CliftonStrengths team analysis across 23 colleagues: theme frequency, domain balance, coverage gaps.</p>
+                    <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
+                    [GALLUP, TEAM ANALYTICS, STRENGTHS]
+                    </span>
+                    <a href="gallup.html"><i class="fa fa-chart-bar"></i> View Analysis</a>
+                </div>
+                <div class="exp-item" style="border: none; padding-left: 0;">
+                    <h3 style="color: var(--projects-accent)">PYTHON &amp; SQL TRAININGS</h3>
+                    <div class="meta">ERSTE GROUP AUDIT</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Internal trainings hosted locally and across the wider Erste Group audit team.</p>
+                    <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
+                    [PYTHON, SQL, TEACHING]
+                    </span>
+                </div>
+                <div class="exp-item" style="border: none; padding-left: 0;">
+                    <h3 style="color: var(--projects-accent)">DATA-DRIVEN AUDIT</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Audit plans and testing procedures built on transactional data, with automation and analytics replacing manual sampling.</p>
+                    <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
+                    [ANOMALY DETECTION, AUTOMATION]
+                    </span>
+                </div>
+                <div class="exp-item" style="border: none; padding-left: 0;">
+                    <h3 style="color: var(--projects-accent)">POWER BI REPORTING</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Interactive dashboards surfacing insights from audit data use cases to executives.</p>
+                    <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
+                    [POWER BI, DAX, DATA MODELLING]
+                    </span>
+                </div>
+                <div class="exp-item" style="border: none; padding-left: 0;">
+                    <h3 style="color: var(--projects-accent)">COOP JEDNOTA &mdash; GEN Z STRATEGY</h3>
+                    <div class="meta">NEXTERIA LEADERSHIP ACADEMY</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Identifying and developing strategies to better target Gen Z customers.</p>
+                    <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
+                    [RETAIL STRATEGY, MARKET RESEARCH]
+                    </span>
+                </div>
+                <div class="exp-item" style="border: none; padding-left: 0;">
+                    <h3 style="color: var(--projects-accent)">HIGH SCHOOL OUTREACH</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Volunteer programme sharing university experience with prospective students.</p>
+                    <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
+                    [OUTREACH, MENTORING]
+                    </span>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <div id="contact">
+        <div id="map"></div>
+        <div class="contact-overlay">
+            <img src="fotky_makovec.jpg" alt="Andrea" class="contact-photo">
+            <div class="contact-info">
+                <h4>get_in_touch()</h4>
+                <p><i class="fa fa-map-marker"></i> Devínska Nová Ves, Bratislava</p>
+                <p><i class="fa fa-envelope"></i> andrejka.sevcovicova@gmail.com</p>
+                <p><i class="fa fa-phone"></i> +421 948 168 967</p>
+                <p><i class="fab fa-linkedin"></i> Andrea Ševčovičová</p>
+                <a href="CV_Sevcovicova.pdf" download class="download-btn">
+                    <i class="fa fa-file-pdf"></i> ./CV_Sevcovicova.pdf
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+
+            document.getElementById("dna").style.transform = `translateY(-${winScroll * 0.2}px)`;
+        };
+
+        window.addEventListener('mousemove', e => {
+            document.body.style.setProperty('--mouse-x', e.clientX + 'px');
+            document.body.style.setProperty('--mouse-y', e.clientY + 'px');
+        });
+
+        const text = "Internal auditor and data analytics team lead, with a background in applied mathematics.";
+        let i = 0;
+
+        function type() {
+            const target = document.getElementById("typewriter");
+            if (target && i < text.length) {
+                target.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, 40);
+            }
+        }
+
+        type();
+
+        var map = L.map('map', {
+            center: [48.1486, 17.1077],
+            zoom: 13,
+            zoomControl: false,
+            dragging: false,
+            scrollWheelZoom: false
+        });
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '©OpenStreetMap'
+        }).addTo(map);
+
+        L.circle([48.1486, 17.1077], {
+            color: '#65B8FF',
+            fillColor: '#65B8FF',
+            fillOpacity: 0.5,
+            radius: 500
+        }).addTo(map);
+    </script>
+</body>
+</html>
