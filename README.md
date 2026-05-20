@@ -8,7 +8,7 @@
 
 ### 🌟 About this homepage 🌟
 
-hii bestie ✨ welcome to my lil pocket of the WWW. lowkey just vibing 💅 peep the link below, iykyk:
+hii bestie ✨ welcome to my lil pocket of the WWW ✨ lowkey just vibing 💅 peep the link below, iykyk:
 
 <a href="https://andreasevc.github.io"><img src="pink-link.svg" alt="andreasevc.github.io" width="380"></a>
 
