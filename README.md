@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="wordart-header.svg" alt="andreasevc.github.io" width="750">
+<img src="wordart-header.svg" alt="andreasevc.github.io" width="700">
 
 # ✨🎀✨ Welcome to my homepage! ✨🎀✨
 
