@@ -464,6 +464,144 @@
             padding: 6px 0;
             font-size: 0.78rem;
         }
+
+        /* Heatmaps & biplot */
+        #similarity-plot, #cooccurrence-plot, #pca-biplot-plot {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        #similarity-plot svg,
+        #cooccurrence-plot svg,
+        #pca-biplot-plot svg { display: block; overflow: visible; }
+        .heat-legend {
+            display: flex; align-items: center; gap: 10px;
+            font-family: var(--mono); font-size: 0.72rem;
+            color: var(--text-muted); margin-bottom: 14px; flex-wrap: wrap;
+        }
+        .heat-legend .scale {
+            display: inline-block; width: 140px; height: 12px;
+            border-radius: 2px;
+            background: linear-gradient(to right, rgba(180,63,130,0.85), #0d1117, rgba(116,108,240,0.85));
+        }
+        .heat-legend .scale-mono {
+            background: linear-gradient(to right, #0d1117, rgba(116,108,240,0.85));
+        }
+        .heat-legend .legend-note { margin-left: 10px; opacity: 0.85; }
+
+        /* Bottleneck */
+        .bottleneck-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        .bottleneck-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 22px;
+        }
+        .bottleneck-card h4 {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            margin-bottom: 14px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+        }
+        .bottleneck-card h4 .count {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 400;
+        }
+        .bottleneck-list { list-style: none; padding: 0; margin: 0; }
+        .bottleneck-list li {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            padding: 8px 0;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            align-items: baseline;
+        }
+        .bottleneck-list li:last-child { border-bottom: none; }
+        .bottleneck-list .talent { font-weight: 500; }
+        .bottleneck-list .owners {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            text-align: right;
+        }
+
+        /* Distinctiveness */
+        .distinct-row {
+            display: grid;
+            grid-template-columns: 36px 110px 1fr 50px;
+            grid-template-rows: auto auto;
+            gap: 4px 14px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .distinct-row:last-child { border-bottom: none; }
+        .distinct-row.you {
+            background: rgba(116, 108, 240, 0.05);
+            border-radius: 4px;
+            margin: 0 -10px;
+            padding: 12px 10px;
+        }
+        .distinct-rank {
+            grid-row: 1;
+            font-family: var(--mono);
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            text-align: right;
+        }
+        .distinct-name {
+            grid-row: 1;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .distinct-row.you .distinct-name { color: var(--accent-green); }
+        .distinct-bar-track {
+            grid-row: 1;
+            background: rgba(255,255,255,0.04);
+            height: 12px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .distinct-bar-fill {
+            height: 100%;
+            width: 0;
+            background: var(--accent-green);
+            transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .distinct-score-val {
+            grid-row: 1;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+        .distinct-chips {
+            grid-row: 2;
+            grid-column: 2 / -1;
+            padding-top: 4px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        @media (max-width: 600px) {
+            .distinct-row { grid-template-columns: 30px 1fr 50px; }
+            .distinct-bar-track { display: none; }
+            .distinct-chips { grid-column: 2 / -1; }
+        }
     </style>
 </head>
 <body>
@@ -522,9 +660,52 @@
 </section>
 
 <section class="section-block">
+    <h2>pca_biplot.svg</h2>
+    <p class="lead">Same PC1/PC2 axes as the projection above, overlaid with the 12 talents whose loadings on these components are largest. Each arrow points toward the kind of person who scores high on that talent &mdash; people in the direction of, say, <em>Achiever</em> rank Achiever near the top of their list; people opposite the arrow rank it near the bottom. Faint dots are people, plotted at the same coordinates as in the PCA above for reference.</p>
+    <div class="legend">
+        <span><span class="swatch d-Executing"></span>Executing</span>
+        <span><span class="swatch d-Influencing"></span>Influencing</span>
+        <span><span class="swatch d-RelationshipBuilding"></span>Relationship Building</span>
+        <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
+    </div>
+    <div id="pca-biplot-plot"></div>
+    <p class="footnote">Loadings = X<sup>T</sup>U, the projection of each talent (column of the centered rank matrix) onto the top two left singular vectors. Loading vectors are uniformly scaled to be visually comparable to the score cloud; only the 12 largest by magnitude are shown.</p>
+</section>
+
+<section class="section-block">
+    <h2>similarity_matrix.svg</h2>
+    <p class="lead">Spearman rank correlation between every pair of people, computed across all 34 talents. Purple = similar overall profile, magenta = opposite profile, dark = unrelated. Rows and columns are ordered by team with separators between teams &mdash; bright purple blocks along the diagonal would mean a team's members are unusually similar to each other; an isolated bright cell outside the diagonal blocks means two people on different teams share a profile.</p>
+    <div class="heat-legend">
+        <span>&minus;1</span>
+        <span class="scale"></span>
+        <span>+1</span>
+        <span class="legend-note">hover any cell for the exact correlation</span>
+    </div>
+    <div id="similarity-plot"></div>
+</section>
+
+<section class="section-block">
+    <h2>talent_cooccurrence.svg</h2>
+    <p class="lead">For every pair of talents, how many of the 23 people carry both in their top 5. Talents are grouped into the four domain blocks (separators drawn between blocks); bright squares clustered inside a block mean talents in that domain tend to be carried by the same people. The diagonal repeats each talent's overall frequency for reference.</p>
+    <div class="heat-legend">
+        <span>0</span>
+        <span class="scale scale-mono"></span>
+        <span>max</span>
+        <span class="legend-note">hover any cell for the exact count</span>
+    </div>
+    <div id="cooccurrence-plot"></div>
+</section>
+
+<section class="section-block">
     <h2>coverage.log</h2>
     <p class="lead">Talents that no one in the department has in their top 5 &mdash; and top 10. Useful to flag when assembling a team for a project that needs those strengths.</p>
     <div id="coverage-output"></div>
+</section>
+
+<section class="section-block">
+    <h2>bottleneck.log</h2>
+    <p class="lead">Talents that only one or two people in the department carry in their top 5. If those people are unavailable for an assignment, that strength essentially leaves the department &mdash; useful to know when scoping a project that needs them, or when thinking about cross-training and resilience.</p>
+    <div id="bottleneck-output"></div>
 </section>
 
 <section class="section-block">
@@ -568,6 +749,12 @@
     <h2>roster.tsv</h2>
     <p class="lead">Each person's top five talents. My own row (<span style="color: var(--accent-green); font-family: var(--mono);">User33</span>) is highlighted.</p>
     <div class="roster-wrap"><table class="roster" id="roster"></table></div>
+</section>
+
+<section class="section-block">
+    <h2>distinctiveness.tsv</h2>
+    <p class="lead">For each person, the sum of <em>1 &divide; (how many people share each top-5 talent)</em>, across their five signature strengths. Higher = a profile that is harder to replicate from the rest of the department. A score near 5 would mean every one of their top-5 talents is unique to them; a score near 1 means each is widely shared. Chips show the talent and the freq within the 23-person department.</p>
+    <div id="distinctiveness-output"></div>
 </section>
 
 </main>
@@ -1116,6 +1303,280 @@ window.addEventListener('mousemove', e => {
     document.body.style.setProperty('--mouse-x', e.clientX + 'px');
     document.body.style.setProperty('--mouse-y', e.clientY + 'px');
 });
+
+/* ============================================================ */
+/* ====================== ADVANCED ANALYTICS =================== */
+/* ============================================================ */
+
+/* ---------- PCA biplot (scores + loadings) ---------- */
+(function renderBiplot() {
+    // raw_loading_j,k = (X^T U)_jk = sum_i Xc[i][j] * pc_k.vec[i]  (== V_jk * sigma_k)
+    const loadings = themes.map((t, j) => {
+        let v1 = 0, v2 = 0;
+        for (let i = 0; i < N; i++) {
+            v1 += Xc[i][j] * pc1.vec[i];
+            v2 += Xc[i][j] * pc2.vec[i];
+        }
+        return { talent: t, l1: v1, l2: v2, mag: Math.hypot(v1, v2) };
+    });
+    const topLoadings = loadings.slice().sort((a, b) => b.mag - a.mag).slice(0, 12);
+
+    const scoreXmax = Math.max(...pcaScores.map(s => Math.abs(s[0])));
+    const scoreYmax = Math.max(...pcaScores.map(s => Math.abs(s[1])));
+    const loadMag = Math.max(...loadings.map(l => l.mag));
+    const scale = Math.min(scoreXmax, scoreYmax) / loadMag * 1.4;
+
+    const W = 760, H = 480, PAD = 50;
+    const xmax = Math.max(scoreXmax, loadMag * scale) * 1.1;
+    const ymax = Math.max(scoreYmax, loadMag * scale) * 1.1;
+    const sx = v => W/2 + (v / xmax) * (W/2 - PAD);
+    const sy = v => H/2 - (v / ymax) * (H/2 - PAD);
+
+    const dots = pcaScores.map((s, i) => {
+        const d = dominantDomain(people[i]);
+        const cssVar = domainVar[d];
+        return `<circle cx="${sx(s[0]).toFixed(1)}" cy="${sy(s[1]).toFixed(1)}" r="3" fill="var(${cssVar})" opacity="0.4"><title>${people[i].nickname}</title></circle>`;
+    }).join('');
+
+    const arrows = topLoadings.map(l => {
+        const d = themeDomain[l.talent];
+        const cssVar = domainVar[d];
+        const x1 = sx(0), y1 = sy(0);
+        const x2 = sx(l.l1 * scale), y2 = sy(l.l2 * scale);
+        const dx = x2 - x1, dy = y2 - y1;
+        const len = Math.hypot(dx, dy) || 1;
+        const lx = x2 + dx/len * 8;
+        const ly = y2 + dy/len * 8;
+        const anchor = dx > 5 ? 'start' : dx < -5 ? 'end' : 'middle';
+        return `
+            <line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(${cssVar})" stroke-width="1.6" opacity="0.9"/>
+            <circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="var(${cssVar})"/>
+            <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="var(${cssVar})" font-family="JetBrains Mono, monospace" font-size="11" font-weight="500" text-anchor="${anchor}" dominant-baseline="middle">${l.talent}</text>
+        `;
+    }).join('');
+
+    document.getElementById('pca-biplot-plot').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width: ${W}px;">
+        <line x1="${PAD}" y1="${H/2}" x2="${W-PAD}" y2="${H/2}" stroke="rgba(255,255,255,0.1)"/>
+        <line x1="${W/2}" y1="${PAD}" x2="${W/2}" y2="${H-PAD}" stroke="rgba(255,255,255,0.1)"/>
+        <text x="${W/2}" y="${H-12}" fill="rgba(230,237,243,0.55)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle">PC1 &middot; ${varExp1}%</text>
+        <text x="20" y="${H/2}" fill="rgba(230,237,243,0.55)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" transform="rotate(-90 20 ${H/2})">PC2 &middot; ${varExp2}%</text>
+        ${dots}
+        ${arrows}
+    </svg>`;
+})();
+
+/* ---------- Person x person similarity heatmap (Spearman ρ) ---------- */
+(function renderSimilarity() {
+    const rankMean = (1 + 34) / 2;                  // 17.5
+    const sumSqDevs = 34 * (34 * 34 - 1) / 12;      // ranks 1..34, no ties
+
+    function spearman(p1, p2) {
+        let sum = 0;
+        for (const t of themes) {
+            sum += (p1.ranks[t] - rankMean) * (p2.ranks[t] - rankMean);
+        }
+        return sum / sumSqDevs;
+    }
+
+    const teamOrder = ['general_manager', 'dep1_manager', 'methodology', 'dep1_team1', 'dep1_team2', 'dep1_team3', 'dep2_team1', 'dep2_team2'];
+    const ordered = people.slice().sort((a, b) =>
+        teamOrder.indexOf(a.team) - teamOrder.indexOf(b.team) || a.nickname.localeCompare(b.nickname)
+    );
+
+    function heatColor(r) {
+        if (r >= 0) return `rgba(116, 108, 240, ${Math.min(r, 1).toFixed(3)})`;
+        return `rgba(180, 63, 130, ${Math.min(-r, 1).toFixed(3)})`;
+    }
+
+    const W = 760, labelPad = 90;
+    const cell = (W - labelPad) / ordered.length;
+    const H = labelPad + ordered.length * cell;
+
+    let cells = '';
+    for (let i = 0; i < ordered.length; i++) {
+        for (let j = 0; j < ordered.length; j++) {
+            const v = i === j ? 1 : spearman(ordered[i], ordered[j]);
+            const x = labelPad + j * cell;
+            const y = labelPad + i * cell;
+            cells += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="${heatColor(v)}" stroke="rgba(13,17,23,0.5)" stroke-width="0.5"><title>${ordered[i].nickname} ↔ ${ordered[j].nickname}: ρ = ${v.toFixed(2)}</title></rect>`;
+        }
+    }
+
+    let labels = '';
+    for (let i = 0; i < ordered.length; i++) {
+        const isYou = ordered[i].nickname === 'User33';
+        const col = isYou ? '#746cf0' : 'rgba(230,237,243,0.7)';
+        const weight = isYou ? '600' : '400';
+        const yCenter = labelPad + i * cell + cell/2;
+        const xCenter = labelPad + i * cell + cell/2;
+        labels += `<text x="${(labelPad - 8).toFixed(1)}" y="${yCenter.toFixed(1)}" fill="${col}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="${weight}" text-anchor="end" dominant-baseline="middle">${ordered[i].nickname}</text>`;
+        labels += `<text x="${xCenter.toFixed(1)}" y="${(labelPad - 8).toFixed(1)}" fill="${col}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="${weight}" text-anchor="start" dominant-baseline="middle" transform="rotate(-45 ${xCenter.toFixed(1)} ${(labelPad - 8).toFixed(1)})">${ordered[i].nickname}</text>`;
+    }
+
+    let separators = '';
+    let lastTeam = ordered[0].team;
+    for (let i = 1; i < ordered.length; i++) {
+        if (ordered[i].team !== lastTeam) {
+            const p = labelPad + i * cell;
+            separators += `<line x1="${p.toFixed(1)}" y1="${labelPad}" x2="${p.toFixed(1)}" y2="${(labelPad + ordered.length * cell).toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
+            separators += `<line x1="${labelPad}" y1="${p.toFixed(1)}" x2="${(labelPad + ordered.length * cell).toFixed(1)}" y2="${p.toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
+            lastTeam = ordered[i].team;
+        }
+    }
+
+    document.getElementById('similarity-plot').innerHTML = `<svg viewBox="0 0 ${W} ${H.toFixed(0)}" width="100%" style="max-width: ${W}px; overflow: visible;">
+        ${cells}
+        ${separators}
+        ${labels}
+    </svg>`;
+})();
+
+/* ---------- Talent x talent co-occurrence matrix ---------- */
+(function renderCooccurrence() {
+    // Order talents by domain (existing order), then by freq desc within each domain
+    const orderedThemes = [];
+    Object.keys(domains).forEach(d => {
+        const inDom = domains[d].slice().sort((a, b) => freq[b] - freq[a]);
+        orderedThemes.push(...inDom);
+    });
+
+    const counts = orderedThemes.map(t1 => orderedThemes.map(t2 => {
+        let c = 0;
+        people.forEach(p => {
+            if (p.ranks[t1] <= 5 && p.ranks[t2] <= 5) c++;
+        });
+        return c;
+    }));
+
+    let maxOff = 0;
+    for (let i = 0; i < orderedThemes.length; i++) {
+        for (let j = 0; j < orderedThemes.length; j++) {
+            if (i !== j && counts[i][j] > maxOff) maxOff = counts[i][j];
+        }
+    }
+    const maxOnDiag = Math.max(...orderedThemes.map(t => freq[t]));
+
+    function cooccColor(c, onDiag) {
+        if (c === 0) return 'rgba(255,255,255,0.015)';
+        const m = onDiag ? maxOnDiag : maxOff;
+        const t = m === 0 ? 0 : c / m;
+        return `rgba(116, 108, 240, ${(0.15 + 0.85 * t).toFixed(3)})`;
+    }
+
+    const W = 760, labelPad = 120;
+    const cell = (W - labelPad) / orderedThemes.length;
+    const H = labelPad + orderedThemes.length * cell;
+
+    let cells = '';
+    for (let i = 0; i < orderedThemes.length; i++) {
+        for (let j = 0; j < orderedThemes.length; j++) {
+            const v = counts[i][j];
+            const x = labelPad + j * cell;
+            const y = labelPad + i * cell;
+            cells += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="${cooccColor(v, i===j)}" stroke="rgba(13,17,23,0.5)" stroke-width="0.5"><title>${orderedThemes[i]} ∩ ${orderedThemes[j]}: ${v}${i===j ? ' (=freq)' : ''}</title></rect>`;
+        }
+    }
+
+    let labels = '';
+    for (let i = 0; i < orderedThemes.length; i++) {
+        const d = themeDomain[orderedThemes[i]];
+        const cssVar = domainVar[d];
+        const yCenter = labelPad + i * cell + cell/2;
+        const xCenter = labelPad + i * cell + cell/2;
+        labels += `<text x="${(labelPad - 6).toFixed(1)}" y="${yCenter.toFixed(1)}" fill="var(${cssVar})" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="end" dominant-baseline="middle">${orderedThemes[i]}</text>`;
+        labels += `<text x="${xCenter.toFixed(1)}" y="${(labelPad - 6).toFixed(1)}" fill="var(${cssVar})" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="start" dominant-baseline="middle" transform="rotate(-90 ${xCenter.toFixed(1)} ${(labelPad - 6).toFixed(1)})">${orderedThemes[i]}</text>`;
+    }
+
+    let separators = '';
+    let cumulative = 0;
+    const domNames = Object.keys(domains);
+    domNames.forEach((d, idx) => {
+        cumulative += domains[d].length;
+        if (idx < domNames.length - 1) {
+            const p = labelPad + cumulative * cell;
+            separators += `<line x1="${p.toFixed(1)}" y1="${labelPad}" x2="${p.toFixed(1)}" y2="${(labelPad + orderedThemes.length * cell).toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
+            separators += `<line x1="${labelPad}" y1="${p.toFixed(1)}" x2="${(labelPad + orderedThemes.length * cell).toFixed(1)}" y2="${p.toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
+        }
+    });
+
+    document.getElementById('cooccurrence-plot').innerHTML = `<svg viewBox="0 0 ${W} ${H.toFixed(0)}" width="100%" style="max-width: ${W}px; overflow: visible;">
+        ${cells}
+        ${separators}
+        ${labels}
+    </svg>`;
+})();
+
+/* ---------- Bottleneck / single points of failure ---------- */
+(function renderBottleneck() {
+    const owners = {};
+    themes.forEach(t => {
+        owners[t] = people.filter(p => p.ranks[t] <= 5).map(p => ({ name: p.nickname, rank: p.ranks[t] }));
+    });
+
+    const sortByDomainThenName = (a, b) =>
+        Object.keys(domains).indexOf(themeDomain[a]) - Object.keys(domains).indexOf(themeDomain[b]) || a.localeCompare(b);
+    const single = themes.filter(t => owners[t].length === 1).sort(sortByDomainThenName);
+    const dual = themes.filter(t => owners[t].length === 2).sort(sortByDomainThenName);
+
+    const renderItem = t => {
+        const own = owners[t].slice().sort((a, b) => a.rank - b.rank);
+        return `<li>
+            <span class="talent" style="color: var(${domainVar[themeDomain[t]]})">${t}</span>
+            <span class="owners">${own.map(o => `${o.name} #${o.rank}`).join(', ')}</span>
+        </li>`;
+    };
+
+    const renderCard = (list, title) => {
+        if (list.length === 0) {
+            return `<div class="bottleneck-card"><h4>${title} <span class="count">0 talents</span></h4><span class="empty-note">&mdash; none &mdash;</span></div>`;
+        }
+        return `<div class="bottleneck-card">
+            <h4>${title} <span class="count">${list.length} talent${list.length === 1 ? '' : 's'}</span></h4>
+            <ul class="bottleneck-list">${list.map(renderItem).join('')}</ul>
+        </div>`;
+    };
+
+    document.getElementById('bottleneck-output').innerHTML = `<div class="bottleneck-grid">
+        ${renderCard(single, 'Single owner in top 5')}
+        ${renderCard(dual, 'Two owners in top 5')}
+    </div>`;
+})();
+
+/* ---------- Distinctiveness / rarity score ---------- */
+(function renderDistinctiveness() {
+    const scores = people.map(p => {
+        const top5 = p.ordered.slice(0, 5);
+        const contributions = top5.map(t => ({ talent: t, freq: freq[t], contrib: 1 / Math.max(freq[t], 1) }));
+        const total = contributions.reduce((s, c) => s + c.contrib, 0);
+        return { nickname: p.nickname, team: p.team, contributions, total };
+    });
+    scores.sort((a, b) => b.total - a.total);
+    const maxScore = Math.max(...scores.map(s => s.total));
+
+    document.getElementById('distinctiveness-output').innerHTML = scores.map((s, i) => {
+        const isYou = s.nickname === 'User33';
+        const w = (s.total / maxScore * 100).toFixed(1);
+        const chips = s.contributions
+            .slice()
+            .sort((a, b) => a.freq - b.freq)
+            .map(c => `<span class="chip" style="color: var(${domainVar[themeDomain[c.talent]]})"><span class="chip-text">${c.talent}</span><span class="contrib">${c.freq}/${N}</span></span>`)
+            .join('');
+        return `<div class="distinct-row${isYou ? ' you' : ''}">
+            <div class="distinct-rank">${i + 1}</div>
+            <div class="distinct-name">${s.nickname}${isYou ? ' (me)' : ''}</div>
+            <div class="distinct-bar-track"><div class="distinct-bar-fill" data-w="${w}"></div></div>
+            <div class="distinct-score-val">${s.total.toFixed(2)}</div>
+            <div class="distinct-chips">${chips}</div>
+        </div>`;
+    }).join('');
+
+    // animate the new bars (the global rAF already ran earlier)
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.distinct-bar-fill[data-w]').forEach(el => {
+            el.style.width = el.dataset.w + '%';
+        });
+    });
+})();
 </script>
 
 </body>
