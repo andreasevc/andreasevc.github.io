@@ -914,11 +914,81 @@
             text-align: right;
             color: var(--text-muted);
         }
+
+        /* Side navigation */
+        .side-nav {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 240px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-light);
+            padding: 28px 14px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .side-nav .nav-title {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+            margin: 0 12px 14px;
+        }
+        .side-nav ul { list-style: none; padding: 0; margin: 0; }
+        .side-nav li { margin: 1px 0; }
+        .side-nav a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.15s ease, color 0.15s ease;
+            border-left: 2px solid transparent;
+            font-size: 0.85rem;
+            line-height: 1.35;
+        }
+        .side-nav a:hover {
+            color: var(--accent-green);
+            background: rgba(36, 83, 117, 0.04);
+            text-decoration: none;
+        }
+        .side-nav a.active {
+            color: var(--accent-green);
+            background: rgba(36, 83, 117, 0.08);
+            font-weight: 700;
+            border-left-color: var(--accent-green);
+        }
+        @media (min-width: 1100px) {
+            body { padding-left: 240px; }
+        }
+        @media (max-width: 1099px) {
+            .side-nav { display: none; }
+        }
     </style>
 </head>
 <body>
 
 <div id="scroll-progress"></div>
+
+<nav class="side-nav" aria-label="Sections">
+    <div class="nav-title">Sections</div>
+    <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#talent-frequency">Talent Frequency</a></li>
+        <li><a href="#domain-balance">Domain Balance</a></li>
+        <li><a href="#profile-map">Profile Map (PCA)</a></li>
+        <li><a href="#what-drives-map">What Drives the Map</a></li>
+        <li><a href="#person-similarity">Person &times; Person Similarity</a></li>
+        <li><a href="#talent-cooccurrence">Talent Co-occurrence</a></li>
+        <li><a href="#coverage-gaps">Coverage Gaps</a></li>
+        <li><a href="#bottleneck-talents">Bottleneck Talents</a></li>
+        <li><a href="#strengths-by-team">Strengths by Team</a></li>
+        <li><a href="#pair-picker">Pair Picker</a></li>
+        <li><a href="#best-combinations">Best Combinations</a></li>
+        <li><a href="#top-pairs">Top Complementary Pairs</a></li>
+        <li><a href="#distinctiveness">Distinctiveness</a></li>
+    </ul>
+</nav>
 
 <header>
     <div class="header-inner">
@@ -932,13 +1002,13 @@
 
 <main>
 
-<section class="section-block">
+<section class="section-block" id="overview">
     <h2>Overview</h2>
     <p class="lead">23 assessments, each ranked across all 34 Gallup CliftonStrengths talents. The 34 talents are grouped into four domains - <span style="color: var(--d-exec); font-weight: 600;">Executing</span>, <span style="color: var(--d-infl); font-weight: 600;">Influencing</span>, <span style="color: var(--d-rel); font-weight: 600;">Relationship Building</span>, and <span style="color: var(--d-stra); font-weight: 600;">Strategic Thinking</span>. Names are anonymised and each person is identified by a numeric user ID.</p>
     <div class="stats-grid" id="overview"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="talent-frequency">
     <h2>Talent Frequency</h2>
     <p class="lead">For each talent, how many of the 23 people have it inside their top 5 signature strengths. Bars are coloured by talent domain, sorted descending. The top 5 talents are shown by default; click below to reveal the remaining 29.</p>
     <div class="legend">
@@ -951,15 +1021,15 @@
     <button type="button" id="freq-toggle" class="show-more-btn">Show all 34 talents</button>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="domain-balance">
     <h2>Domain Balance</h2>
     <p class="lead">Out of all top-5 slots in the department, what share lands in each domain? The <em>baseline</em> is what we'd expect if the 34 talents were drawn uniformly.</p>
     <div class="domain-grid" id="domain-cards"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="profile-map">
     <h2>Profile Map (PCA)</h2>
-    <p class="lead">Two-dimensional projection of each person's full 34-talent rank profile, computed via principal component analysis. Points that sit close together have similar strength profiles overall; distance reflects difference across all talents - not just top 5. Each dot is colored by its owner's dominant top-5 domain; my own dot (<span style="color: var(--accent-green); font-weight: 600;">User33</span>) is outlined.</p>
+    <p class="lead">Two-dimensional projection of each person's full 34-talent rank profile, computed via principal component analysis. Points that sit close together have similar strength profiles overall; distance reflects difference across all talents - not just top 5. Each dot is colored by its owner's dominant top-5 domain; my own dot (<span style="color: var(--accent-green); font-weight: 600;">User33</span>) is outlined. The dashed black ring marks the <strong>world average</strong> &mdash; the Gallup population baseline talent ordering &mdash; projected onto the same axes for reference (it does not influence the PCA itself).</p>
     
     <details class="explainer">
         <summary>What is PCA, and what am I looking at?</summary>
@@ -971,6 +1041,7 @@
             <li><strong>Close dots</strong> = people with overall similar talent profiles, even if their top-5 lists look different on paper.</li>
             <li><strong>Distant dots</strong> = genuinely different ways of thinking and working.</li>
             <li><strong>Clusters</strong> hint at groups of people who'd likely approach problems in similar ways.</li>
+            <li>The <strong>World avg</strong> marker (dashed black ring) is the Gallup population baseline talent ordering projected onto these same axes. It is <em>not</em> part of the PCA calculation &mdash; PCA still runs only on the 23 collected results &mdash; but plotting it here lets us see where a "typical" profile lands relative to the team. People sitting far from the World avg marker have profiles that diverge most from the global baseline.</li>
         </ul>
     </details>
     
@@ -984,7 +1055,7 @@
     <p class="footnote">Computed in-browser: each row is centered, the n&times;n Gram matrix is formed, and the top two eigenvectors are extracted by power iteration with deflation. The 2D coordinates are the corresponding singular-value-scaled scores. No external linear-algebra library.</p>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="what-drives-map">
     <h2>What Drives the Map</h2>
     <details class="explainer">
         <summary>How to read this chart and what positive/negative bars say about a person's position on the map</summary>
@@ -1009,7 +1080,7 @@
     <p class="footnote">Each value is the loading X<sup>T</sup>U: the projection of a talent (column of the centered rank matrix) onto a principal component. A person's PC1 coordinate is a weighted sum across all 34 talents using PC1's loadings as weights; same for PC2.</p>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="person-similarity">
     <h2>Person &times; Person Similarity</h2>
     <details class="explainer">
         <summary>How the matrix works and what "correlation" actually means here</summary>
@@ -1031,7 +1102,7 @@
     <div id="similarity-plot"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="talent-cooccurrence">
     <h2>Talent Co-occurrence</h2>
     <details class="explainer">
         <summary>How to read this matrix and what the patterns reveal</summary>
@@ -1052,19 +1123,19 @@
     <div id="cooccurrence-plot"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="coverage-gaps">
     <h2>Coverage Gaps</h2>
     <p class="lead">Talents that no one in the department has in their top 5 - and top 10. Useful to flag when assembling a team for a project that needs those strengths.</p>
     <div id="coverage-output"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="bottleneck-talents">
     <h2>Bottleneck Talents</h2>
     <p class="lead">Talents that only one or two people in the department carry in their top 5. If those people are unavailable for an assignment, that strength essentially leaves the department - useful to know when scoping a project that needs them, or when thinking about cross-training and resilience.</p>
     <div id="bottleneck-output"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="strengths-by-team">
     <h2>Strengths by Team</h2>
     <p class="lead">Per-team collective strengths. For the selected unit, talents are ranked by average rank across its members - lower average = stronger collective signal.</p>
     <div class="picker-grid" style="max-width: 360px;">
@@ -1073,7 +1144,7 @@
     <div id="team-output"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="pair-picker">
     <h2>Pair Picker</h2>
     <p class="lead">Pick two or three people to see their combined signature strengths, how the four domains split across the group, and which talents none of them have in their top 10 - useful when staffing an engagement and you want to check who's bringing what.</p>
     <div class="picker-grid">
@@ -1084,7 +1155,7 @@
     <div id="pair-output"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="best-combinations">
     <h2>Best Combinations</h2>
     <p class="lead">For one selected person, every eligible 2-person staffing combination ranked by complementarity - one at a time. Use the arrows to scroll through them. Pool is limited to operational team members; managers and the methodology owner (User01, User02, User04) are excluded. Filled chips mean both members have that talent in their own top 5.</p>
     <div class="picker-grid" style="max-width: 360px;">
@@ -1098,7 +1169,7 @@
     <div id="best-combos-output"></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="top-pairs">
     <h2>Top Complementary Pairs</h2>
     <p class="lead">All 253 possible pairs ranked by how many <em>unique</em> talents appear in their combined top 5 (max 10 if no overlap). Filled chips mean both members have that talent in their own top 5. Use the arrows to scroll through the ranking.</p>
     <div class="pairs-nav">
@@ -1109,7 +1180,7 @@
     <div class="pairs-table-wrap"><table class="pairs-table" id="top-pairs"></table></div>
 </section>
 
-<section class="section-block">
+<section class="section-block" id="distinctiveness">
     <h2>Distinctiveness</h2>
     <details class="explainer">
         <summary>How the score is calculated and how to read the numbers</summary>
@@ -1369,8 +1440,34 @@ function dominantDomain(p) {
 }
 
 (function renderPCA() {
-    const xs = pcaScores.map(s => s[0]);
-    const ys = pcaScores.map(s => s[1]);
+    // World average reference profile (Gallup population baseline).
+    // Projected onto the existing PCA axes WITHOUT being part of the PCA computation.
+    const worldRanks = {
+        'Achiever': 1, 'Arranger': 16, 'Belief': 25, 'Consistency': 24, 'Deliberative': 26,
+        'Discipline': 31, 'Focus': 28, 'Responsibility': 2, 'Restorative': 9,
+        'Activator': 29, 'Command': 34, 'Communication': 17, 'Competition': 27, 'Maximizer': 14,
+        'Self-Assurance': 33, 'Significance': 32, 'Woo': 21,
+        'Adaptability': 10, 'Connectedness': 23, 'Developer': 12, 'Empathy': 8, 'Harmony': 7,
+        'Includer': 22, 'Individualization': 13, 'Positivity': 11, 'Relator': 4,
+        'Analytical': 18, 'Context': 30, 'Futuristic': 19, 'Ideation': 15, 'Input': 6,
+        'Intellection': 20, 'Learner': 3, 'Strategic': 5
+    };
+    // Same transform as the in-sample: invert rank, then subtract the in-sample colMeans.
+    const worldCentered = themes.map((t, j) => (35 - worldRanks[t]) - colMeans[j]);
+    // y_new[k] = (sum_i u_k[i] * (x_new · X[i,:])) / sigma_k
+    const sigma1 = Math.sqrt(Math.max(pc1.val, 0)) || 1;
+    const sigma2 = Math.sqrt(Math.max(pc2.val, 0)) || 1;
+    const rowDots = Xc.map(row => row.reduce((s, v, j) => s + v * worldCentered[j], 0));
+    let worldX = 0, worldY = 0;
+    for (let i = 0; i < N; i++) {
+        worldX += pc1.vec[i] * rowDots[i];
+        worldY += pc2.vec[i] * rowDots[i];
+    }
+    worldX /= sigma1;
+    worldY /= sigma2;
+
+    const xs = pcaScores.map(s => s[0]).concat(worldX);
+    const ys = pcaScores.map(s => s[1]).concat(worldY);
     const xmin = Math.min(...xs), xmax = Math.max(...xs);
     const ymin = Math.min(...ys), ymax = Math.max(...ys);
     const W = 760, H = 460, PAD = 60;
@@ -1381,7 +1478,7 @@ function dominantDomain(p) {
         const d = dominantDomain(p);
         const cssVar = domainVar[d];
         const isYou = p.nickname === 'User33';
-        const cx = sx(xs[i]), cy = sy(ys[i]);
+        const cx = sx(pcaScores[i][0]), cy = sy(pcaScores[i][1]);
         return `
             <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isYou ? 8 : 5}" fill="var(${cssVar})" opacity="${isYou ? 1 : 0.85}"${isYou ? ' stroke="#245375" stroke-width="2"' : ''}>
                 <title>${p.nickname} — dominant: ${d}</title>
@@ -1390,12 +1487,22 @@ function dominantDomain(p) {
         `;
     }).join('');
 
+    const wcx = sx(worldX), wcy = sy(worldY);
+    const worldMarker = `
+        <g>
+            <circle cx="${wcx.toFixed(1)}" cy="${wcy.toFixed(1)}" r="10" fill="none" stroke="#1a2935" stroke-width="2" stroke-dasharray="3 2" opacity="0.85"><title>World average — Gallup population baseline (not part of PCA computation)</title></circle>
+            <circle cx="${wcx.toFixed(1)}" cy="${wcy.toFixed(1)}" r="3.5" fill="#1a2935"><title>World average — Gallup population baseline (not part of PCA computation)</title></circle>
+            <text x="${(wcx + 14).toFixed(1)}" y="${(wcy + 4).toFixed(1)}" fill="#1a2935" font-family="Inter, sans-serif" font-size="11" font-weight="700">World avg</text>
+        </g>
+    `;
+
     document.getElementById('pca-plot').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width: ${W}px;">
         <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD}" y2="${H-PAD}" stroke="rgba(36,83,117,0.18)"/>
         <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H-PAD}" stroke="rgba(36,83,117,0.18)"/>
         <text x="${W/2}" y="${H-12}" fill="#5d6b7e" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" font-weight="500">PC1 &nbsp;·&nbsp; ${varExp1}% variance</text>
         <text x="20" y="${H/2}" fill="#5d6b7e" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" font-weight="500" transform="rotate(-90 20 ${H/2})">PC2 &nbsp;·&nbsp; ${varExp2}% variance</text>
         ${dots}
+        ${worldMarker}
     </svg>`;
 })();
 
@@ -1680,12 +1787,34 @@ document.getElementById('pairs-next').addEventListener('click', () => {
 
 renderPairsPage();
 
-/* ---------- scroll progress ---------- */
-window.onscroll = function() {
+/* ---------- scroll progress + side-nav active section ---------- */
+const navSections = Array.from(document.querySelectorAll('.section-block[id]'));
+const navLinksById = {};
+document.querySelectorAll('.side-nav a').forEach(a => {
+    navLinksById[a.getAttribute('href').slice(1)] = a;
+});
+
+function updateActiveNav() {
+    if (navSections.length === 0) return;
+    const offset = window.innerHeight * 0.3;
+    let currentId = navSections[0].id;
+    for (const s of navSections) {
+        if (s.getBoundingClientRect().top <= offset) currentId = s.id;
+        else break;
+    }
+    for (const id in navLinksById) {
+        navLinksById[id].classList.toggle('active', id === currentId);
+    }
+}
+
+window.addEventListener('scroll', () => {
     const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
     const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     document.getElementById("scroll-progress").style.width = ((winScroll / height) * 100) + "%";
-};
+    updateActiveNav();
+}, { passive: true });
+window.addEventListener('resize', updateActiveNav, { passive: true });
+updateActiveNav();
 
 /* ============================================================ */
 /* ====================== ADVANCED ANALYTICS =================== */
