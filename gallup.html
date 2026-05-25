@@ -5,221 +5,393 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallup Analysis | Andrea Ševčovičová</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root {
-            --bg: #0d1117;
-            --card-bg: #161b22;
-            --dark-green: #b43f82;
-            --accent-green: #746cf0;
-            --projects-accent: #f3eef1;
-            --link-green: #d6589d;
-            --text-main: #e6edf3;
-            --text-muted: #8b949e;
-            --border: #30363d;
-            --mono: 'JetBrains Mono', monospace;
-            --mouse-x: 50%;
-            --mouse-y: 50%;
+            --bg: #E4EAF0;
+            --card-bg: #ffffff;
+            --text-main: #1a2935;
+            --text-muted: #5d6b7e;
+            --text-faint: #8a96a7;
+            --border: #c7d2dd;
+            --border-light: #dde4ec;
 
-            --d-exec: #b388ff;
-            --d-infl: #ff9966;
-            --d-rel:  #64b5f6;
-            --d-stra: #81c784;
+            /* Brand */
+            --accent-green: #245375;    /* Stone Normal — primary section color */
+            --dark-green:   #023449;    /* Stone Dark */
+            --link-green:   #2870ED;    /* Bright Blue Normal — links/accent */
+            --stone-light:  #7591AB;    /* Stone Light */
+
+            /* Domain palette */
+            --d-exec: #721C7A;          /* Aubergine — Executing */
+            --d-infl: #FF6130;          /* Orange    — Influencing */
+            --d-rel:  #064EA1;          /* Bright Blue Dark — Relationship Building */
+            --d-stra: #028661;          /* Forest    — Strategic Thinking */
+
+            --mono: 'JetBrains Mono', monospace;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
         #scroll-progress {
             position: fixed; top: 0; left: 0; height: 3px;
             background: var(--accent-green);
             z-index: 2000; width: 0%;
-            box-shadow: 0 0 10px var(--accent-green);
-        }
-
-        .dna-sidebar {
-            position: fixed; left: 10px; top: 0; bottom: 0;
-            width: 20px; font-family: var(--mono); font-size: 20px;
-            color: var(--dark-green); opacity: 0.3; overflow: hidden;
-            user-select: none; pointer-events: none; z-index: 0;
-            writing-mode: vertical-rl; text-orientation: upright;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-            background: radial-gradient(
-                800px circle at var(--mouse-x) var(--mouse-y),
-                rgba(189, 63, 178, 0.096),
-                transparent 85%
-            ), var(--bg);
-            background-attachment: fixed;
+            transition: width 0.1s ease;
         }
 
         a {
             color: var(--link-green);
             text-decoration: none;
-            transition: 0.2s;
-            font-family: var(--mono);
-            font-size: 0.85rem;
+            transition: color 0.2s;
         }
-        a:hover { color: var(--text-main); text-decoration: underline; }
+        a:hover { color: var(--dark-green); text-decoration: underline; }
 
         header {
-            padding: 80px 8% 60px;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-            z-index: 1;
+            padding: 56px 8% 44px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-light);
         }
-
-        .code-snippet {
-            font-family: var(--mono);
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            border-color: var(--accent-green);
             color: var(--accent-green);
-            margin-bottom: 10px;
-            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        .header-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-top: 12px;
+            max-width: 720px;
         }
 
-        h1 { font-size: 2.6rem; font-weight: 600; letter-spacing: -1px; }
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--accent-green);
+            line-height: 1.15;
+        }
 
-        main { padding: 60px 8%; position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+        main {
+            padding: 56px 8%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
         h2 {
-            font-family: var(--mono);
-            font-size: 1.3rem;
+            font-size: 1.4rem;
+            font-weight: 600;
             color: var(--accent-green);
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
+            margin-bottom: 14px;
+            letter-spacing: -0.2px;
         }
-        h2::before { content: "> "; }
 
-        .section-block { margin-bottom: 70px; }
+        .section-block { margin-bottom: 64px; }
 
         .lead {
             font-size: 0.95rem;
             color: var(--text-muted);
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             max-width: 760px;
         }
 
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 25px;
-            padding: 12px 24px;
-            border: 1px solid var(--accent-green);
-            border-radius: 4px;
-            background: rgba(116, 108, 240, 0.05);
-            color: var(--accent-green);
-            font-family: var(--mono);
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-transform: lowercase;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Stats grid */
+        /* Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
+            gap: 14px;
         }
         .stat {
             background: var(--card-bg);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-light);
             border-radius: 8px;
-            padding: 20px;
+            padding: 22px;
         }
-        .stat .num { font-family: var(--mono); font-size: 2rem; color: var(--accent-green); display: block; line-height: 1.1; }
-        .stat .label { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; display: block; }
+        .stat .num {
+            font-family: var(--mono);
+            font-size: 2rem;
+            color: var(--accent-green);
+            display: block;
+            line-height: 1.1;
+            font-weight: 500;
+        }
+        .stat .label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-top: 6px;
+            display: block;
+            font-weight: 600;
+        }
 
-        /* Theme bars */
-        .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 22px; font-family: var(--mono); font-size: 0.78rem; color: var(--text-muted); }
-        .legend .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
+        /* Legend */
+        .legend {
+            display: flex; flex-wrap: wrap; gap: 18px;
+            margin-bottom: 20px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .legend .swatch {
+            display: inline-block; width: 12px; height: 12px;
+            margin-right: 6px; vertical-align: middle; border-radius: 2px;
+        }
         .swatch.d-Executing             { background: var(--d-exec); }
         .swatch.d-Influencing           { background: var(--d-infl); }
         .swatch.d-RelationshipBuilding  { background: var(--d-rel); }
         .swatch.d-StrategicThinking     { background: var(--d-stra); }
 
+        /* Bar chart */
         .bar-chart { display: grid; gap: 6px; }
-        .bar-row { display: grid; grid-template-columns: 170px 1fr 40px; align-items: center; gap: 14px; }
-        .bar-label { font-family: var(--mono); font-size: 0.8rem; color: var(--text-main); text-align: right; }
-        .bar-track { background: rgba(255,255,255,0.04); height: 16px; border-radius: 2px; overflow: hidden; }
+        .bar-row {
+            display: grid;
+            grid-template-columns: 170px 1fr 40px;
+            align-items: center;
+            gap: 14px;
+        }
+        .bar-label {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            text-align: right;
+            font-weight: 500;
+        }
+        .bar-track {
+            background: #d3dde7;
+            height: 16px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
         .bar-fill { height: 100%; width: 0; transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .bar-value { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); text-align: right; }
-
+        .bar-value {
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
         .d-Executing            .bar-fill { background: var(--d-exec); }
         .d-Influencing          .bar-fill { background: var(--d-infl); }
         .d-RelationshipBuilding .bar-fill { background: var(--d-rel); }
         .d-StrategicThinking    .bar-fill { background: var(--d-stra); }
 
         /* Domain balance */
-        .domain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-        .domain-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 22px; }
-        .domain-card .name { font-family: var(--mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
-        .domain-card .pct { font-size: 2.4rem; font-weight: 600; font-family: var(--mono); line-height: 1; }
-        .domain-card .base { font-size: 0.72rem; color: var(--text-muted); font-family: var(--mono); margin-top: 10px; }
-        .domain-card .meter { height: 6px; background: rgba(255,255,255,0.06); margin-top: 14px; border-radius: 2px; overflow: hidden; }
+        .domain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .domain-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 22px;
+        }
+        .domain-card .name {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+        .domain-card .pct {
+            font-size: 2.4rem;
+            font-weight: 600;
+            font-family: var(--mono);
+            line-height: 1;
+        }
+        .domain-card .base {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+        .domain-card .meter {
+            height: 6px;
+            background: #d3dde7;
+            margin-top: 14px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
         .domain-card .meter > div { height: 100%; width: 0; transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
         /* Coverage */
-        .coverage-block { margin-bottom: 26px; }
-        .coverage-block h4 { font-family: var(--mono); font-size: 0.9rem; color: var(--text-main); margin-bottom: 12px; font-weight: 500; }
+        .coverage-block { margin-bottom: 22px; }
+        .coverage-block h4 {
+            font-size: 0.92rem;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
         .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-        .pill { font-family: var(--mono); font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; border: 1px solid currentColor; background: rgba(255,255,255,0.02); }
-        .empty-note { color: var(--text-muted); font-family: var(--mono); font-size: 0.82rem; }
+        .pill {
+            font-size: 0.78rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid currentColor;
+            background: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+        .empty-note {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            font-style: italic;
+        }
 
-        /* Team grid */
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
-        .team-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px 22px; }
-        .team-card h4 { font-family: var(--mono); font-size: 0.92rem; color: var(--accent-green); margin-bottom: 4px; font-weight: 500; }
-        .team-card .count { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); margin-bottom: 14px; }
+        /* Team cards */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 14px;
+        }
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 22px;
+        }
+        .team-card h4 {
+            font-size: 1.02rem;
+            color: var(--accent-green);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .team-card .count {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
         .team-themes { list-style: none; padding: 0; margin: 0; }
-        .team-themes li { font-family: var(--mono); font-size: 0.85rem; padding: 8px 0; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .team-themes li {
+            font-size: 0.9rem;
+            padding: 9px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid var(--border-light);
+        }
         .team-themes li:last-child { border-bottom: none; }
         .team-themes .theme { font-weight: 500; }
-        .team-themes .meta-rank { color: var(--text-muted); font-size: 0.72rem; }
+        .team-themes .meta-rank {
+            color: var(--text-muted);
+            font-size: 0.76rem;
+            font-family: var(--mono);
+        }
 
         /* Roster */
-        .roster-wrap { overflow-x: auto; }
-        .roster { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.8rem; }
-        .roster th, .roster td { padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        .roster th { color: var(--text-muted); text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.05em; font-weight: 500; }
-        .roster td.nickname { color: var(--text-main); font-weight: 500; }
+        .roster-wrap {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            overflow: hidden;
+            overflow-x: auto;
+        }
+        .roster { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .roster th, .roster td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+        .roster th {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.07em;
+            font-weight: 600;
+            background: rgba(36, 83, 117, 0.04);
+        }
+        .roster td.nickname { color: var(--text-main); font-weight: 600; }
         .roster tr.you td.nickname { color: var(--accent-green); }
-        .roster tr.you { background: rgba(116, 108, 240, 0.04); }
-        .chip { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 0.72rem; margin: 2px 4px 2px 0; border: 1px solid; background: rgba(255,255,255,0.02); }
+        .roster tr.you { background: rgba(40, 112, 237, 0.06); }
+
+        /* Chips */
+        .chip {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 14px;
+            font-size: 0.76rem;
+            margin: 2px 4px 2px 0;
+            border: 1px solid currentColor;
+            background: rgba(255, 255, 255, 0.4);
+            font-weight: 500;
+        }
+        .chip .contrib {
+            font-size: 0.66rem;
+            color: var(--text-muted);
+            margin-left: 5px;
+            opacity: 0.85;
+        }
+        .chip.filled {
+            background: currentColor;
+            border-color: currentColor;
+        }
+        .chip.filled .chip-text { color: white; font-weight: 600; }
+        .chip.filled .contrib { color: rgba(255,255,255,0.8); opacity: 1; }
 
         footer {
             padding: 30px 8%;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--border-light);
             color: var(--text-muted);
-            font-size: 0.82rem;
-            font-family: var(--mono);
+            font-size: 0.86rem;
+            background: var(--card-bg);
+        }
+        footer .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
         }
 
         @media (max-width: 700px) {
             .bar-row { grid-template-columns: 120px 1fr 36px; gap: 10px; }
-            .bar-label { font-size: 0.72rem; }
-            h1 { font-size: 1.9rem; }
+            .bar-label { font-size: 0.74rem; }
+            h1 { font-size: 1.8rem; }
         }
 
-        /* PCA plot */
-        #pca-plot {
+        /* PCA */
+        #pca-plot, #pca-biplot-plot, #similarity-plot, #cooccurrence-plot {
             background: var(--card-bg);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-light);
             border-radius: 8px;
-            padding: 16px;
+            padding: 18px;
         }
-        #pca-plot svg { display: block; }
+        #pca-plot svg,
+        #pca-biplot-plot svg,
+        #similarity-plot svg,
+        #cooccurrence-plot svg { display: block; overflow: visible; }
+
         .footnote {
-            font-family: var(--mono);
-            font-size: 0.72rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             margin-top: 14px;
             max-width: 760px;
@@ -235,56 +407,55 @@
         }
         .picker-grid label {
             display: block;
-            font-family: var(--mono);
-            font-size: 0.68rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.07em;
             margin-bottom: 6px;
+            font-weight: 600;
         }
         .picker-grid select {
             width: 100%;
             background: var(--card-bg);
             border: 1px solid var(--border);
             color: var(--text-main);
-            font-family: var(--mono);
-            font-size: 0.85rem;
+            font-family: inherit;
+            font-size: 0.9rem;
             padding: 10px 12px;
             border-radius: 6px;
             cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .picker-grid select:focus { outline: 1px solid var(--accent-green); }
+        .picker-grid select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(36, 83, 117, 0.12);
+        }
 
         .pair-card {
             background: var(--card-bg);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-light);
             border-radius: 8px;
-            padding: 24px;
+            padding: 26px;
             margin-top: 20px;
         }
         .pair-card h4 {
-            font-family: var(--mono);
-            font-size: 1rem;
+            font-size: 1.05rem;
             color: var(--accent-green);
             margin-bottom: 18px;
-            font-weight: 500;
+            font-weight: 600;
         }
         .pair-section { margin-bottom: 22px; }
         .pair-section:last-child { margin-bottom: 0; }
         .pair-section .label {
-            font-family: var(--mono);
             font-size: 0.72rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.07em;
             margin-bottom: 10px;
+            font-weight: 600;
         }
-        .chip .contrib {
-            font-size: 0.62rem;
-            color: var(--text-muted);
-            margin-left: 5px;
-            opacity: 0.85;
-        }
+
         .domain-bar {
             display: grid;
             grid-template-columns: 170px 1fr 36px;
@@ -292,29 +463,46 @@
             align-items: center;
             margin: 5px 0;
         }
-        .domain-bar .dname { font-family: var(--mono); font-size: 0.78rem; }
-        .domain-bar .dtrack { background: rgba(255,255,255,0.04); height: 13px; border-radius: 2px; overflow: hidden; }
+        .domain-bar .dname { font-size: 0.85rem; font-weight: 500; }
+        .domain-bar .dtrack { background: #d3dde7; height: 13px; border-radius: 2px; overflow: hidden; }
         .domain-bar .dfill { height: 100%; transition: width 0.5s ease; }
-        .domain-bar .dval { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); text-align: right; }
+        .domain-bar .dval {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
 
         /* Top pairs table */
-        .pairs-table-wrap { overflow-x: auto; }
-        .pairs-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.8rem; }
+        .pairs-table-wrap {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            overflow: hidden;
+            overflow-x: auto;
+        }
+        .pairs-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
         .pairs-table th, .pairs-table td {
-            padding: 10px 12px;
+            padding: 11px 14px;
             text-align: left;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--border-light);
             vertical-align: middle;
         }
         .pairs-table th {
             color: var(--text-muted);
             text-transform: uppercase;
-            font-size: 0.68rem;
-            letter-spacing: 0.05em;
-            font-weight: 500;
+            font-size: 0.7rem;
+            letter-spacing: 0.07em;
+            font-weight: 600;
+            background: rgba(36, 83, 117, 0.04);
         }
-        .pairs-table td.users { color: var(--text-main); font-weight: 500; white-space: nowrap; }
-        .pairs-table td.score { color: var(--accent-green); white-space: nowrap; }
+        .pairs-table td.users { color: var(--text-main); font-weight: 600; white-space: nowrap; }
+        .pairs-table td.score {
+            color: var(--accent-green);
+            white-space: nowrap;
+            font-weight: 600;
+            font-family: var(--mono);
+        }
 
         /* Complementarities list */
         .complement-list { list-style: none; padding: 0; margin: 0; }
@@ -323,21 +511,55 @@
             grid-template-columns: 150px 1fr auto;
             align-items: center;
             gap: 14px;
-            padding: 9px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            font-family: var(--mono);
-            font-size: 0.82rem;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.88rem;
         }
         .complement-list li:last-child { border-bottom: none; }
-        .complement-list .talent { font-weight: 500; }
-        .complement-list .ranks { color: var(--text-muted); font-size: 0.78rem; }
+        .complement-list .talent { font-weight: 600; }
+        .complement-list .ranks {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-family: var(--mono);
+        }
         .complement-list .gap-val {
             color: var(--accent-green);
             font-size: 0.72rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.07em;
             white-space: nowrap;
+            font-weight: 700;
         }
+
+        .explainer {
+        background: rgba(0, 0, 0, 0.03);
+        border-left: 3px solid var(--accent-green);
+        border-radius: 4px;
+        padding: 1rem 1.25rem;
+        margin: 1.5rem 0;
+        }
+
+        .explainer summary {
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0.25rem 0;
+        }
+
+        .explainer summary:hover {
+        color: var(--accent-green);
+        }
+
+        .explainer p,
+        .explainer ul {
+        margin-top: 0.75rem;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        }
+
+        .explainer ul {
+        padding-left: 1.25rem;
+        }
+
         @media (max-width: 600px) {
             .complement-list li {
                 grid-template-columns: 1fr;
@@ -345,14 +567,6 @@
                 padding: 12px 0;
             }
         }
-
-        /* Filled chip variant (used when all members share a talent) */
-        .chip.filled {
-            background: currentColor;
-            border-color: currentColor;
-        }
-        .chip.filled .chip-text { color: var(--bg); font-weight: 500; }
-        .chip.filled .contrib { color: var(--bg); opacity: 0.6; }
 
         /* Top-pairs navigation */
         .pairs-nav {
@@ -365,7 +579,6 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             color: var(--accent-green);
-            font-family: var(--mono);
             font-size: 0.85rem;
             padding: 8px 14px;
             border-radius: 6px;
@@ -375,29 +588,19 @@
         }
         .nav-arrow:hover:not(:disabled) {
             border-color: var(--accent-green);
-            box-shadow: 0 0 12px rgba(116, 108, 240, 0.25);
+            background: rgba(36, 83, 117, 0.05);
         }
         .nav-arrow:disabled {
-            opacity: 0.3;
+            opacity: 0.4;
             cursor: not-allowed;
         }
         .pairs-counter {
             color: var(--text-muted);
+            font-size: 0.85rem;
             font-family: var(--mono);
-            font-size: 0.8rem;
         }
 
-        /* Best combinations for selected user */
-        .combo-title {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            font-weight: 600;
-            margin: 28px 0 14px;
-        }
-        .combo-title:first-child { margin-top: 0; }
+        /* Best combinations */
         .combo-list {
             list-style: none;
             padding: 0;
@@ -406,9 +609,9 @@
         }
         .combo-list > li {
             background: var(--card-bg);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-light);
             border-radius: 8px;
-            padding: 16px 20px 16px 56px;
+            padding: 20px 22px 20px 60px;
             margin-bottom: 10px;
             position: relative;
             counter-increment: combo;
@@ -417,11 +620,10 @@
             content: counter(combo);
             position: absolute;
             left: 22px;
-            top: 18px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 1rem;
+            top: 20px;
+            font-weight: 700;
+            color: var(--accent-green);
+            font-size: 1.15rem;
         }
         .combo-list .combo-header {
             display: flex;
@@ -432,10 +634,9 @@
             flex-wrap: wrap;
         }
         .combo-list .combo-partners {
-            font-family: 'Inter', sans-serif;
             color: var(--text-main);
-            font-weight: 500;
-            font-size: 0.95rem;
+            font-weight: 600;
+            font-size: 1rem;
         }
         .combo-list .combo-stats {
             font-family: var(--mono);
@@ -450,43 +651,37 @@
         .combo-gaps {
             margin-top: 14px;
             padding-top: 12px;
-            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+            border-top: 1px dashed var(--border);
         }
         .combo-gaps-title {
-            font-family: var(--mono);
-            font-size: 0.68rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.07em;
             margin-bottom: 8px;
+            font-weight: 600;
         }
         .combo-gaps .complement-list li {
             padding: 6px 0;
-            font-size: 0.78rem;
+            font-size: 0.82rem;
         }
 
-        /* Heatmaps & biplot */
-        #similarity-plot, #cooccurrence-plot, #pca-biplot-plot {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-        }
-        #similarity-plot svg,
-        #cooccurrence-plot svg,
-        #pca-biplot-plot svg { display: block; overflow: visible; }
+        /* Heatmap legends */
         .heat-legend {
             display: flex; align-items: center; gap: 10px;
-            font-family: var(--mono); font-size: 0.72rem;
-            color: var(--text-muted); margin-bottom: 14px; flex-wrap: wrap;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            flex-wrap: wrap;
         }
         .heat-legend .scale {
             display: inline-block; width: 140px; height: 12px;
             border-radius: 2px;
-            background: linear-gradient(to right, rgba(180,63,130,0.85), #0d1117, rgba(116,108,240,0.85));
+            background: linear-gradient(to right, #EB4C79, #ffffff, #2870ED);
+            border: 1px solid var(--border-light);
         }
         .heat-legend .scale-mono {
-            background: linear-gradient(to right, #0d1117, rgba(116,108,240,0.85));
+            background: linear-gradient(to right, #ffffff, #2870ED);
         }
         .heat-legend .legend-note { margin-left: 10px; opacity: 0.85; }
 
@@ -494,20 +689,19 @@
         .bottleneck-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 16px;
+            gap: 14px;
         }
         .bottleneck-card {
             background: var(--card-bg);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-light);
             border-radius: 8px;
-            padding: 20px 22px;
+            padding: 22px 24px;
         }
         .bottleneck-card h4 {
-            font-family: var(--mono);
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--accent-green);
             margin-bottom: 14px;
-            font-weight: 500;
+            font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: baseline;
@@ -515,63 +709,69 @@
         }
         .bottleneck-card h4 .count {
             color: var(--text-muted);
-            font-size: 0.72rem;
-            font-weight: 400;
+            font-size: 0.74rem;
+            font-weight: 500;
         }
         .bottleneck-list { list-style: none; padding: 0; margin: 0; }
         .bottleneck-list li {
             display: grid;
             grid-template-columns: 1fr auto;
             gap: 12px;
-            padding: 8px 0;
-            font-family: var(--mono);
-            font-size: 0.82rem;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding: 9px 0;
+            font-size: 0.88rem;
+            border-bottom: 1px solid var(--border-light);
             align-items: baseline;
         }
         .bottleneck-list li:last-child { border-bottom: none; }
-        .bottleneck-list .talent { font-weight: 500; }
+        .bottleneck-list .talent { font-weight: 600; }
         .bottleneck-list .owners {
             color: var(--text-muted);
-            font-size: 0.78rem;
+            font-size: 0.82rem;
+            font-family: var(--mono);
             text-align: right;
         }
 
         /* Distinctiveness */
+        #distinctiveness-output {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 6px 22px;
+        }
         .distinct-row {
             display: grid;
             grid-template-columns: 36px 110px 1fr 50px;
             grid-template-rows: auto auto;
             gap: 4px 14px;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-light);
         }
         .distinct-row:last-child { border-bottom: none; }
         .distinct-row.you {
-            background: rgba(116, 108, 240, 0.05);
-            border-radius: 4px;
-            margin: 0 -10px;
-            padding: 12px 10px;
+            background: rgba(40, 112, 237, 0.06);
+            border-radius: 6px;
+            margin: 0 -12px;
+            padding: 16px 12px;
         }
         .distinct-rank {
             grid-row: 1;
             font-family: var(--mono);
             color: var(--text-muted);
-            font-size: 0.78rem;
+            font-size: 0.85rem;
             text-align: right;
+            font-weight: 600;
         }
         .distinct-name {
             grid-row: 1;
-            font-family: var(--mono);
-            font-size: 0.85rem;
+            font-size: 0.92rem;
             color: var(--text-main);
-            font-weight: 500;
+            font-weight: 600;
         }
         .distinct-row.you .distinct-name { color: var(--accent-green); }
         .distinct-bar-track {
             grid-row: 1;
-            background: rgba(255,255,255,0.04);
+            background: #d3dde7;
             height: 12px;
             border-radius: 2px;
             overflow: hidden;
@@ -585,14 +785,15 @@
         .distinct-score-val {
             grid-row: 1;
             font-family: var(--mono);
-            font-size: 0.82rem;
+            font-size: 0.88rem;
             color: var(--text-muted);
             text-align: right;
+            font-weight: 600;
         }
         .distinct-chips {
             grid-row: 2;
             grid-column: 2 / -1;
-            padding-top: 4px;
+            padding-top: 6px;
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
@@ -607,30 +808,28 @@
 <body>
 
 <div id="scroll-progress"></div>
-<div class="dna-sidebar">10011010111110011111001101011111001111100110101111100111110011010111110011111001101011111001111</div>
 
 <header>
-    <div class="code-snippet">$ cd ./projects/gallup_strengths/</div>
-    <h1>Gallup Strengths Analysis</h1>
-    <div class="code-snippet" style="margin-top: 10px; opacity: 0.9;">
-        <span style="color:#f6d365;">print</span>(<span style="color:#43e97b;">"Static analysis of 23 CliftonStrengths assessments."</span>)
+    <div class="header-inner">
+        <a href="index.html" class="back-link">
+            <i class="fa fa-arrow-left"></i> Back to home
+        </a>
+        <h1>Gallup Strengths Analysis</h1>
+        <p class="header-subtitle">Static analysis of 23 CliftonStrengths assessments.</p>
     </div>
-    <a href="index.html" class="download-btn">
-        <i class="fa fa-arrow-left"></i> back to home
-    </a>
 </header>
 
 <main>
 
 <section class="section-block">
-    <h2>overview.json</h2>
-    <p class="lead">23 colleagues, each ranked across all 34 Gallup CliftonStrengths talents. The 34 talents are grouped into four domains &mdash; <span style="color: var(--d-exec)">Executing</span>, <span style="color: var(--d-infl)">Influencing</span>, <span style="color: var(--d-rel)">Relationship Building</span>, and <span style="color: var(--d-stra)">Strategic Thinking</span>. Names are anonymised; each person is identified by a numeric user ID.</p>
+    <h2>Overview</h2>
+    <p class="lead">23 assessments, each ranked across all 34 Gallup CliftonStrengths talents. The 34 talents are grouped into four domains - <span style="color: var(--d-exec); font-weight: 600;">Executing</span>, <span style="color: var(--d-infl); font-weight: 600;">Influencing</span>, <span style="color: var(--d-rel); font-weight: 600;">Relationship Building</span>, and <span style="color: var(--d-stra); font-weight: 600;">Strategic Thinking</span>. Names are anonymised and each person is identified by a numeric user ID.</p>
     <div class="stats-grid" id="overview"></div>
 </section>
 
 <section class="section-block">
-    <h2>talent_frequency.bar</h2>
-    <p class="lead">For each talent, how many of the 23 people have it inside their top 5 signature strengths. Bars are coloured by domain, sorted descending.</p>
+    <h2>Talent Frequency</h2>
+    <p class="lead">For each talent, how many of the 23 people have it inside their top 5 signature strengths. Bars are coloured by talent domain, sorted descending.</p>
     <div class="legend">
         <span><span class="swatch d-Executing"></span>Executing</span>
         <span><span class="swatch d-Influencing"></span>Influencing</span>
@@ -641,14 +840,28 @@
 </section>
 
 <section class="section-block">
-    <h2>domain_balance.json</h2>
+    <h2>Domain Balance</h2>
     <p class="lead">Out of all top-5 slots in the department, what share lands in each domain? The <em>baseline</em> is what we'd expect if the 34 talents were drawn uniformly.</p>
     <div class="domain-grid" id="domain-cards"></div>
 </section>
 
 <section class="section-block">
-    <h2>pca.svg</h2>
-    <p class="lead">Two-dimensional projection of each person's full 34-talent rank profile, computed via principal component analysis. Points that sit close together have similar strength profiles overall; distance reflects difference across all talents &mdash; not just top 5. Each dot is colored by its owner's dominant top-5 domain; my own dot (<span style="color: var(--accent-green); font-family: var(--mono);">User33</span>) is outlined.</p>
+    <h2>Profile Map (PCA)</h2>
+    <p class="lead">Two-dimensional projection of each person's full 34-talent rank profile, computed via principal component analysis. Points that sit close together have similar strength profiles overall; distance reflects difference across all talents - not just top 5. Each dot is colored by its owner's dominant top-5 domain; my own dot (<span style="color: var(--accent-green); font-weight: 600;">User33</span>) is outlined.</p>
+    
+    <details class="explainer">
+        <summary>What is PCA, and what am I looking at?</summary>
+        <p>Each person in this analysis is described by 34 numbers (their talents ranked 1 - most significant to 34 - least significant). That's a 34-dimensional profile, which is impossible to plot directly. <strong>Principal Component Analysis (PCA)</strong> is a technique that squashes high-dimensional data down to 2D so we can actually see it.</p>
+        <p>The trick: instead of just picking two talents and ignoring the other 32, PCA finds the two <em>directions</em> through the full 34-dimensional space where people differ from each other the most, and projects everyone onto those two directions. Think of it like photographing a 3D sculpture - you can only capture 2D in a photo, so you'd choose the angle that reveals the most interesting structure. PCA picks that "best angle" mathematically, but in 34 dimensions instead of 3.</p>
+        <p>What this means for the chart below:</p>
+        <ul>
+            <li>The axes don't represent any single talent - they're abstract combinations of all 34, weighted to maximize how spread out people appear.</li>
+            <li><strong>Close dots</strong> = people with overall similar talent profiles, even if their top-5 lists look different on paper.</li>
+            <li><strong>Distant dots</strong> = genuinely different ways of thinking and working.</li>
+            <li><strong>Clusters</strong> hint at groups of people who'd likely approach problems in similar ways.</li>
+        </ul>
+    </details>
+    
     <div class="legend">
         <span><span class="swatch d-Executing"></span>Executing</span>
         <span><span class="swatch d-Influencing"></span>Influencing</span>
@@ -660,8 +873,8 @@
 </section>
 
 <section class="section-block">
-    <h2>pca_biplot.svg</h2>
-    <p class="lead">Same PC1/PC2 axes as the projection above, overlaid with the 12 talents whose loadings on these components are largest. Each arrow points toward the kind of person who scores high on that talent &mdash; people in the direction of, say, <em>Achiever</em> rank Achiever near the top of their list; people opposite the arrow rank it near the bottom. Faint dots are people, plotted at the same coordinates as in the PCA above for reference.</p>
+    <h2>What Drives the Map</h2>
+    <p class="lead">Same PC1/PC2 axes as the projection above, overlaid with the 12 talents whose loadings on these components are largest. Each arrow points toward the kind of person who scores high on that talent - people in the direction of, say, <em>Achiever</em> rank Achiever near the top of their list; people opposite the arrow rank it near the bottom. Faint dots are people, plotted at the same coordinates as in the PCA above for reference.</p>
     <div class="legend">
         <span><span class="swatch d-Executing"></span>Executing</span>
         <span><span class="swatch d-Influencing"></span>Influencing</span>
@@ -673,8 +886,8 @@
 </section>
 
 <section class="section-block">
-    <h2>similarity_matrix.svg</h2>
-    <p class="lead">Spearman rank correlation between every pair of people, computed across all 34 talents. Purple = similar overall profile, magenta = opposite profile, dark = unrelated. Rows and columns are ordered by team with separators between teams &mdash; bright purple blocks along the diagonal would mean a team's members are unusually similar to each other; an isolated bright cell outside the diagonal blocks means two people on different teams share a profile.</p>
+    <h2>Person &times; Person Similarity</h2>
+    <p class="lead">Spearman rank correlation between every pair of people, computed across all 34 talents. Blue = similar overall profile, pink = opposite profile, light = unrelated. Rows and columns are ordered by team with separators between teams - bright blue blocks along the diagonal would mean a team's members are unusually similar to each other; an isolated bright cell outside the diagonal blocks means two people on different teams share a profile.</p>
     <div class="heat-legend">
         <span>&minus;1</span>
         <span class="scale"></span>
@@ -685,7 +898,7 @@
 </section>
 
 <section class="section-block">
-    <h2>talent_cooccurrence.svg</h2>
+    <h2>Talent Co-occurrence</h2>
     <p class="lead">For every pair of talents, how many of the 23 people carry both in their top 5. Talents are grouped into the four domain blocks (separators drawn between blocks); bright squares clustered inside a block mean talents in that domain tend to be carried by the same people. The diagonal repeats each talent's overall frequency for reference.</p>
     <div class="heat-legend">
         <span>0</span>
@@ -697,26 +910,26 @@
 </section>
 
 <section class="section-block">
-    <h2>coverage.log</h2>
-    <p class="lead">Talents that no one in the department has in their top 5 &mdash; and top 10. Useful to flag when assembling a team for a project that needs those strengths.</p>
+    <h2>Coverage Gaps</h2>
+    <p class="lead">Talents that no one in the department has in their top 5 - and top 10. Useful to flag when assembling a team for a project that needs those strengths.</p>
     <div id="coverage-output"></div>
 </section>
 
 <section class="section-block">
-    <h2>bottleneck.log</h2>
-    <p class="lead">Talents that only one or two people in the department carry in their top 5. If those people are unavailable for an assignment, that strength essentially leaves the department &mdash; useful to know when scoping a project that needs them, or when thinking about cross-training and resilience.</p>
+    <h2>Bottleneck Talents</h2>
+    <p class="lead">Talents that only one or two people in the department carry in their top 5. If those people are unavailable for an assignment, that strength essentially leaves the department - useful to know when scoping a project that needs them, or when thinking about cross-training and resilience.</p>
     <div id="bottleneck-output"></div>
 </section>
 
 <section class="section-block">
-    <h2>by_team.md</h2>
-    <p class="lead">Per-team collective strengths. For each unit, talents ranked by average rank across its members &mdash; lower average = stronger collective signal.</p>
+    <h2>Strengths by Team</h2>
+    <p class="lead">Per-team collective strengths. For each unit, talents ranked by average rank across its members - lower average = stronger collective signal.</p>
     <div class="team-grid" id="team-output"></div>
 </section>
 
 <section class="section-block">
-    <h2>pair_picker.js</h2>
-    <p class="lead">Pick two or three people to see their combined signature strengths, how the four domains split across the group, and which talents none of them have in their top 10 &mdash; useful when staffing an engagement and you want to check who's bringing what.</p>
+    <h2>Pair Picker</h2>
+    <p class="lead">Pick two or three people to see their combined signature strengths, how the four domains split across the group, and which talents none of them have in their top 10 - useful when staffing an engagement and you want to check who's bringing what.</p>
     <div class="picker-grid">
         <div><label>Person A</label><select id="pick-a"></select></div>
         <div><label>Person B</label><select id="pick-b"></select></div>
@@ -726,8 +939,8 @@
 </section>
 
 <section class="section-block">
-    <h2>best_combinations.json</h2>
-    <p class="lead">For one selected person, the top five most complementary 2-person staffing combinations &mdash; with the specific talents that complement each other inside each pairing. Pool is limited to operational team members; managers and the methodology owner (User01, User02, User04) are excluded. Filled chips mean both members have that talent in their own top 5.</p>
+    <h2>Best Combinations</h2>
+    <p class="lead">For one selected person, the top five most complementary 2-person staffing combinations - with the specific talents that complement each other inside each pairing. Pool is limited to operational team members; managers and the methodology owner (User01, User02, User04) are excluded. Filled chips mean both members have that talent in their own top 5.</p>
     <div class="picker-grid" style="max-width: 360px;">
         <div><label>Selected person</label><select id="best-for-user"></select></div>
     </div>
@@ -735,7 +948,7 @@
 </section>
 
 <section class="section-block">
-    <h2>top_complementary_pairs.csv</h2>
+    <h2>Top Complementary Pairs</h2>
     <p class="lead">All 253 possible pairs ranked by how many <em>unique</em> talents appear in their combined top 5 (max 10 if no overlap). Filled chips mean both members have that talent in their own top 5. Use the arrows to scroll through the ranking.</p>
     <div class="pairs-nav">
         <button class="nav-arrow" id="pairs-prev" aria-label="previous page"><i class="fa fa-arrow-left"></i></button>
@@ -746,13 +959,13 @@
 </section>
 
 <section class="section-block">
-    <h2>roster.tsv</h2>
-    <p class="lead">Each person's top five talents. My own row (<span style="color: var(--accent-green); font-family: var(--mono);">User33</span>) is highlighted.</p>
+    <h2>Roster</h2>
+    <p class="lead">Each person's top five talents. My own row (<span style="color: var(--accent-green); font-weight: 600;">User33</span>) is highlighted.</p>
     <div class="roster-wrap"><table class="roster" id="roster"></table></div>
 </section>
 
 <section class="section-block">
-    <h2>distinctiveness.tsv</h2>
+    <h2>Distinctiveness</h2>
     <p class="lead">For each person, the sum of <em>1 &divide; (how many people share each top-5 talent)</em>, across their five signature strengths. Higher = a profile that is harder to replicate from the rest of the department. A score near 5 would mean every one of their top-5 talents is unique to them; a score near 1 means each is widely shared. Chips show the talent and the freq within the 23-person department.</p>
     <div id="distinctiveness-output"></div>
 </section>
@@ -760,7 +973,9 @@
 </main>
 
 <footer>
-    <p>Source data: anonymised departmental CliftonStrengths results. Analysis computed client-side in vanilla JavaScript &mdash; no external libraries.</p>
+    <div class="footer-inner">
+        <p>Source data: anonymised departmental CliftonStrengths results. Analysis computed client-side in vanilla JavaScript - no external libraries.</p>
+    </div>
 </footer>
 
 <script>
@@ -873,7 +1088,7 @@ document.getElementById('domain-cards').innerHTML = Object.keys(domains).map(d =
 /* ---------- coverage gaps ---------- */
 const missingAt = (n) => themes.filter(t => !people.some(p => p.ranks[t] <= n));
 const renderPills = (arr) => arr.length === 0
-    ? `<span class="empty-note">&mdash; every talent is represented &mdash;</span>`
+    ? `<span class="empty-note">- every talent is represented -</span>`
     : arr.map(t => `<span class="pill" style="color: var(${domainVar[themeDomain[t]]})">${t}</span>`).join('');
 
 const m5 = missingAt(5);
@@ -891,7 +1106,7 @@ document.getElementById('coverage-output').innerHTML = `
 
 /* ---------- by team ---------- */
 const teamGroups = [
-    { name: 'management & methodology', teams: ['general_manager', 'dep1_manager', 'methodology'] },
+    { name: 'Management & methodology', teams: ['general_manager', 'dep1_manager', 'methodology'] },
     { name: 'dep1_team1', teams: ['dep1_team1'] },
     { name: 'dep1_team2', teams: ['dep1_team2'] },
     { name: 'dep1_team3', teams: ['dep1_team3'] },
@@ -968,23 +1183,19 @@ function powerIter(M, maxIter = 500, tol = 1e-12) {
         if (Math.abs(newLam - lam) < tol) { v = vNew; lam = newLam; break; }
         v = vNew; lam = newLam;
     }
-    // Sign convention: largest |coord| is positive (so plot is stable across runs)
     const maxI = v.reduce((mi, x, i) => Math.abs(x) > Math.abs(v[mi]) ? i : mi, 0);
     if (v[maxI] < 0) v = v.map(x => -x);
     return { vec: v, val: lam };
 }
 
-// Feature matrix: invert rank so higher = stronger (rank 1 -> 34, rank 34 -> 1)
 const Xraw = people.map(p => themes.map(t => 35 - p.ranks[t]));
 const colMeans = themes.map((_, j) => Xraw.reduce((s, r) => s + r[j], 0) / N);
 const Xc = Xraw.map(r => r.map((v, j) => v - colMeans[j]));
 
-// Gram matrix Xc * Xc^T  (N x N) -- eigenvectors give left singular vectors
 const Gram = matmulM(Xc, transposeM(Xc));
 const trGram = Gram.reduce((s, r, i) => s + r[i], 0);
 
 const pc1 = powerIter(Gram);
-// Deflate
 const G2 = Gram.map((r, i) => r.map((x, j) => x - pc1.val * pc1.vec[i] * pc1.vec[j]));
 const pc2 = powerIter(G2);
 
@@ -1016,18 +1227,18 @@ function dominantDomain(p) {
         const isYou = p.nickname === 'User33';
         const cx = sx(xs[i]), cy = sy(ys[i]);
         return `
-            <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isYou ? 8 : 5}" fill="var(${cssVar})" opacity="${isYou ? 1 : 0.78}"${isYou ? ' stroke="#746cf0" stroke-width="2"' : ''}>
+            <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isYou ? 8 : 5}" fill="var(${cssVar})" opacity="${isYou ? 1 : 0.85}"${isYou ? ' stroke="#245375" stroke-width="2"' : ''}>
                 <title>${p.nickname} — dominant: ${d}</title>
             </circle>
-            <text x="${(cx + 10).toFixed(1)}" y="${(cy + 4).toFixed(1)}" fill="${isYou ? '#746cf0' : 'rgba(230,237,243,0.65)'}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="${isYou ? '600' : '400'}">${p.nickname}</text>
+            <text x="${(cx + 10).toFixed(1)}" y="${(cy + 4).toFixed(1)}" fill="${isYou ? '#245375' : '#5d6b7e'}" font-family="Inter, sans-serif" font-size="10" font-weight="${isYou ? '700' : '500'}">${p.nickname}</text>
         `;
     }).join('');
 
     document.getElementById('pca-plot').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width: ${W}px;">
-        <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD}" y2="${H-PAD}" stroke="rgba(255,255,255,0.12)"/>
-        <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H-PAD}" stroke="rgba(255,255,255,0.12)"/>
-        <text x="${W/2}" y="${H-12}" fill="rgba(230,237,243,0.6)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle">PC1 &nbsp;·&nbsp; ${varExp1}% variance</text>
-        <text x="20" y="${H/2}" fill="rgba(230,237,243,0.6)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" transform="rotate(-90 20 ${H/2})">PC2 &nbsp;·&nbsp; ${varExp2}% variance</text>
+        <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD}" y2="${H-PAD}" stroke="rgba(36,83,117,0.18)"/>
+        <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H-PAD}" stroke="rgba(36,83,117,0.18)"/>
+        <text x="${W/2}" y="${H-12}" fill="#5d6b7e" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" font-weight="500">PC1 &nbsp;·&nbsp; ${varExp1}% variance</text>
+        <text x="20" y="${H/2}" fill="#5d6b7e" font-family="Inter, sans-serif" font-size="11" text-anchor="middle" font-weight="500" transform="rotate(-90 20 ${H/2})">PC2 &nbsp;·&nbsp; ${varExp2}% variance</text>
         ${dots}
     </svg>`;
 })();
@@ -1054,7 +1265,6 @@ function renderPair() {
     }
     const group = uniqueIds.map(id => people.find(p => p.nickname === id));
 
-    // Owners for top-5 and top-10 themes
     const owners5 = {}, owners10 = {};
     group.forEach(m => {
         m.ordered.slice(0, 5).forEach(t => (owners5[t] = owners5[t] || []).push(m.nickname));
@@ -1064,13 +1274,11 @@ function renderPair() {
     const domSet5 = new Set(combined5.map(t => themeDomain[t]));
     const missingDomains = Object.keys(domains).filter(d => !domSet5.has(d));
 
-    // Blind spots: 5 talents where even the best-ranked person in the group ranks them weakly
     const blindspots = themes
         .map(t => ({ talent: t, minRank: Math.min(...group.map(m => m.ranks[t])) }))
         .sort((a, b) => b.minRank - a.minRank)
         .slice(0, 5);
 
-    // Best complementarities: one member has the talent in top 5, another has it ranked much lower
     const complementarities = themes
         .map(t => {
             const ranks = group.map(m => ({ name: m.nickname, rank: m.ranks[t] }));
@@ -1081,7 +1289,6 @@ function renderPair() {
         .sort((a, b) => b.gap - a.gap)
         .slice(0, 5);
 
-    // Domain mix of combined top-5
     const domCount = { 'Executing': 0, 'Influencing': 0, 'Relationship Building': 0, 'Strategic Thinking': 0 };
     combined5.forEach(t => { domCount[themeDomain[t]] += owners5[t].length; });
     const slotTotal = group.length * 5;
@@ -1162,14 +1369,12 @@ function renderBestCombos() {
     const others = eligiblePool.filter(p => p.nickname !== selectedNick);
     const myTop = new Set(me.ordered.slice(0, 5));
 
-    // 2-person combinations: me + each eligible partner
     const bcPairs = others.map(p => {
         const pTop = new Set(p.ordered.slice(0, 5));
         const union = [...new Set([...myTop, ...pTop])];
         const intersection = [...myTop].filter(t => pTop.has(t));
         const doms = new Set(union.map(t => themeDomain[t]));
 
-        // Complementary gaps: one has the talent in top 5, the other ranks it much lower
         const pair = [me, p];
         const gaps = themes
             .map(t => {
@@ -1293,16 +1498,12 @@ document.getElementById('pairs-next').addEventListener('click', () => {
 
 renderPairsPage();
 
-/* ---------- scroll progress + mouse glow ---------- */
+/* ---------- scroll progress ---------- */
 window.onscroll = function() {
     const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
     const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     document.getElementById("scroll-progress").style.width = ((winScroll / height) * 100) + "%";
 };
-window.addEventListener('mousemove', e => {
-    document.body.style.setProperty('--mouse-x', e.clientX + 'px');
-    document.body.style.setProperty('--mouse-y', e.clientY + 'px');
-});
 
 /* ============================================================ */
 /* ====================== ADVANCED ANALYTICS =================== */
@@ -1310,7 +1511,6 @@ window.addEventListener('mousemove', e => {
 
 /* ---------- PCA biplot (scores + loadings) ---------- */
 (function renderBiplot() {
-    // raw_loading_j,k = (X^T U)_jk = sum_i Xc[i][j] * pc_k.vec[i]  (== V_jk * sigma_k)
     const loadings = themes.map((t, j) => {
         let v1 = 0, v2 = 0;
         for (let i = 0; i < N; i++) {
@@ -1335,7 +1535,7 @@ window.addEventListener('mousemove', e => {
     const dots = pcaScores.map((s, i) => {
         const d = dominantDomain(people[i]);
         const cssVar = domainVar[d];
-        return `<circle cx="${sx(s[0]).toFixed(1)}" cy="${sy(s[1]).toFixed(1)}" r="3" fill="var(${cssVar})" opacity="0.4"><title>${people[i].nickname}</title></circle>`;
+        return `<circle cx="${sx(s[0]).toFixed(1)}" cy="${sy(s[1]).toFixed(1)}" r="3" fill="var(${cssVar})" opacity="0.45"><title>${people[i].nickname}</title></circle>`;
     }).join('');
 
     const arrows = topLoadings.map(l => {
@@ -1349,17 +1549,17 @@ window.addEventListener('mousemove', e => {
         const ly = y2 + dy/len * 8;
         const anchor = dx > 5 ? 'start' : dx < -5 ? 'end' : 'middle';
         return `
-            <line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(${cssVar})" stroke-width="1.6" opacity="0.9"/>
-            <circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3" fill="var(${cssVar})"/>
-            <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="var(${cssVar})" font-family="JetBrains Mono, monospace" font-size="11" font-weight="500" text-anchor="${anchor}" dominant-baseline="middle">${l.talent}</text>
+            <line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(${cssVar})" stroke-width="1.8" opacity="0.92"/>
+            <circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3.5" fill="var(${cssVar})"/>
+            <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="var(${cssVar})" font-family="Inter, sans-serif" font-size="11" font-weight="600" text-anchor="${anchor}" dominant-baseline="middle">${l.talent}</text>
         `;
     }).join('');
 
     document.getElementById('pca-biplot-plot').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width: ${W}px;">
-        <line x1="${PAD}" y1="${H/2}" x2="${W-PAD}" y2="${H/2}" stroke="rgba(255,255,255,0.1)"/>
-        <line x1="${W/2}" y1="${PAD}" x2="${W/2}" y2="${H-PAD}" stroke="rgba(255,255,255,0.1)"/>
-        <text x="${W/2}" y="${H-12}" fill="rgba(230,237,243,0.55)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle">PC1 &middot; ${varExp1}%</text>
-        <text x="20" y="${H/2}" fill="rgba(230,237,243,0.55)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" transform="rotate(-90 20 ${H/2})">PC2 &middot; ${varExp2}%</text>
+        <line x1="${PAD}" y1="${H/2}" x2="${W-PAD}" y2="${H/2}" stroke="rgba(36,83,117,0.15)"/>
+        <line x1="${W/2}" y1="${PAD}" x2="${W/2}" y2="${H-PAD}" stroke="rgba(36,83,117,0.15)"/>
+        <text x="${W/2}" y="${H-12}" fill="#5d6b7e" font-family="Inter, sans-serif" font-size="11" font-weight="500" text-anchor="middle">PC1 &middot; ${varExp1}%</text>
+        <text x="20" y="${H/2}" fill="#5d6b7e" font-family="Inter, sans-serif" font-size="11" font-weight="500" text-anchor="middle" transform="rotate(-90 20 ${H/2})">PC2 &middot; ${varExp2}%</text>
         ${dots}
         ${arrows}
     </svg>`;
@@ -1367,8 +1567,8 @@ window.addEventListener('mousemove', e => {
 
 /* ---------- Person x person similarity heatmap (Spearman ρ) ---------- */
 (function renderSimilarity() {
-    const rankMean = (1 + 34) / 2;                  // 17.5
-    const sumSqDevs = 34 * (34 * 34 - 1) / 12;      // ranks 1..34, no ties
+    const rankMean = (1 + 34) / 2;
+    const sumSqDevs = 34 * (34 * 34 - 1) / 12;
 
     function spearman(p1, p2) {
         let sum = 0;
@@ -1384,8 +1584,8 @@ window.addEventListener('mousemove', e => {
     );
 
     function heatColor(r) {
-        if (r >= 0) return `rgba(116, 108, 240, ${Math.min(r, 1).toFixed(3)})`;
-        return `rgba(180, 63, 130, ${Math.min(-r, 1).toFixed(3)})`;
+        if (r >= 0) return `rgba(40, 112, 237, ${Math.min(r, 1).toFixed(3)})`;
+        return `rgba(235, 76, 121, ${Math.min(-r, 1).toFixed(3)})`;
     }
 
     const W = 760, labelPad = 90;
@@ -1398,19 +1598,19 @@ window.addEventListener('mousemove', e => {
             const v = i === j ? 1 : spearman(ordered[i], ordered[j]);
             const x = labelPad + j * cell;
             const y = labelPad + i * cell;
-            cells += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="${heatColor(v)}" stroke="rgba(13,17,23,0.5)" stroke-width="0.5"><title>${ordered[i].nickname} ↔ ${ordered[j].nickname}: ρ = ${v.toFixed(2)}</title></rect>`;
+            cells += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="${heatColor(v)}" stroke="rgba(36,83,117,0.1)" stroke-width="0.5"><title>${ordered[i].nickname} ↔ ${ordered[j].nickname}: ρ = ${v.toFixed(2)}</title></rect>`;
         }
     }
 
     let labels = '';
     for (let i = 0; i < ordered.length; i++) {
         const isYou = ordered[i].nickname === 'User33';
-        const col = isYou ? '#746cf0' : 'rgba(230,237,243,0.7)';
-        const weight = isYou ? '600' : '400';
+        const col = isYou ? '#245375' : '#5d6b7e';
+        const weight = isYou ? '700' : '500';
         const yCenter = labelPad + i * cell + cell/2;
         const xCenter = labelPad + i * cell + cell/2;
-        labels += `<text x="${(labelPad - 8).toFixed(1)}" y="${yCenter.toFixed(1)}" fill="${col}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="${weight}" text-anchor="end" dominant-baseline="middle">${ordered[i].nickname}</text>`;
-        labels += `<text x="${xCenter.toFixed(1)}" y="${(labelPad - 8).toFixed(1)}" fill="${col}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="${weight}" text-anchor="start" dominant-baseline="middle" transform="rotate(-45 ${xCenter.toFixed(1)} ${(labelPad - 8).toFixed(1)})">${ordered[i].nickname}</text>`;
+        labels += `<text x="${(labelPad - 8).toFixed(1)}" y="${yCenter.toFixed(1)}" fill="${col}" font-family="Inter, sans-serif" font-size="10" font-weight="${weight}" text-anchor="end" dominant-baseline="middle">${ordered[i].nickname}</text>`;
+        labels += `<text x="${xCenter.toFixed(1)}" y="${(labelPad - 8).toFixed(1)}" fill="${col}" font-family="Inter, sans-serif" font-size="10" font-weight="${weight}" text-anchor="start" dominant-baseline="middle" transform="rotate(-45 ${xCenter.toFixed(1)} ${(labelPad - 8).toFixed(1)})">${ordered[i].nickname}</text>`;
     }
 
     let separators = '';
@@ -1418,8 +1618,8 @@ window.addEventListener('mousemove', e => {
     for (let i = 1; i < ordered.length; i++) {
         if (ordered[i].team !== lastTeam) {
             const p = labelPad + i * cell;
-            separators += `<line x1="${p.toFixed(1)}" y1="${labelPad}" x2="${p.toFixed(1)}" y2="${(labelPad + ordered.length * cell).toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
-            separators += `<line x1="${labelPad}" y1="${p.toFixed(1)}" x2="${(labelPad + ordered.length * cell).toFixed(1)}" y2="${p.toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
+            separators += `<line x1="${p.toFixed(1)}" y1="${labelPad}" x2="${p.toFixed(1)}" y2="${(labelPad + ordered.length * cell).toFixed(1)}" stroke="rgba(36,83,117,0.45)" stroke-width="1"/>`;
+            separators += `<line x1="${labelPad}" y1="${p.toFixed(1)}" x2="${(labelPad + ordered.length * cell).toFixed(1)}" y2="${p.toFixed(1)}" stroke="rgba(36,83,117,0.45)" stroke-width="1"/>`;
             lastTeam = ordered[i].team;
         }
     }
@@ -1433,7 +1633,6 @@ window.addEventListener('mousemove', e => {
 
 /* ---------- Talent x talent co-occurrence matrix ---------- */
 (function renderCooccurrence() {
-    // Order talents by domain (existing order), then by freq desc within each domain
     const orderedThemes = [];
     Object.keys(domains).forEach(d => {
         const inDom = domains[d].slice().sort((a, b) => freq[b] - freq[a]);
@@ -1457,10 +1656,10 @@ window.addEventListener('mousemove', e => {
     const maxOnDiag = Math.max(...orderedThemes.map(t => freq[t]));
 
     function cooccColor(c, onDiag) {
-        if (c === 0) return 'rgba(255,255,255,0.015)';
+        if (c === 0) return 'rgba(36,83,117,0.03)';
         const m = onDiag ? maxOnDiag : maxOff;
         const t = m === 0 ? 0 : c / m;
-        return `rgba(116, 108, 240, ${(0.15 + 0.85 * t).toFixed(3)})`;
+        return `rgba(40, 112, 237, ${(0.1 + 0.85 * t).toFixed(3)})`;
     }
 
     const W = 760, labelPad = 120;
@@ -1473,7 +1672,7 @@ window.addEventListener('mousemove', e => {
             const v = counts[i][j];
             const x = labelPad + j * cell;
             const y = labelPad + i * cell;
-            cells += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="${cooccColor(v, i===j)}" stroke="rgba(13,17,23,0.5)" stroke-width="0.5"><title>${orderedThemes[i]} ∩ ${orderedThemes[j]}: ${v}${i===j ? ' (=freq)' : ''}</title></rect>`;
+            cells += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="${cooccColor(v, i===j)}" stroke="rgba(36,83,117,0.08)" stroke-width="0.5"><title>${orderedThemes[i]} ∩ ${orderedThemes[j]}: ${v}${i===j ? ' (=freq)' : ''}</title></rect>`;
         }
     }
 
@@ -1483,8 +1682,8 @@ window.addEventListener('mousemove', e => {
         const cssVar = domainVar[d];
         const yCenter = labelPad + i * cell + cell/2;
         const xCenter = labelPad + i * cell + cell/2;
-        labels += `<text x="${(labelPad - 6).toFixed(1)}" y="${yCenter.toFixed(1)}" fill="var(${cssVar})" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="end" dominant-baseline="middle">${orderedThemes[i]}</text>`;
-        labels += `<text x="${xCenter.toFixed(1)}" y="${(labelPad - 6).toFixed(1)}" fill="var(${cssVar})" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="start" dominant-baseline="middle" transform="rotate(-90 ${xCenter.toFixed(1)} ${(labelPad - 6).toFixed(1)})">${orderedThemes[i]}</text>`;
+        labels += `<text x="${(labelPad - 6).toFixed(1)}" y="${yCenter.toFixed(1)}" fill="var(${cssVar})" font-family="Inter, sans-serif" font-size="10" font-weight="600" text-anchor="end" dominant-baseline="middle">${orderedThemes[i]}</text>`;
+        labels += `<text x="${xCenter.toFixed(1)}" y="${(labelPad - 6).toFixed(1)}" fill="var(${cssVar})" font-family="Inter, sans-serif" font-size="10" font-weight="600" text-anchor="start" dominant-baseline="middle" transform="rotate(-90 ${xCenter.toFixed(1)} ${(labelPad - 6).toFixed(1)})">${orderedThemes[i]}</text>`;
     }
 
     let separators = '';
@@ -1494,8 +1693,8 @@ window.addEventListener('mousemove', e => {
         cumulative += domains[d].length;
         if (idx < domNames.length - 1) {
             const p = labelPad + cumulative * cell;
-            separators += `<line x1="${p.toFixed(1)}" y1="${labelPad}" x2="${p.toFixed(1)}" y2="${(labelPad + orderedThemes.length * cell).toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
-            separators += `<line x1="${labelPad}" y1="${p.toFixed(1)}" x2="${(labelPad + orderedThemes.length * cell).toFixed(1)}" y2="${p.toFixed(1)}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>`;
+            separators += `<line x1="${p.toFixed(1)}" y1="${labelPad}" x2="${p.toFixed(1)}" y2="${(labelPad + orderedThemes.length * cell).toFixed(1)}" stroke="rgba(36,83,117,0.45)" stroke-width="1"/>`;
+            separators += `<line x1="${labelPad}" y1="${p.toFixed(1)}" x2="${(labelPad + orderedThemes.length * cell).toFixed(1)}" y2="${p.toFixed(1)}" stroke="rgba(36,83,117,0.45)" stroke-width="1"/>`;
         }
     });
 
@@ -1528,7 +1727,7 @@ window.addEventListener('mousemove', e => {
 
     const renderCard = (list, title) => {
         if (list.length === 0) {
-            return `<div class="bottleneck-card"><h4>${title} <span class="count">0 talents</span></h4><span class="empty-note">&mdash; none &mdash;</span></div>`;
+            return `<div class="bottleneck-card"><h4>${title} <span class="count">0 talents</span></h4><span class="empty-note">- none -</span></div>`;
         }
         return `<div class="bottleneck-card">
             <h4>${title} <span class="count">${list.length} talent${list.length === 1 ? '' : 's'}</span></h4>
@@ -1570,7 +1769,6 @@ window.addEventListener('mousemove', e => {
         </div>`;
     }).join('');
 
-    // animate the new bars (the global rAF already ran earlier)
     requestAnimationFrame(() => {
         document.querySelectorAll('.distinct-bar-fill[data-w]').forEach(el => {
             el.style.width = el.dataset.w + '%';

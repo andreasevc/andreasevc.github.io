@@ -12,7 +12,7 @@ hii bestie ✨ welcome to my lil pocket of the WWW ✨ lowkey just vibing 💅 p
 
 <a href="https://andreasevc.github.io"><img src="pink-link.svg" alt="andreasevc.github.io" width="380"></a>
 
-💖 Made with love and questionable taste 💖
+💖 Made with lots of love and very questionable taste 💖
 
 ### 🚧 This page is under eternal construction 🚧
 
