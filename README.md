@@ -14,6 +14,6 @@ hii bestie ✨ welcome to my lil pocket of the WWW ✨ lowkey just vibing 💅 p
 
 💖 Made with lots of love and very questionable taste 💖
 
-### 🚧 This page is under eternal construction 🚧
+### 🚧 This page is under eternal construction, although it is already perfect. 🚧
 
 </div>
