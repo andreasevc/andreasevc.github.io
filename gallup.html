@@ -970,23 +970,14 @@
 
 <div id="scroll-progress"></div>
 
-<nav class="side-nav" aria-label="Sections">
-    <div class="nav-title">Sections</div>
+<nav class="side-nav" aria-label="Navigation">
+    <div class="nav-title">Navigation</div>
     <ul>
         <li><a href="#overview">Overview</a></li>
-        <li><a href="#talent-frequency">Talent Frequency</a></li>
-        <li><a href="#domain-balance">Domain Balance</a></li>
         <li><a href="#profile-map">Profile Map (PCA)</a></li>
-        <li><a href="#what-drives-map">What Drives the Map</a></li>
         <li><a href="#person-similarity">Person &times; Person Similarity</a></li>
-        <li><a href="#talent-cooccurrence">Talent Co-occurrence</a></li>
-        <li><a href="#coverage-gaps">Coverage Gaps</a></li>
         <li><a href="#bottleneck-talents">Bottleneck Talents</a></li>
-        <li><a href="#strengths-by-team">Strengths by Team</a></li>
         <li><a href="#pair-picker">Pair Picker</a></li>
-        <li><a href="#best-combinations">Best Combinations</a></li>
-        <li><a href="#top-pairs">Top Complementary Pairs</a></li>
-        <li><a href="#distinctiveness">Distinctiveness</a></li>
     </ul>
 </nav>
 
@@ -1123,16 +1114,16 @@
     <div id="cooccurrence-plot"></div>
 </section>
 
-<section class="section-block" id="coverage-gaps">
-    <h2>Coverage Gaps</h2>
-    <p class="lead">Talents that no one in the department has in their top 5 - and top 10. Useful to flag when assembling a team for a project that needs those strengths.</p>
-    <div id="coverage-output"></div>
-</section>
-
 <section class="section-block" id="bottleneck-talents">
     <h2>Bottleneck Talents</h2>
     <p class="lead">Talents that only one or two people in the department carry in their top 5. If those people are unavailable for an assignment, that strength essentially leaves the department - useful to know when scoping a project that needs them, or when thinking about cross-training and resilience.</p>
     <div id="bottleneck-output"></div>
+</section>
+
+<section class="section-block" id="coverage-gaps">
+    <h2>Coverage Gaps</h2>
+    <p class="lead">Talents that no one in the department has in their top 5 - and top 10. Useful to flag when assembling a team for a project that needs those strengths.</p>
+    <div id="coverage-output"></div>
 </section>
 
 <section class="section-block" id="strengths-by-team">
@@ -1169,7 +1160,7 @@
     <div id="best-combos-output"></div>
 </section>
 
-<section class="section-block" id="top-pairs">
+<section class="section-block" id="top-complementary-pairs">
     <h2>Top Complementary Pairs</h2>
     <p class="lead">All 253 possible pairs ranked by how many <em>unique</em> talents appear in their combined top 5 (max 10 if no overlap). Filled chips mean both members have that talent in their own top 5. Use the arrows to scroll through the ranking.</p>
     <div class="pairs-nav">
