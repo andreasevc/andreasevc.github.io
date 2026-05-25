@@ -987,7 +987,7 @@
 <section class="section-block">
     <h2>What Drives the Map</h2>
     <details class="explainer">
-        <summary>Click to see which talents define each PCA axis &mdash; and what someone's position on the map says about them</summary>
+        <summary>How to read this chart &mdash; and what positive/negative bars say about a person's position on the map</summary>
         <p>The Profile Map above places each person on two axes &mdash; <strong>PC1</strong> (horizontal) and <strong>PC2</strong> (vertical) &mdash; but the map alone doesn't tell you what those axes <em>mean</em>. This chart breaks each axis down talent by talent: how strongly does ranking each of the 34 talents high push someone toward one end of that PC or the other?</p>
         <p>Bars to the <strong>right</strong> of the centre line are <strong>positive</strong> contributions; bars to the <strong>left</strong> are <strong>negative</strong>. A long bar means the talent is a defining feature of that axis; a tiny bar means it barely moves it.</p>
         <p><strong>How to read a person's position on the map using this chart:</strong></p>
@@ -998,15 +998,15 @@
             <li>Two people land close together on the map when they rank the same talents highly &mdash; even if their top-5 lists look different on paper, the weighted sum across all 34 talents comes out similar.</li>
         </ul>
         <p>Bars are coloured by domain, so if one domain dominates the top of a column and another dominates the bottom, that PC essentially contrasts those two domains. For example, green Strategic Thinking at the top of PC1 and orange Influencing at the bottom would mean PC1 separates "analytical" profiles (right of the map) from "people-driven" ones (left of the map).</p>
-        <div class="legend">
-            <span><span class="swatch d-Executing"></span>Executing</span>
-            <span><span class="swatch d-Influencing"></span>Influencing</span>
-            <span><span class="swatch d-RelationshipBuilding"></span>Relationship Building</span>
-            <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
-        </div>
-        <div id="pca-biplot-plot"></div>
-        <p class="footnote">Each value is the loading X<sup>T</sup>U: the projection of a talent (column of the centered rank matrix) onto a principal component. A person's PC1 coordinate is a weighted sum across all 34 talents using PC1's loadings as weights; same for PC2.</p>
     </details>
+    <div class="legend">
+        <span><span class="swatch d-Executing"></span>Executing</span>
+        <span><span class="swatch d-Influencing"></span>Influencing</span>
+        <span><span class="swatch d-RelationshipBuilding"></span>Relationship Building</span>
+        <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
+    </div>
+    <div id="pca-biplot-plot"></div>
+    <p class="footnote">Each value is the loading X<sup>T</sup>U: the projection of a talent (column of the centered rank matrix) onto a principal component. A person's PC1 coordinate is a weighted sum across all 34 talents using PC1's loadings as weights; same for PC2.</p>
 </section>
 
 <section class="section-block">
