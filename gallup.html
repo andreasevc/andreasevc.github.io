@@ -788,6 +788,8 @@
             font-weight: 600;
         }
         .distinct-row.you .distinct-name { color: var(--accent-green); }
+        #distinctiveness-output .distinct-row.extra { display: none; }
+        #distinctiveness-output.show-all .distinct-row.extra { display: grid; }
         .distinct-bar-track {
             grid-row: 1;
             background: #d3dde7;
@@ -984,23 +986,42 @@
 
 <section class="section-block">
     <h2>What Drives the Map</h2>
-    <p class="lead">The Profile Map above places people on two principal components &mdash; <strong>PC1</strong> (the map's horizontal axis) and <strong>PC2</strong> (its vertical axis). But the map alone doesn't tell you what those axes <em>mean</em>. This chart breaks each axis down talent by talent: how strongly does ranking each of the 34 talents high push someone toward the positive end (right of the map for PC1, top for PC2) or the negative end (left/bottom)?</p>
-    <p class="lead">Bars to the <strong>right</strong> of the centre line = positive contribution; bars to the <strong>left</strong> = negative. A long bar means the talent is a defining feature of that axis; a tiny bar means it barely moves it. Bars are coloured by domain, so if all the green Strategic Thinking bars cluster at the top of PC1 and all the orange Influencing bars at the bottom, then PC1 essentially separates analytical thinkers from people-influencers. Within each column, talents are sorted top-to-bottom by their loading on that PC.</p>
-    <div class="legend">
-        <span><span class="swatch d-Executing"></span>Executing</span>
-        <span><span class="swatch d-Influencing"></span>Influencing</span>
-        <span><span class="swatch d-RelationshipBuilding"></span>Relationship Building</span>
-        <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
-    </div>
-    <div id="pca-biplot-plot"></div>
-    <p class="footnote">Each value is the loading X<sup>T</sup>U: the projection of a talent (column of the centered rank matrix) onto a principal component. A person's PC1 coordinate is a weighted sum across all 34 talents using PC1's loadings as weights; same for PC2. That is why two people with similar rankings end up close together on the Profile Map.</p>
+    <details class="explainer">
+        <summary>Click to see which talents define each PCA axis &mdash; and what someone's position on the map says about them</summary>
+        <p>The Profile Map above places each person on two axes &mdash; <strong>PC1</strong> (horizontal) and <strong>PC2</strong> (vertical) &mdash; but the map alone doesn't tell you what those axes <em>mean</em>. This chart breaks each axis down talent by talent: how strongly does ranking each of the 34 talents high push someone toward one end of that PC or the other?</p>
+        <p>Bars to the <strong>right</strong> of the centre line are <strong>positive</strong> contributions; bars to the <strong>left</strong> are <strong>negative</strong>. A long bar means the talent is a defining feature of that axis; a tiny bar means it barely moves it.</p>
+        <p><strong>How to read a person's position on the map using this chart:</strong></p>
+        <ul>
+            <li>A person on the <strong>far right</strong> of the Profile Map is someone whose top talents tend to be the ones at the <em>top</em> of the PC1 column here (talents with positive bars), and whose bottom talents are the ones at the <em>bottom</em> of the column (talents with negative bars).</li>
+            <li>A person on the <strong>far left</strong> is the opposite &mdash; they rank highly the talents that sit at the <em>bottom</em> of the PC1 column (negative bars).</li>
+            <li>The same logic applies vertically: someone at the <strong>top of the map</strong> ranks highly the talents at the top of the PC2 column; someone at the <strong>bottom of the map</strong> ranks highly the talents at the bottom of the PC2 column.</li>
+            <li>Two people land close together on the map when they rank the same talents highly &mdash; even if their top-5 lists look different on paper, the weighted sum across all 34 talents comes out similar.</li>
+        </ul>
+        <p>Bars are coloured by domain, so if one domain dominates the top of a column and another dominates the bottom, that PC essentially contrasts those two domains. For example, green Strategic Thinking at the top of PC1 and orange Influencing at the bottom would mean PC1 separates "analytical" profiles (right of the map) from "people-driven" ones (left of the map).</p>
+        <div class="legend">
+            <span><span class="swatch d-Executing"></span>Executing</span>
+            <span><span class="swatch d-Influencing"></span>Influencing</span>
+            <span><span class="swatch d-RelationshipBuilding"></span>Relationship Building</span>
+            <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
+        </div>
+        <div id="pca-biplot-plot"></div>
+        <p class="footnote">Each value is the loading X<sup>T</sup>U: the projection of a talent (column of the centered rank matrix) onto a principal component. A person's PC1 coordinate is a weighted sum across all 34 talents using PC1's loadings as weights; same for PC2.</p>
+    </details>
 </section>
 
 <section class="section-block">
     <h2>Person &times; Person Similarity</h2>
-    <p class="lead">For every pair of people, this matrix asks a single question: <em>how similar are their full 34-talent rankings?</em> The colour of each cell is a Spearman rank correlation, a number between &minus;1 and +1.</p>
-    <p class="lead">Imagine handing two colleagues the same 34 cards (one per talent) and asking each to stack them from "most like me" on top down to "least like me" at the bottom. If both end up with the cards in exactly the same order, their correlation is <strong style="color: #02A3A4;">+1 (teal)</strong> &mdash; they have effectively the same strengths profile. If one stack is the mirror image of the other &mdash; the cards on top of one stack sit at the bottom of the other &mdash; the correlation is <strong style="color: #FF6130;">&minus;1 (orange)</strong>. Cells near 0 (white) mean the two orderings are unrelated; knowing one person's ranking tells you almost nothing about the other's.</p>
-    <p class="lead">Rows and columns are ordered by team with separators between teams &mdash; bright teal blocks along the diagonal would mean a team's members are unusually similar to each other; an isolated bright cell outside the diagonal blocks means two people on different teams share a profile.</p>
+    <details class="explainer">
+        <summary>How the matrix works &mdash; and what "correlation" actually means here</summary>
+        <p>For every pair of people, this matrix asks a single question: <em>how similar are their full 34-talent rankings?</em> The colour of each cell is a Spearman rank correlation, a number between &minus;1 and +1.</p>
+        <p>Imagine handing two colleagues the same 34 cards (one per talent) and asking each to stack them from "most like me" on top down to "least like me" at the bottom:</p>
+        <ul>
+            <li>If both stacks come out in <strong>exactly the same order</strong>, their correlation is <strong style="color: #02A3A4;">+1 (teal)</strong> &mdash; effectively the same strengths profile.</li>
+            <li>If one stack is the <strong>mirror image</strong> of the other &mdash; the cards on top of one sit at the bottom of the other &mdash; the correlation is <strong style="color: #FF6130;">&minus;1 (orange)</strong>.</li>
+            <li>Cells near 0 (white) mean the two orderings are unrelated; knowing one person's ranking tells you almost nothing about the other's.</li>
+        </ul>
+        <p>Rows and columns are ordered by team with separators between teams. Bright teal blocks along a team's diagonal block would mean its members are unusually similar to each other; an isolated bright cell outside the diagonal blocks means two people on different teams share a profile. The matrix diagonal itself is left blank &mdash; every person trivially correlates +1 with themselves, which isn't informative.</p>
+    </details>
     <div class="heat-legend">
         <span>&minus;1</span>
         <span class="scale"></span>
@@ -1012,7 +1033,16 @@
 
 <section class="section-block">
     <h2>Talent Co-occurrence</h2>
-    <p class="lead">For every pair of talents, how many of the 23 people carry both in their top 5. Talents are grouped into the four domain blocks (separators drawn between blocks); bright squares clustered inside a block mean talents in that domain tend to be carried by the same people. The diagonal repeats each talent's overall frequency for reference.</p>
+    <details class="explainer">
+        <summary>How to read this matrix &mdash; and what the patterns reveal</summary>
+        <p>For every pair of talents, this matrix counts how many of the 23 people carry <em>both</em> in their top 5. Darker cells = more people share that pair of talents.</p>
+        <p>Talents are grouped into the four domain blocks, with separators drawn between blocks. There are two patterns worth scanning for:</p>
+        <ul>
+            <li><strong>Bright squares clustered inside a block</strong> mean talents in that domain tend to be carried by the same people &mdash; the domain has internal coherence.</li>
+            <li><strong>Bright cells between blocks</strong> (off-domain) reveal interesting cross-domain co-occurrences &mdash; e.g. a talent from Executing that often shows up alongside one from Strategic Thinking in the same person's top 5.</li>
+        </ul>
+        <p>The diagonal repeats each talent's overall frequency for reference (a talent always co-occurs with itself, by definition), and is styled with the same scale so you can compare the most-shared <em>pairs</em> against the most-popular individual talents.</p>
+    </details>
     <div class="heat-legend">
         <span>0</span>
         <span class="scale scale-mono"></span>
@@ -1081,8 +1111,19 @@
 
 <section class="section-block">
     <h2>Distinctiveness</h2>
-    <p class="lead">For each person, the sum of <em>1 &divide; (how many people share each top-5 talent)</em>, across their five signature strengths. Higher = a profile that is harder to replicate from the rest of the department. A score near 5 would mean every one of their top-5 talents is unique to them; a score near 1 means each is widely shared. Chips show the talent and the freq within the 23-person department.</p>
+    <details class="explainer">
+        <summary>How the score is calculated &mdash; and how to read the numbers</summary>
+        <p>For each person, distinctiveness is the sum of <em>1 &divide; (how many people share each top-5 talent)</em>, across their five signature strengths. In plain English: <strong>rare talents are worth more, common talents are worth less</strong>.</p>
+        <p><strong>How to interpret the score:</strong></p>
+        <ul>
+            <li>A score near <strong>5.0</strong> would mean every one of someone's top-5 talents is held by them alone &mdash; a one-of-a-kind profile in this department.</li>
+            <li>A score near <strong>1.0</strong> means each of their top-5 talents is widely shared by many colleagues &mdash; a very "typical" profile.</li>
+            <li>Realistic scores in this dataset land roughly between <strong>0.5 and 2.5</strong>. The higher a person sits in the ranking, the harder it is to replace their unique contribution by reshuffling other team members.</li>
+        </ul>
+        <p>Each chip shows the talent and its frequency in the 23-person department (e.g. "Belief 1/23" means only that one person carries Belief in their top 5 &mdash; the rarest possible). The narrower the fraction, the bigger that talent's contribution to the person's distinctiveness score. Chips within a row are sorted with the rarest first.</p>
+    </details>
     <div id="distinctiveness-output"></div>
+    <button type="button" id="distinct-toggle" class="show-more-btn">Show all 23 people</button>
 </section>
 
 </main>
@@ -1159,7 +1200,6 @@ const TOP = 5;
 const teams = [...new Set(people.map(p => p.team))];
 document.getElementById('overview').innerHTML = [
     [N, 'members'],
-    [teams.length, 'units'],
     [4, 'domains']
 ].map(([n, l]) => `<div class="stat"><span class="num">${n}</span><span class="label">${l}</span></div>`).join('');
 
@@ -1734,7 +1774,8 @@ window.onscroll = function() {
     let cells = '';
     for (let i = 0; i < ordered.length; i++) {
         for (let j = 0; j < ordered.length; j++) {
-            const v = i === j ? 1 : spearman(ordered[i], ordered[j]);
+            if (i === j) continue;
+            const v = spearman(ordered[i], ordered[j]);
             const x = labelPad + j * cell;
             const y = labelPad + i * cell;
             cells += `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="${heatColor(v)}" stroke="rgba(36,83,117,0.1)" stroke-width="0.5"><title>${ordered[i].nickname} ↔ ${ordered[j].nickname}: ρ = ${v.toFixed(2)}</title></rect>`;
@@ -1894,12 +1935,13 @@ window.onscroll = function() {
     document.getElementById('distinctiveness-output').innerHTML = scores.map((s, i) => {
         const isYou = s.nickname === 'User33';
         const w = (s.total / maxScore * 100).toFixed(1);
+        const extraCls = (i >= 5 && !isYou) ? ' extra' : '';
         const chips = s.contributions
             .slice()
             .sort((a, b) => a.freq - b.freq)
             .map(c => `<span class="chip" style="color: var(${domainVar[themeDomain[c.talent]]})"><span class="chip-text">${c.talent}</span><span class="contrib">${c.freq}/${N}</span></span>`)
             .join('');
-        return `<div class="distinct-row${isYou ? ' you' : ''}">
+        return `<div class="distinct-row${isYou ? ' you' : ''}${extraCls}">
             <div class="distinct-rank">${i + 1}</div>
             <div class="distinct-name">${s.nickname}${isYou ? ' (me)' : ''}</div>
             <div class="distinct-bar-track"><div class="distinct-bar-fill" data-w="${w}"></div></div>
@@ -1907,6 +1949,13 @@ window.onscroll = function() {
             <div class="distinct-chips">${chips}</div>
         </div>`;
     }).join('');
+
+    const distinctBtn = document.getElementById('distinct-toggle');
+    const distinctOut = document.getElementById('distinctiveness-output');
+    distinctBtn.addEventListener('click', () => {
+        const showing = distinctOut.classList.toggle('show-all');
+        distinctBtn.textContent = showing ? 'Show top 5 only' : 'Show all 23 people';
+    });
 
     requestAnimationFrame(() => {
         document.querySelectorAll('.distinct-bar-fill[data-w]').forEach(el => {
