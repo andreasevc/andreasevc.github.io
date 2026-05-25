@@ -206,6 +206,25 @@
         .d-RelationshipBuilding .bar-fill { background: var(--d-rel); }
         .d-StrategicThinking    .bar-fill { background: var(--d-stra); }
 
+        .bar-chart .bar-row.extra { display: none; }
+        .bar-chart.show-all .bar-row.extra { display: grid; }
+        .show-more-btn {
+            margin-top: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--accent-green);
+            font-size: 0.85rem;
+            padding: 9px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .show-more-btn:hover {
+            border-color: var(--accent-green);
+            background: rgba(36, 83, 117, 0.05);
+        }
+
         /* Domain balance */
         .domain-grid {
             display: grid;
@@ -677,11 +696,11 @@
         .heat-legend .scale {
             display: inline-block; width: 140px; height: 12px;
             border-radius: 2px;
-            background: linear-gradient(to right, #EB4C79, #ffffff, #2870ED);
+            background: linear-gradient(to right, #FF6130, #ffffff, #02A3A4);
             border: 1px solid var(--border-light);
         }
         .heat-legend .scale-mono {
-            background: linear-gradient(to right, #ffffff, #2870ED);
+            background: linear-gradient(to right, #ffffff, #245375);
         }
         .heat-legend .legend-note { margin-left: 10px; opacity: 0.85; }
 
@@ -803,6 +822,96 @@
             .distinct-bar-track { display: none; }
             .distinct-chips { grid-column: 2 / -1; }
         }
+
+        /* PC drivers (diverging bar charts) */
+        #pca-biplot-plot { padding: 24px 26px; }
+        .pc-driver-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        @media (max-width: 880px) {
+            .pc-driver-grid { grid-template-columns: 1fr; gap: 32px; }
+        }
+        .pc-driver-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .pc-driver-header h4 {
+            font-size: 1rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+        .pc-driver-header .pc-var {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .pc-axes {
+            display: grid;
+            grid-template-columns: 140px 1fr 1fr 50px;
+            gap: 6px;
+            font-size: 0.66rem;
+            color: var(--text-faint);
+            margin: 8px 0 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+        .pc-axes .pc-axis-neg {
+            grid-column: 2;
+            text-align: right;
+            padding-right: 6px;
+        }
+        .pc-axes .pc-axis-pos {
+            grid-column: 3;
+            text-align: left;
+            padding-left: 6px;
+        }
+        .pc-rows { display: grid; gap: 3px; }
+        .pc-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 1fr 50px;
+            gap: 6px;
+            align-items: center;
+        }
+        .pc-label {
+            text-align: right;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 0.8rem;
+            padding-right: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .pc-half {
+            height: 12px;
+            display: flex;
+            align-items: stretch;
+        }
+        .pc-half.left {
+            justify-content: flex-end;
+            border-right: 1px solid var(--text-muted);
+        }
+        .pc-half.right { justify-content: flex-start; }
+        .pc-bar {
+            height: 100%;
+            width: 0;
+            border-radius: 1px;
+            transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+            opacity: 0.88;
+        }
+        .pc-value {
+            font-family: var(--mono);
+            font-size: 0.76rem;
+            text-align: right;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -829,7 +938,7 @@
 
 <section class="section-block">
     <h2>Talent Frequency</h2>
-    <p class="lead">For each talent, how many of the 23 people have it inside their top 5 signature strengths. Bars are coloured by talent domain, sorted descending.</p>
+    <p class="lead">For each talent, how many of the 23 people have it inside their top 5 signature strengths. Bars are coloured by talent domain, sorted descending. The top 5 talents are shown by default; click below to reveal the remaining 29.</p>
     <div class="legend">
         <span><span class="swatch d-Executing"></span>Executing</span>
         <span><span class="swatch d-Influencing"></span>Influencing</span>
@@ -837,6 +946,7 @@
         <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
     </div>
     <div id="theme-bars" class="bar-chart"></div>
+    <button type="button" id="freq-toggle" class="show-more-btn">Show all 34 talents</button>
 </section>
 
 <section class="section-block">
@@ -874,7 +984,8 @@
 
 <section class="section-block">
     <h2>What Drives the Map</h2>
-    <p class="lead">Same PC1/PC2 axes as the projection above, overlaid with the 12 talents whose loadings on these components are largest. Each arrow points toward the kind of person who scores high on that talent - people in the direction of, say, <em>Achiever</em> rank Achiever near the top of their list; people opposite the arrow rank it near the bottom. Faint dots are people, plotted at the same coordinates as in the PCA above for reference.</p>
+    <p class="lead">The Profile Map above places people on two principal components &mdash; <strong>PC1</strong> (the map's horizontal axis) and <strong>PC2</strong> (its vertical axis). But the map alone doesn't tell you what those axes <em>mean</em>. This chart breaks each axis down talent by talent: how strongly does ranking each of the 34 talents high push someone toward the positive end (right of the map for PC1, top for PC2) or the negative end (left/bottom)?</p>
+    <p class="lead">Bars to the <strong>right</strong> of the centre line = positive contribution; bars to the <strong>left</strong> = negative. A long bar means the talent is a defining feature of that axis; a tiny bar means it barely moves it. Bars are coloured by domain, so if all the green Strategic Thinking bars cluster at the top of PC1 and all the orange Influencing bars at the bottom, then PC1 essentially separates analytical thinkers from people-influencers. Within each column, talents are sorted top-to-bottom by their loading on that PC.</p>
     <div class="legend">
         <span><span class="swatch d-Executing"></span>Executing</span>
         <span><span class="swatch d-Influencing"></span>Influencing</span>
@@ -882,12 +993,14 @@
         <span><span class="swatch d-StrategicThinking"></span>Strategic Thinking</span>
     </div>
     <div id="pca-biplot-plot"></div>
-    <p class="footnote">Loadings = X<sup>T</sup>U, the projection of each talent (column of the centered rank matrix) onto the top two left singular vectors. Loading vectors are uniformly scaled to be visually comparable to the score cloud; only the 12 largest by magnitude are shown.</p>
+    <p class="footnote">Each value is the loading X<sup>T</sup>U: the projection of a talent (column of the centered rank matrix) onto a principal component. A person's PC1 coordinate is a weighted sum across all 34 talents using PC1's loadings as weights; same for PC2. That is why two people with similar rankings end up close together on the Profile Map.</p>
 </section>
 
 <section class="section-block">
     <h2>Person &times; Person Similarity</h2>
-    <p class="lead">Spearman rank correlation between every pair of people, computed across all 34 talents. Blue = similar overall profile, pink = opposite profile, light = unrelated. Rows and columns are ordered by team with separators between teams - bright blue blocks along the diagonal would mean a team's members are unusually similar to each other; an isolated bright cell outside the diagonal blocks means two people on different teams share a profile.</p>
+    <p class="lead">For every pair of people, this matrix asks a single question: <em>how similar are their full 34-talent rankings?</em> The colour of each cell is a Spearman rank correlation, a number between &minus;1 and +1.</p>
+    <p class="lead">Imagine handing two colleagues the same 34 cards (one per talent) and asking each to stack them from "most like me" on top down to "least like me" at the bottom. If both end up with the cards in exactly the same order, their correlation is <strong style="color: #02A3A4;">+1 (teal)</strong> &mdash; they have effectively the same strengths profile. If one stack is the mirror image of the other &mdash; the cards on top of one stack sit at the bottom of the other &mdash; the correlation is <strong style="color: #FF6130;">&minus;1 (orange)</strong>. Cells near 0 (white) mean the two orderings are unrelated; knowing one person's ranking tells you almost nothing about the other's.</p>
+    <p class="lead">Rows and columns are ordered by team with separators between teams &mdash; bright teal blocks along the diagonal would mean a team's members are unusually similar to each other; an isolated bright cell outside the diagonal blocks means two people on different teams share a profile.</p>
     <div class="heat-legend">
         <span>&minus;1</span>
         <span class="scale"></span>
@@ -923,8 +1036,11 @@
 
 <section class="section-block">
     <h2>Strengths by Team</h2>
-    <p class="lead">Per-team collective strengths. For each unit, talents ranked by average rank across its members - lower average = stronger collective signal.</p>
-    <div class="team-grid" id="team-output"></div>
+    <p class="lead">Per-team collective strengths. For the selected unit, talents are ranked by average rank across its members &mdash; lower average = stronger collective signal.</p>
+    <div class="picker-grid" style="max-width: 360px;">
+        <div><label>Team</label><select id="team-select"></select></div>
+    </div>
+    <div id="team-output"></div>
 </section>
 
 <section class="section-block">
@@ -940,9 +1056,14 @@
 
 <section class="section-block">
     <h2>Best Combinations</h2>
-    <p class="lead">For one selected person, the top five most complementary 2-person staffing combinations - with the specific talents that complement each other inside each pairing. Pool is limited to operational team members; managers and the methodology owner (User01, User02, User04) are excluded. Filled chips mean both members have that talent in their own top 5.</p>
+    <p class="lead">For one selected person, every eligible 2-person staffing combination ranked by complementarity &mdash; one at a time. Use the arrows to scroll through them. Pool is limited to operational team members; managers and the methodology owner (User01, User02, User04) are excluded. Filled chips mean both members have that talent in their own top 5.</p>
     <div class="picker-grid" style="max-width: 360px;">
         <div><label>Selected person</label><select id="best-for-user"></select></div>
+    </div>
+    <div class="pairs-nav">
+        <button class="nav-arrow" id="best-prev" aria-label="previous combination"><i class="fa fa-arrow-left"></i></button>
+        <button class="nav-arrow" id="best-next" aria-label="next combination"><i class="fa fa-arrow-right"></i></button>
+        <span class="pairs-counter" id="best-counter"></span>
     </div>
     <div id="best-combos-output"></div>
 </section>
@@ -956,12 +1077,6 @@
         <span class="pairs-counter" id="pairs-counter"></span>
     </div>
     <div class="pairs-table-wrap"><table class="pairs-table" id="top-pairs"></table></div>
-</section>
-
-<section class="section-block">
-    <h2>Roster</h2>
-    <p class="lead">Each person's top five talents. My own row (<span style="color: var(--accent-green); font-weight: 600;">User33</span>) is highlighted.</p>
-    <div class="roster-wrap"><table class="roster" id="roster"></table></div>
 </section>
 
 <section class="section-block">
@@ -1055,14 +1170,24 @@ people.forEach(p => themes.forEach(t => { if (p.ranks[t] <= TOP) freq[t]++; }));
 const sortedThemes = themes.slice().sort((a, b) => freq[b] - freq[a]);
 const maxF = Math.max(...Object.values(freq));
 
-document.getElementById('theme-bars').innerHTML = sortedThemes.map(t => {
+document.getElementById('theme-bars').innerHTML = sortedThemes.map((t, i) => {
     const w = maxF === 0 ? 0 : (freq[t] / maxF) * 100;
-    return `<div class="bar-row ${domainClass[themeDomain[t]]}">
+    const extraCls = i >= 5 ? ' extra' : '';
+    return `<div class="bar-row${extraCls} ${domainClass[themeDomain[t]]}">
         <span class="bar-label">${t}</span>
         <div class="bar-track"><div class="bar-fill" data-w="${w}"></div></div>
         <span class="bar-value">${freq[t]}</span>
     </div>`;
 }).join('');
+
+(function wireFreqToggle() {
+    const btn = document.getElementById('freq-toggle');
+    const bars = document.getElementById('theme-bars');
+    btn.addEventListener('click', () => {
+        const showing = bars.classList.toggle('show-all');
+        btn.textContent = showing ? 'Show top 5 only' : 'Show all 34 talents';
+    });
+})();
 
 /* ---------- domain balance ---------- */
 const totalSlots = N * TOP;
@@ -1113,13 +1238,19 @@ const teamGroups = [
     { name: 'dep2_team1', teams: ['dep2_team1'] },
     { name: 'dep2_team2', teams: ['dep2_team2'] }
 ];
-document.getElementById('team-output').innerHTML = teamGroups.map(group => {
+const teamSelect = document.getElementById('team-select');
+teamSelect.innerHTML = teamGroups.map((g, i) => `<option value="${i}">${g.name}</option>`).join('');
+
+function renderSelectedTeam() {
+    const group = teamGroups[parseInt(teamSelect.value, 10)];
+    const out = document.getElementById('team-output');
+    if (!group) { out.innerHTML = ''; return; }
     const members = people.filter(p => group.teams.includes(p.team));
-    if (members.length === 0) return '';
+    if (members.length === 0) { out.innerHTML = ''; return; }
     const sumRank = {};
     themes.forEach(t => sumRank[t] = members.reduce((s, p) => s + p.ranks[t], 0));
     const top = themes.slice().sort((a, b) => sumRank[a] - sumRank[b]).slice(0, 5);
-    return `<div class="team-card">
+    out.innerHTML = `<div class="team-card">
         <h4>${group.name}</h4>
         <div class="count">${members.length} member${members.length === 1 ? '' : 's'} &middot; ${members.map(m => m.nickname).join(', ')}</div>
         <ul class="team-themes">
@@ -1129,24 +1260,9 @@ document.getElementById('team-output').innerHTML = teamGroups.map(group => {
             }).join('')}
         </ul>
     </div>`;
-}).join('');
-
-/* ---------- roster ---------- */
-document.getElementById('roster').innerHTML = `
-    <thead>
-        <tr><th>User</th><th>Top 5 talents (rank 1 &rarr; 5)</th></tr>
-    </thead>
-    <tbody>
-        ${people.map(p => {
-            const isYou = p.nickname === 'User33';
-            const top = p.ordered.slice(0, 5);
-            return `<tr${isYou ? ' class="you"' : ''}>
-                <td class="nickname">${p.nickname}${isYou ? ' &nbsp;(me)' : ''}</td>
-                <td>${top.map(t => `<span class="chip" style="color: var(${domainVar[themeDomain[t]]})">${t}</span>`).join('')}</td>
-            </tr>`;
-        }).join('')}
-    </tbody>
-`;
+}
+teamSelect.addEventListener('change', renderSelectedTeam);
+renderSelectedTeam();
 
 /* ---------- animate bars in ---------- */
 requestAnimationFrame(() => {
@@ -1362,6 +1478,55 @@ const bestForSel = document.getElementById('best-for-user');
 bestForSel.innerHTML = eligiblePool.map(p => `<option value="${p.nickname}">${p.nickname} (${p.team})</option>`).join('');
 bestForSel.value = eligiblePool.some(p => p.nickname === 'User33') ? 'User33' : eligiblePool[0].nickname;
 
+let bestPairs = [];
+let bestIdx = 0;
+
+const sortByDomainOrder = (arr) => arr.slice().sort((x, y) =>
+    Object.keys(domains).indexOf(themeDomain[x]) - Object.keys(domains).indexOf(themeDomain[y]) || x.localeCompare(y)
+);
+
+function renderBestComboRow(combo, selectedNick) {
+    const sharedSet = new Set(combo.intersection);
+    return `<li>
+        <div class="combo-header">
+            <span class="combo-partners">${selectedNick} + ${combo.partner}</span>
+            <span class="combo-stats">${combo.unique}/10 unique &middot; ${combo.domains}/4 domains</span>
+        </div>
+        <div class="combo-chips">${sortByDomainOrder(combo.union).map(t => {
+            const filled = sharedSet.has(t);
+            return `<span class="chip${filled ? ' filled' : ''}" style="color: var(${domainVar[themeDomain[t]]})"><span class="chip-text">${t}</span></span>`;
+        }).join('')}</div>
+        ${combo.gaps.length > 0 ? `
+            <div class="combo-gaps">
+                <div class="combo-gaps-title">Complementary gaps &nbsp;&middot;&nbsp; one is strong, the other is weak</div>
+                <ul class="complement-list">${combo.gaps.map(g => `<li>
+                    <span class="talent" style="color: var(${domainVar[themeDomain[g.talent]]})">${g.talent}</span>
+                    <span class="ranks">${g.ranks.map(r => r.name + ' #' + r.rank).join(' &rarr; ')}</span>
+                    <span class="gap-val">gap ${g.gap}</span>
+                </li>`).join('')}</ul>
+            </div>
+        ` : ''}
+    </li>`;
+}
+
+function updateBestComboView() {
+    const selectedNick = bestForSel.value;
+    const counter = document.getElementById('best-counter');
+    const prev = document.getElementById('best-prev');
+    const next = document.getElementById('best-next');
+    const out = document.getElementById('best-combos-output');
+    if (bestPairs.length === 0) {
+        counter.textContent = '0 of 0';
+        prev.disabled = true; next.disabled = true;
+        out.innerHTML = '';
+        return;
+    }
+    counter.textContent = `${bestIdx + 1} of ${bestPairs.length}`;
+    prev.disabled = bestIdx === 0;
+    next.disabled = bestIdx >= bestPairs.length - 1;
+    out.innerHTML = `<ol class="combo-list" start="${bestIdx + 1}">${renderBestComboRow(bestPairs[bestIdx], selectedNick)}</ol>`;
+}
+
 function renderBestCombos() {
     const selectedNick = bestForSel.value;
     const me = people.find(p => p.nickname === selectedNick);
@@ -1369,7 +1534,7 @@ function renderBestCombos() {
     const others = eligiblePool.filter(p => p.nickname !== selectedNick);
     const myTop = new Set(me.ordered.slice(0, 5));
 
-    const bcPairs = others.map(p => {
+    bestPairs = others.map(p => {
         const pTop = new Set(p.ordered.slice(0, 5));
         const union = [...new Set([...myTop, ...pTop])];
         const intersection = [...myTop].filter(t => pTop.has(t));
@@ -1388,40 +1553,17 @@ function renderBestCombos() {
 
         return { partner: p.nickname, union, intersection, unique: union.length, domains: doms.size, gaps };
     });
-    bcPairs.sort((a, b) => b.unique - a.unique || b.domains - a.domains);
-    const topPairs = bcPairs.slice(0, 5);
-
-    const sortByDomainOrder = (arr) => arr.slice().sort((x, y) =>
-        Object.keys(domains).indexOf(themeDomain[x]) - Object.keys(domains).indexOf(themeDomain[y]) || x.localeCompare(y)
-    );
-
-    const renderRow = (combo) => {
-        const sharedSet = new Set(combo.intersection);
-        return `<li>
-            <div class="combo-header">
-                <span class="combo-partners">${selectedNick} + ${combo.partner}</span>
-                <span class="combo-stats">${combo.unique}/10 unique &middot; ${combo.domains}/4 domains</span>
-            </div>
-            <div class="combo-chips">${sortByDomainOrder(combo.union).map(t => {
-                const filled = sharedSet.has(t);
-                return `<span class="chip${filled ? ' filled' : ''}" style="color: var(${domainVar[themeDomain[t]]})"><span class="chip-text">${t}</span></span>`;
-            }).join('')}</div>
-            ${combo.gaps.length > 0 ? `
-                <div class="combo-gaps">
-                    <div class="combo-gaps-title">Complementary gaps &nbsp;&middot;&nbsp; one is strong, the other is weak</div>
-                    <ul class="complement-list">${combo.gaps.map(g => `<li>
-                        <span class="talent" style="color: var(${domainVar[themeDomain[g.talent]]})">${g.talent}</span>
-                        <span class="ranks">${g.ranks.map(r => r.name + ' #' + r.rank).join(' &rarr; ')}</span>
-                        <span class="gap-val">gap ${g.gap}</span>
-                    </li>`).join('')}</ul>
-                </div>
-            ` : ''}
-        </li>`;
-    };
-
-    document.getElementById('best-combos-output').innerHTML =
-        `<ol class="combo-list">${topPairs.map(renderRow).join('')}</ol>`;
+    bestPairs.sort((a, b) => b.unique - a.unique || b.domains - a.domains);
+    bestIdx = 0;
+    updateBestComboView();
 }
+
+document.getElementById('best-prev').addEventListener('click', () => {
+    if (bestIdx > 0) { bestIdx--; updateBestComboView(); }
+});
+document.getElementById('best-next').addEventListener('click', () => {
+    if (bestIdx < bestPairs.length - 1) { bestIdx++; updateBestComboView(); }
+});
 bestForSel.addEventListener('change', renderBestCombos);
 renderBestCombos();
 
@@ -1509,60 +1651,57 @@ window.onscroll = function() {
 /* ====================== ADVANCED ANALYTICS =================== */
 /* ============================================================ */
 
-/* ---------- PCA biplot (scores + loadings) ---------- */
-(function renderBiplot() {
+/* ---------- PC drivers: signed loadings per talent ---------- */
+(function renderPCDrivers() {
     const loadings = themes.map((t, j) => {
         let v1 = 0, v2 = 0;
         for (let i = 0; i < N; i++) {
             v1 += Xc[i][j] * pc1.vec[i];
             v2 += Xc[i][j] * pc2.vec[i];
         }
-        return { talent: t, l1: v1, l2: v2, mag: Math.hypot(v1, v2) };
+        return { talent: t, l1: v1, l2: v2 };
     });
-    const topLoadings = loadings.slice().sort((a, b) => b.mag - a.mag).slice(0, 12);
+    const maxL1 = Math.max(...loadings.map(l => Math.abs(l.l1)));
+    const maxL2 = Math.max(...loadings.map(l => Math.abs(l.l2)));
 
-    const scoreXmax = Math.max(...pcaScores.map(s => Math.abs(s[0])));
-    const scoreYmax = Math.max(...pcaScores.map(s => Math.abs(s[1])));
-    const loadMag = Math.max(...loadings.map(l => l.mag));
-    const scale = Math.min(scoreXmax, scoreYmax) / loadMag * 1.4;
+    function renderCol(pcKey, maxAbs, varExp, axisLabel) {
+        const sorted = loadings.slice().sort((a, b) => b[pcKey] - a[pcKey]);
+        const rows = sorted.map(l => {
+            const v = l[pcKey];
+            const pct = (Math.abs(v) / maxAbs * 100).toFixed(1);
+            const cssVar = domainVar[themeDomain[l.talent]];
+            const isPositive = v >= 0;
+            const barHtml = `<div class="pc-bar" data-w="${pct}" style="background: var(${cssVar});"></div>`;
+            return `<div class="pc-row">
+                <span class="pc-label">${l.talent}</span>
+                <div class="pc-half left">${!isPositive ? barHtml : ''}</div>
+                <div class="pc-half right">${isPositive ? barHtml : ''}</div>
+                <span class="pc-value">${(v >= 0 ? '+' : '') + v.toFixed(2)}</span>
+            </div>`;
+        }).join('');
+        return `<div class="pc-driver-col">
+            <div class="pc-driver-header">
+                <h4>${axisLabel}</h4>
+                <span class="pc-var">${varExp}% variance</span>
+            </div>
+            <div class="pc-axes">
+                <span class="pc-axis-neg">&larr; negative</span>
+                <span class="pc-axis-pos">positive &rarr;</span>
+            </div>
+            <div class="pc-rows">${rows}</div>
+        </div>`;
+    }
 
-    const W = 760, H = 480, PAD = 50;
-    const xmax = Math.max(scoreXmax, loadMag * scale) * 1.1;
-    const ymax = Math.max(scoreYmax, loadMag * scale) * 1.1;
-    const sx = v => W/2 + (v / xmax) * (W/2 - PAD);
-    const sy = v => H/2 - (v / ymax) * (H/2 - PAD);
+    document.getElementById('pca-biplot-plot').innerHTML = `<div class="pc-driver-grid">
+        ${renderCol('l1', maxL1, varExp1, 'PC1 &nbsp;·&nbsp; horizontal axis')}
+        ${renderCol('l2', maxL2, varExp2, 'PC2 &nbsp;·&nbsp; vertical axis')}
+    </div>`;
 
-    const dots = pcaScores.map((s, i) => {
-        const d = dominantDomain(people[i]);
-        const cssVar = domainVar[d];
-        return `<circle cx="${sx(s[0]).toFixed(1)}" cy="${sy(s[1]).toFixed(1)}" r="3" fill="var(${cssVar})" opacity="0.45"><title>${people[i].nickname}</title></circle>`;
-    }).join('');
-
-    const arrows = topLoadings.map(l => {
-        const d = themeDomain[l.talent];
-        const cssVar = domainVar[d];
-        const x1 = sx(0), y1 = sy(0);
-        const x2 = sx(l.l1 * scale), y2 = sy(l.l2 * scale);
-        const dx = x2 - x1, dy = y2 - y1;
-        const len = Math.hypot(dx, dy) || 1;
-        const lx = x2 + dx/len * 8;
-        const ly = y2 + dy/len * 8;
-        const anchor = dx > 5 ? 'start' : dx < -5 ? 'end' : 'middle';
-        return `
-            <line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(${cssVar})" stroke-width="1.8" opacity="0.92"/>
-            <circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="3.5" fill="var(${cssVar})"/>
-            <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="var(${cssVar})" font-family="Inter, sans-serif" font-size="11" font-weight="600" text-anchor="${anchor}" dominant-baseline="middle">${l.talent}</text>
-        `;
-    }).join('');
-
-    document.getElementById('pca-biplot-plot').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width: ${W}px;">
-        <line x1="${PAD}" y1="${H/2}" x2="${W-PAD}" y2="${H/2}" stroke="rgba(36,83,117,0.15)"/>
-        <line x1="${W/2}" y1="${PAD}" x2="${W/2}" y2="${H-PAD}" stroke="rgba(36,83,117,0.15)"/>
-        <text x="${W/2}" y="${H-12}" fill="#5d6b7e" font-family="Inter, sans-serif" font-size="11" font-weight="500" text-anchor="middle">PC1 &middot; ${varExp1}%</text>
-        <text x="20" y="${H/2}" fill="#5d6b7e" font-family="Inter, sans-serif" font-size="11" font-weight="500" text-anchor="middle" transform="rotate(-90 20 ${H/2})">PC2 &middot; ${varExp2}%</text>
-        ${dots}
-        ${arrows}
-    </svg>`;
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.pc-bar[data-w]').forEach(el => {
+            el.style.width = el.dataset.w + '%';
+        });
+    });
 })();
 
 /* ---------- Person x person similarity heatmap (Spearman ρ) ---------- */
@@ -1584,8 +1723,8 @@ window.onscroll = function() {
     );
 
     function heatColor(r) {
-        if (r >= 0) return `rgba(40, 112, 237, ${Math.min(r, 1).toFixed(3)})`;
-        return `rgba(235, 76, 121, ${Math.min(-r, 1).toFixed(3)})`;
+        if (r >= 0) return `rgba(2, 163, 164, ${Math.min(r, 1).toFixed(3)})`;
+        return `rgba(255, 97, 48, ${Math.min(-r, 1).toFixed(3)})`;
     }
 
     const W = 760, labelPad = 90;
@@ -1659,7 +1798,7 @@ window.onscroll = function() {
         if (c === 0) return 'rgba(36,83,117,0.03)';
         const m = onDiag ? maxOnDiag : maxOff;
         const t = m === 0 ? 0 : c / m;
-        return `rgba(40, 112, 237, ${(0.1 + 0.85 * t).toFixed(3)})`;
+        return `rgba(36, 83, 117, ${(0.1 + 0.85 * t).toFixed(3)})`;
     }
 
     const W = 760, labelPad = 120;
