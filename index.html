@@ -221,6 +221,32 @@
         .download-btn i {
             font-size: 1rem;
         }
+
+        .lang-list { display: flex; flex-direction: column; gap: 10px; }
+        .lang-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .lang-item:hover {
+            border-color: var(--accent-green);
+            background: rgba(116, 108, 240, 0.05);
+        }
+        .lang-name {
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .lang-level {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--accent-green);
+        }
     </style>
 </head>
 
@@ -252,8 +278,28 @@
                 <div class="exp-item">
                     <div class="meta">JAN 2022 - PRESENT // BRATISLAVA, SK</div>
                     <h3>Slovenská sporiteľňa, a.s.</h3>
-                    <p style="font-size: 0.95rem; color: var(--text-muted);">Internal Auditor &amp; Data Analytics Team Lead in the IT and Strategic Risk Management Audit Department. Lead a team of four analysts building data-driven audit strategies in Oracle, MS SQL, and Snowflake, develop Power BI reports for senior management, and run data quality checks and anomaly detection across audit engagements.</p>
-                    <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 8px;">Also host Python and SQL trainings locally and across the wider Erste Group audit team.</p>
+                    <p style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                      Internal Auditor &amp; Data Analytics Team Lead
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                        IT and Strategic Risk Management Audit Department 
+                    </p>
+
+                    <ul style="font-size: 0.95rem; color: var(--text-muted); padding-left: 1.1rem; margin: 0 0 12px 0; line-height: 1.6;">
+                        <li><strong style="color: var(--text-primary);">Lead a team of 4 analysts</strong> building data-driven audit strategies across Oracle, MS SQL, and Snowflake.</li>
+                        <li><strong style="color: var(--text-primary);">Develop Power BI reports</strong> for senior management, surfacing risk signals from across the bank.</li>
+                        <li><strong style="color: var(--text-primary);">Run data quality checks and anomaly detection</strong> across audit engagements.</li>
+                        <li><strong style="color: var(--text-primary);">Deliver Python &amp; SQL trainings</strong> locally and across the wider Erste Group audit community.</li>
+                    </ul>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+                        <span style="font-size: 0.8rem; padding: 3px 10px; background: rgba(0,0,0,0.05); border-radius: 999px; color: var(--text-primary); font-weight: 500;">Python</span>
+                        <span style="font-size: 0.8rem; padding: 3px 10px; background: rgba(0,0,0,0.05); border-radius: 999px; color: var(--text-primary); font-weight: 500;">SQL</span>
+                        <span style="font-size: 0.8rem; padding: 3px 10px; background: rgba(0,0,0,0.05); border-radius: 999px; color: var(--text-primary); font-weight: 500;">Oracle</span>
+                        <span style="font-size: 0.8rem; padding: 3px 10px; background: rgba(0,0,0,0.05); border-radius: 999px; color: var(--text-primary); font-weight: 500;">MS SQL</span>
+                        <span style="font-size: 0.8rem; padding: 3px 10px; background: rgba(0,0,0,0.05); border-radius: 999px; color: var(--text-primary); font-weight: 500;">Snowflake</span>
+                        <span style="font-size: 0.8rem; padding: 3px 10px; background: rgba(0,0,0,0.05); border-radius: 999px; color: var(--text-primary); font-weight: 500;">Power BI</span>
+                    </div>
                 </div>
             </section>
 
@@ -278,6 +324,7 @@
                 <div class="exp-item">
                     <div class="meta">NEXTERIA LEADERSHIP ACADEMY</div>
                     <h3>Leadership Programme</h3>
+                    <a href="https://nexteria.sk" target="_blank" rel="noopener"><i class="fa fa-certificate"></i> Find out about the programme</a>
                 </div>
                 <div class="exp-item">
                     <div class="meta">SAS</div>
@@ -293,30 +340,54 @@
         </main>
 
         <aside>
+        <section class="section-block">
+            <h2>stack.json</h2>
+            <div class="tags">
+                <span class="tag lang">Python</span>
+                <span class="tag lang">R</span>
+                <span class="tag lang">SQL</span>
+                <span class="tag lang">SAS</span>
+                <span class="tag lang">VBA</span>
+
+                <span class="tag bio">Power BI</span>
+                <span class="tag bio">Snowflake</span>
+                <span class="tag bio">Oracle</span>
+                <span class="tag bio">MS SQL</span>
+
+                <span class="tag ml">Excel</span>
+                <span class="tag ml">Power Query</span>
+                <span class="tag ml">PowerPoint</span>
+                <span class="tag ml">Word</span>
+                <span class="tag ml">Teams</span>
+
+                <span class="tag infra">Git</span>
+                <span class="tag infra">GitHub</span>
+                <span class="tag infra">VS Code</span>
+                <span class="tag infra">Jupyter</span>
+                <span class="tag infra">Linux</span>
+                <span class="tag infra">Windows</span>
+                <span class="tag infra">Jira</span>
+                <span class="tag infra">SharePoint</span>
+                <span class="tag infra">OneDrive</span>
+                <span class="tag infra">Outlook</span>
+            </div>
+        </section>
+
             <section class="section-block">
-                <h2>stack.json</h2>
-                <div class="tags">
-                    <span class="tag lang">Python</span>
-                    <span class="tag lang">R</span>
-                    <span class="tag lang">SQL</span>
-                    <span class="tag lang">SAS</span>
-
-                    <span class="tag bio">Power BI</span>
-                    <span class="tag bio">Snowflake</span>
-                    <span class="tag bio">Oracle</span>
-                    <span class="tag bio">MS SQL</span>
-
-                    <span class="tag ml">Excel</span>
-                    <span class="tag ml">PowerPoint</span>
-                    <span class="tag ml">Word</span>
-                    <span class="tag ml">Teams</span>
-
-                    <span class="tag infra">Linux</span>
-                    <span class="tag infra">Windows</span>
-                    <span class="tag infra">Jira</span>
-                    <span class="tag infra">SharePoint</span>
-                    <span class="tag infra">OneDrive</span>
-                    <span class="tag infra">Outlook</span>
+                <h2>languages.yml</h2>
+                <div class="lang-list">
+                    <div class="lang-item">
+                        <span class="lang-name">Slovak</span>
+                        <span class="lang-level">native</span>
+                    </div>
+                    <div class="lang-item">
+                        <span class="lang-name">English</span>
+                        <span class="lang-level">B2 / C1</span>
+                    </div>
+                    <div class="lang-item">
+                        <span class="lang-name">German</span>
+                        <span class="lang-level">B1 / B2 (GDS)</span>
+                    </div>
                 </div>
             </section>
 
@@ -324,8 +395,8 @@
                 <h2>projects.md</h2>
                 <div class="exp-item" style="border: none; padding-left: 0;">
                     <h3 style="color: var(--projects-accent)">GALLUP STRENGTHS ANALYSIS</h3>
-                    <div class="meta">INTERNAL AUDIT DEPARTMENT</div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">CliftonStrengths team analysis across 23 colleagues: theme frequency, domain balance, coverage gaps.</p>
+                    <div class="meta">Collected sample data</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">CliftonStrengths team analysis across 23 results: theme frequency, domain balance, coverage gaps.</p>
                     <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
                     [GALLUP, TEAM ANALYTICS, STRENGTHS]
                     </span>
@@ -343,30 +414,17 @@
                 <div class="exp-item" style="border: none; padding-left: 0;">
                     <h3 style="color: var(--projects-accent)">PYTHON &amp; SQL TRAININGS</h3>
                     <div class="meta">ERSTE GROUP AUDIT</div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Internal trainings hosted locally and across the wider Erste Group audit team.</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Internal trainings for 100+ colleagues hosted locally and across the wider Erste Group audit team.</p>
                     <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
                     [PYTHON, SQL, TEACHING]
                     </span>
+                    <a href="mailto:andrejka.sevcovicova@gmail.com?subject=Python%20%26%20SQL%20training%20materials"><i class="fa fa-envelope"></i> Content available on request</a>
                 </div>
                 <div class="exp-item" style="border: none; padding-left: 0;">
-                    <h3 style="color: var(--projects-accent)">DATA-DRIVEN AUDIT</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Audit plans and testing procedures built on transactional data, with automation and analytics replacing manual sampling.</p>
+                    <h3 style="color: var(--projects-accent)">DUKE OF EDINBURGH AWARD: BUSINESS LEADER</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Business-side mentor for young adults pursuing the Duke of Edinburgh International Award, guiding them through skill development, goal-setting, and reflection on their professional growth.</p>
                     <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
-                    [ANOMALY DETECTION, AUTOMATION]
-                    </span>
-                </div>
-                <div class="exp-item" style="border: none; padding-left: 0;">
-                    <h3 style="color: var(--projects-accent)">POWER BI REPORTING</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Interactive dashboards surfacing insights from audit data use cases to executives.</p>
-                    <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
-                    [POWER BI, DAX, DATA MODELLING]
-                    </span>
-                </div>
-                <div class="exp-item" style="border: none; padding-left: 0;">
-                    <h3 style="color: var(--projects-accent)">HIGH SCHOOL OUTREACH</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">Volunteer programme sharing university experience with prospective students.</p>
-                    <span style="display: block; font-size: 10px; color: var(--projects-accent); font-family: var(--mono);">
-                    [OUTREACH, MENTORING]
+                    [MENTORING, YOUTH DEVELOPMENT, LEADERSHIP]
                     </span>
                 </div>
             </section>
