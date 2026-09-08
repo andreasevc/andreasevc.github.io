@@ -113,6 +113,13 @@ b.hi{color:var(--pink)}
 .row:nth-child(3n).checked .box{background:var(--pink);border-color:var(--pink)}
 .row.checked .box::after{transform:rotate(40deg) scale(1)}
 .row.checked span:last-child{color:var(--muted);text-decoration:line-through}
+.done-msg{
+  display:none;margin-top:24px;padding:18px 24px;border-radius:16px;
+  background:var(--pink);color:#fff;text-align:center;
+  font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;font-size:20px;
+}
+.done-msg.show{display:block;animation:doneIn .4s ease}
+@keyframes doneIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* ---------- FOOT ---------- */
 .foot{background:var(--teal);color:#fff;padding:24px clamp(24px,6vw,96px);display:flex;gap:18px;
@@ -258,6 +265,7 @@ b.hi{color:var(--pink)}
       <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Nahodím prezenčku do Space-u do 12 hodín</span></div>
       <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Vytvorím folder na Drive a nahrám fotky</span></div>
     </div>
+    <p class="done-msg" id="doneMsg">Si super, ďakujeme!</p>
   </section>
 
   <footer class="foot">
@@ -268,10 +276,21 @@ b.hi{color:var(--pink)}
   <div class="stripe"><span class="s4"></span><span class="s3"></span><span class="s2"></span><span class="s1"></span></div>
 </div>
 <script>
-document.querySelectorAll('.check .row').forEach(function(row){
+var checkRows = document.querySelectorAll('.check .row');
+var doneMsg = document.getElementById('doneMsg');
+
+function updateDoneMsg(){
+  var allChecked = Array.prototype.every.call(checkRows, function(r){
+    return r.classList.contains('checked');
+  });
+  doneMsg.classList.toggle('show', allChecked);
+}
+
+checkRows.forEach(function(row){
   function toggle(){
     var checked = row.classList.toggle('checked');
     row.setAttribute('aria-checked', checked ? 'true' : 'false');
+    updateDoneMsg();
   }
   row.addEventListener('click', toggle);
   row.addEventListener('keydown', function(e){
