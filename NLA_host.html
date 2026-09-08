@@ -21,16 +21,16 @@
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0;
-  background:var(--paper);
+  background:#fff;
   color:var(--ink);
   font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   font-size:15px;
   line-height:1.55;
 }
-.wrap{max-width:900px;margin:0 auto;background:#fff}
+.wrap{width:100%;background:#fff}
 
 /* ---------- HERO ---------- */
-.hero{background:var(--navy);color:#fff;padding:46px 44px 42px}
+.hero{background:var(--navy);color:#fff;padding:46px clamp(24px,6vw,96px) 42px}
 .stripe{display:flex;height:10px}
 .stripe span{flex:1}
 .s1{background:var(--teal)}.s2{background:var(--yellow)}.s3{background:var(--pink)}.s4{background:var(--navy)}
@@ -48,7 +48,7 @@ h1{
 }
 
 /* ---------- PHASES ---------- */
-.phase{padding:34px 44px 8px;border-top:1px solid #e3e8f7}
+.phase{padding:34px clamp(24px,6vw,96px) 8px;border-top:1px solid #e3e8f7}
 .phase:first-of-type{border-top:0}
 .ph-head{margin-bottom:20px}
 .ph-title{display:flex;align-items:baseline;gap:14px}
@@ -67,6 +67,7 @@ h1{
   padding:13px 18px 15px;break-inside:avoid;
   transition:all .3s cubic-bezier(.4,0,.2,1);
 }
+.item p,.item ul{max-width:70ch}
 .item:hover{
   background:#fff;
   border-left-color:var(--navy);
@@ -82,7 +83,7 @@ b.hi{color:var(--pink)}
 .mail{color:var(--teal);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(26,170,160,.4)}
 
 /* ---------- CHECKLIST ---------- */
-.check{padding:36px 44px 40px;background:#fff;border-top:1px solid #e3e8f7;margin-top:26px}
+.check{padding:36px clamp(24px,6vw,96px) 40px;background:#fff;border-top:1px solid #e3e8f7;margin-top:26px}
 .check h2{
   font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;font-size:28px;
   margin:0 0 4px;color:var(--navy);letter-spacing:-.02em;
@@ -115,12 +116,16 @@ b.hi{color:var(--pink)}
 .row.checked span:last-child{color:var(--muted);text-decoration:line-through}
 
 /* ---------- FOOT ---------- */
-.foot{background:var(--teal);color:#fff;padding:24px 44px;display:flex;gap:18px;
+.foot{background:var(--teal);color:#fff;padding:24px clamp(24px,6vw,96px);display:flex;gap:18px;
   justify-content:space-between;align-items:center;flex-wrap:wrap}
 .foot p{margin:0;font-size:14px}
 .foot .big{font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;font-size:19px}
 .foot a{color:#fff;font-weight:600}
 
+@media (min-width:980px){
+  .items{grid-template-columns:1fr 1fr}
+  .grid{columns:3}
+}
 @media (max-width:720px){
   .hero,.phase,.check,.foot{padding-left:22px;padding-right:22px}
   .grid{columns:1}
@@ -223,7 +228,7 @@ b.hi{color:var(--pink)}
       </article>
       <article class="item">
         <h3>Vráť priestory do pôvodného stavu</h3>
-        <p>Sedenie tak, ako ste ho našli. Riad do umývačky. Ak je plná, vylož ju alebo umy ručne. Ráno sa v tíme potešíme, že začíname deň v čistom.</p>
+        <p>Sedenie vráť tak, ako ste ho našli. Riad do umývačky. Ak je plná, vylož ju alebo umy ručne. Ráno sa v tíme potešíme, že začíname deň v čistom.</p>
       </article>
       <article class="item">
         <h3>Zamkni a vhoď kľúče</h3>
@@ -258,8 +263,8 @@ b.hi{color:var(--pink)}
   </section>
 
   <footer class="foot">
-    <p class="big">Niečo nesedí? Ozvi sa Ačke.</p>
-    <p>Ačka Ševčovičová &nbsp;·&nbsp; <a href="mailto:andrejka.sevcovicova@gmail.com">andrejka.sevcovicova@gmail.com</a> &nbsp;·&nbsp; 0948 168 967</p>
+    <p class="big">Niečo nesedí? Ozvi sa Aďke.</p>
+    <p>Aďka Ševčovičová &nbsp;·&nbsp; <a href="mailto:andrejka.sevcovicova@gmail.com">andrejka.sevcovicova@gmail.com</a> &nbsp;·&nbsp; 0948 168 967</p>
   </footer>
 
   <div class="stripe"><span class="s4"></span><span class="s3"></span><span class="s2"></span><span class="s1"></span></div>
