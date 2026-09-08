@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Host NLA eventu, sprievodca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#002478;
+  --teal:#1aaaa0;
+  --yellow:#eeaf27;
+  --pink:#f22078;
+  --paper:#f3f5fc;
+  --ink:#0b1a45;
+  --muted:#4a5a86;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:15px;
+  line-height:1.55;
+}
+.wrap{max-width:900px;margin:0 auto;background:#fff}
+
+/* ---------- HERO ---------- */
+.hero{background:var(--navy);color:#fff;padding:46px 44px 42px}
+.stripe{display:flex;height:10px}
+.stripe span{flex:1}
+.s1{background:var(--teal)}.s2{background:var(--yellow)}.s3{background:var(--pink)}.s4{background:var(--navy)}
+.kicker{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--yellow);margin:0 0 10px}
+h1{
+  font-family:"Bricolage Grotesque","Inter",sans-serif;
+  font-weight:800;font-size:clamp(38px,7vw,62px);line-height:.98;
+  margin:0 0 18px;letter-spacing:-.025em;max-width:14ch;
+}
+.hero p{margin:0 0 14px;max-width:58ch;color:#cdd8f5;font-size:15.5px}
+.hero p b{color:#fff;font-weight:600}
+.lead{
+  margin:22px 0 0;padding:14px 18px;background:rgba(255,255,255,.09);
+  border-left:4px solid var(--yellow);max-width:58ch;color:#eaf0ff;font-size:15px;
+}
+
+/* ---------- PHASES ---------- */
+.phase{padding:34px 44px 8px;border-top:1px solid #e3e8f7}
+.phase:first-of-type{border-top:0}
+.ph-head{margin-bottom:20px}
+.ph-title{display:flex;align-items:baseline;gap:14px}
+.ph-num{
+  font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:800;
+  font-size:46px;line-height:.8;color:var(--c);letter-spacing:-.04em;
+}
+.ph-head h2{
+  font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;
+  font-size:30px;margin:0;letter-spacing:-.02em;color:var(--navy);
+}
+.ph-sub{margin:8px 0 0 60px;font-size:14px;font-weight:600;color:var(--c)}
+.items{display:grid;gap:2px}
+.item{
+  border-left:4px solid var(--c);background:#fbfcff;
+  padding:13px 18px 15px;break-inside:avoid;
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+.item:hover{
+  background:#fff;
+  border-left-color:var(--navy);
+  box-shadow:0 6px 18px -8px rgba(0,36,120,.25);
+  transform:translateX(10px);
+}
+.item h3{margin:0 0 4px;font-size:15.5px;font-weight:700;color:var(--navy)}
+.item p{margin:0;color:var(--muted);font-size:14px}
+.item p + p{margin-top:5px}
+b.hi{color:var(--pink)}
+.item ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:14px}
+.item li{margin-bottom:2px}
+.mail{color:var(--teal);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(26,170,160,.4)}
+
+/* ---------- CHECKLIST ---------- */
+.check{padding:36px 44px 40px;background:#fff;border-top:1px solid #e3e8f7;margin-top:26px}
+.check h2{
+  font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;font-size:28px;
+  margin:0 0 4px;color:var(--navy);letter-spacing:-.02em;
+}
+.check .sub{margin:0 0 20px;color:var(--muted);font-size:14px}
+.grid{columns:2;column-gap:26px}
+.row{
+  display:flex;gap:11px;align-items:flex-start;padding:7px 8px;margin:0 -8px;
+  break-inside:avoid;font-size:14.3px;border-radius:6px;cursor:pointer;
+  user-select:none;transition:background .2s ease;
+}
+.row:hover{background:rgba(0,36,120,.05)}
+.box{
+  flex:0 0 17px;height:17px;border:2px solid var(--navy);margin-top:2px;border-radius:3px;
+  position:relative;transition:all .2s cubic-bezier(.4,0,.2,1);
+}
+.box::after{
+  content:"";position:absolute;left:3px;top:-1px;width:6px;height:10px;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  transform:rotate(40deg) scale(0);transition:transform .18s cubic-bezier(.4,0,.2,1);
+}
+.row:nth-child(3n+1) .box{border-color:var(--teal)}
+.row:nth-child(3n+2) .box{border-color:var(--yellow)}
+.row:nth-child(3n) .box{border-color:var(--pink)}
+.row.checked .box{background:var(--navy);border-color:var(--navy)}
+.row:nth-child(3n+1).checked .box{background:var(--teal);border-color:var(--teal)}
+.row:nth-child(3n+2).checked .box{background:var(--yellow);border-color:var(--yellow)}
+.row:nth-child(3n).checked .box{background:var(--pink);border-color:var(--pink)}
+.row.checked .box::after{transform:rotate(40deg) scale(1)}
+.row.checked span:last-child{color:var(--muted);text-decoration:line-through}
+
+/* ---------- FOOT ---------- */
+.foot{background:var(--teal);color:#fff;padding:24px 44px;display:flex;gap:18px;
+  justify-content:space-between;align-items:center;flex-wrap:wrap}
+.foot p{margin:0;font-size:14px}
+.foot .big{font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;font-size:19px}
+.foot a{color:#fff;font-weight:600}
+
+@media (max-width:720px){
+  .hero,.phase,.check,.foot{padding-left:22px;padding-right:22px}
+  .grid{columns:1}
+  .ph-sub{margin-left:0}
+}
+@media print{
+  body{background:#fff}
+  .wrap{max-width:none}
+  .hero,.foot,.item,.lead{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .phase,.check{page-break-inside:avoid}
+  @page{margin:10mm}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="stripe"><span class="s1"></span><span class="s2"></span><span class="s3"></span><span class="s4"></span></div>
+
+  <header class="hero">
+    <p class="kicker">Nexteria Leadership Academy</p>
+    <h1>Si host eventu.</h1>
+    <p>Túto rolu máš buď preto, že si si ju ako <b>ročníkový host</b> vybral/a v rámci dobrovoľníctva, alebo preto, že žiadny z ročníkových hostov na aktivite nie je a my sme ňou výnimočne poverili teba. Vkladáme do teba dôveru.</p>
+    <p class="lead">Držíš v rukách celý event, od odomknutia dverí až po zamknutie. Tu je všetko, čo na to potrebuješ, v poradí, v akom sa to bude diať.</p>
+  </header>
+
+  <!-- PRED -->
+  <section class="phase" style="--c:var(--yellow)">
+    <div class="ph-head">
+      <div class="ph-title"><span class="ph-num">1</span><h2>Pred eventom</h2></div>
+      <p class="ph-sub">Na mieste buď aspoň 30 minút pred začiatkom.</p>
+    </div>
+    <div class="items">
+      <article class="item">
+        <h3>Kľúče si vyzdvihni vopred</h3>
+        <p>Nájdeš ich v office na poličke v strede. <b class="hi">Ak máš event v sobotu, po kľúče si musíš prísť už v piatok.</b></p>
+      </article>
+      <article class="item">
+        <h3>Priprav miestnosť</h3>
+        <p>Vyvetraj, rozlož sedenie a stoly, priprav pomôcky, papiere a perá, všetko nájdeš v sklade. Nachystaj aj dar pre lektora/-ku.</p>
+      </article>
+      <article class="item">
+        <h3>Otestuj techniku</h3>
+        <p>Skontroluj, že projektor funguje a že máš správnu koncovku (HDMI, VGA alebo MAC) podľa požiadaviek lektora. Koncovky nájdeš v office.</p>
+      </article>
+      <article class="item">
+        <h3>Ozvi sa lektorovi/-ke</h3>
+        <p>Prepojíme vás 2 až 3 dni pred eventom. Buď proaktívny/-a a napíš prvý/-á, ak ti je čokoľvek nejasné. Pri príchode ti môže volať, miestnosť sa občas hľadá ťažko.</p>
+      </article>
+      <article class="item">
+        <h3>Priprav občerstvenie a dohodni sa na úvode</h3>
+        <p>Ponúkni vodu, kávu alebo čaj. Opýtaj sa, či lektora/-ku máš uviesť ty, alebo si to radšej urobí sám/sama.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- POCAS -->
+  <section class="phase" style="--c:var(--teal)">
+    <div class="ph-head">
+      <div class="ph-title"><span class="ph-num">2</span><h2>Počas eventu</h2></div>
+      <p class="ph-sub">Kurz zvyčajne začína o 17:30, diskusia o 18:00.</p>
+    </div>
+    <div class="items">
+      <article class="item">
+        <h3>Stráž oficiálny začiatok</h3>
+        <p>Presný čas nájdeš vždy v pozvánke alebo v Google kalendári. Úvodná 15-minútovka je súčasťou kurzu, takže čas začiatku sa ňou neposúva.</p>
+      </article>
+      <article class="item">
+        <h3>Daj kolovať prezenčku</h3>
+        <p>Popros študentov, aby si na čistý papier napísali meno a podpísali sa. <b class="hi">V čase oficiálneho začiatku sprav čiaru</b>, pod ňu sa zapíšu meškajúci. Buď dôsledný/-á, robíme z toho štatistiku.</p>
+        <p>Prezenčku nechaj v office. Ak máte event inde, pošli foto na <a class="mail" href="mailto:katarina.hudakova@nexteria.sk">katarina.hudakova@nexteria.sk</a> a prines ju, keď budeš najbližšie v Nexteria office.</p>
+      </article>
+      <article class="item">
+        <h3>Nahlás meškajúcich</h3>
+        <p>Ak sa ti niekto ozve, že príde neskôr a povie dôvod, daj nám o tom vedieť cez WhatsApp.</p>
+      </article>
+      <article class="item">
+        <h3>Sprav 3 až 4 fotky</h3>
+        <ul>
+          <li>Zachyť emócie, aktivitu, úsmev.</li>
+          <li>Foť celok aj detail.</li>
+          <li>Zaber študentov aj zozadu miestnosti, nech je vidieť účasť.</li>
+          <li>Nezabudni na hosťa alebo lektora, nech je dobre vidieť.</li>
+        </ul>
+        <p>V zdieľanom Drive priečinku vytvor nový folder v tvare <b>mesiac/rok - Názov</b> (napr. 04/2026 - Viem komunikovať s inými?) a nahraj doň fotky či video.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- PO -->
+  <section class="phase" style="--c:var(--pink)">
+    <div class="ph-head">
+      <div class="ph-title"><span class="ph-num">3</span><h2>Po evente</h2></div>
+      <p class="ph-sub">Väčšinu z toho stihneš ešte na mieste, kým balíš.</p>
+    </div>
+    <div class="items">
+      <article class="item">
+        <h3>Odovzdaj dar</h3>
+        <p>Po skončení odovzdaj lektorovi/-ke alebo pozvanému hosťovi diskusie darček a poďakuj za čas a ochotu.</p>
+      </article>
+      <article class="item">
+        <h3>Vráť priestory do pôvodného stavu</h3>
+        <p>Sedenie tak, ako ste ho našli. Riad do umývačky. Ak je plná, vylož ju alebo umy ručne. Ráno sa v tíme potešíme, že začíname deň v čistom.</p>
+      </article>
+      <article class="item">
+        <h3>Zamkni a vhoď kľúče</h3>
+        <p>Hneď po zamknutí hoď kľúče dole do schránky s nadpisom <b>Nexteria</b>.</p>
+      </article>
+      <article class="item">
+        <h3>Zaznač účasť v Space-e</h3>
+        <p>Do 12 hodín od začiatku eventu, cez sekciu „som host“ alebo cez mail, ktorý ti príde po skončení. Najjednoduchšie je urobiť to hneď na mieste z mobilu.</p>
+        <p>Pri každom mene vyber <b>prišiel</b> (ak meškal) alebo <b>prišiel načas</b>. <b class="hi">Bez toho študenti za aktivitu nezískajú body.</b></p>
+      </article>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section class="check">
+    <h2>Checklist</h2>
+    <p class="sub">Klikaním si odškrtávaj hotové kroky počas dňa. (Zoznam sa po obnovení stránky vynuluje.)</p>
+    <div class="grid">
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Prídem 30 minút pred eventom</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Zabezpečím techniku a koncovky</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Pripravím občerstvenie a miestnosť, vyvetrám, stoličky, stoly</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Pripravím papiere a perá zo skladu</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Dám prezenčku, meškajúci pod čiaru</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Spravím 3 až 4 fotky</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Odovzdám darček na konci eventu</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Dám priestory do pôvodného stavu a spustím umývačku</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Zamknem a kľúče vhodím do schránky</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Pošlem info o ospravedlneniach</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Nahodím prezenčku do Space-u do 12 hodín</span></div>
+      <div class="row" tabindex="0" role="checkbox" aria-checked="false"><span class="box"></span><span>Vytvorím folder na Drive a nahrám fotky</span></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p class="big">Niečo nesedí? Ozvi sa Ačke.</p>
+    <p>Ačka Ševčovičová &nbsp;·&nbsp; <a href="mailto:andrejka.sevcovicova@gmail.com">andrejka.sevcovicova@gmail.com</a> &nbsp;·&nbsp; 0948 168 967</p>
+  </footer>
+
+  <div class="stripe"><span class="s4"></span><span class="s3"></span><span class="s2"></span><span class="s1"></span></div>
+</div>
+<script>
+document.querySelectorAll('.check .row').forEach(function(row){
+  function toggle(){
+    var checked = row.classList.toggle('checked');
+    row.setAttribute('aria-checked', checked ? 'true' : 'false');
+  }
+  row.addEventListener('click', toggle);
+  row.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggle();
+    }
+  });
+});
+</script>
+</body>
+</html>
