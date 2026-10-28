@@ -1,0 +1,1705 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexteria – Student Relationship Monitoring (demo)</title>
+<meta name="description" content="Demo of the Nexteria Student Relationship Monitoring dashboard with fictional sample data.">
+<style>
+/* Nexteria brand accents: navy #00257A, teal #00B2A9, yellow #F2AF00, pink #F51776 */
+:root{
+  --navy:#00257A; --teal:#00B2A9; --yellow:#F2AF00; --pink:#F51776;
+  --bg:#f5f5f7; --panel:#ffffff; --fill:#ededf0; --fill-2:#f5f5f7; --text:#1d1d1f; --muted:#6e6e73; --faint:#aeaeb2;
+  --line:#e5e5ea; --sep:rgba(60,60,67,.12);
+  --accent:#00257A; --accent-soft:#e8edf8; --wordmark:#00257A;
+  --ok:#00897f; --ok-soft:#e3f6f4; --bad:#d4145f; --bad-soft:#fde8f0; --warn:#9a6c00; --warn-soft:#fdf3d8;
+  --bar-ok:#00B2A9; --bar-warn:#F2AF00; --bar-bad:#F51776;
+  --row-hover:#f5f5f7; --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04); --pop:0 10px 40px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.08);
+  --seg-on:#ffffff; --seg-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --panel:#1c1c1e; --fill:#2c2c2e; --fill-2:#2c2c2e; --text:#f5f5f7; --muted:#98989d; --faint:#636366;
+    --line:#38383a; --sep:rgba(84,84,88,.6);
+    --accent:#7ea2ff; --accent-soft:#1a2547; --wordmark:#ffffff;
+    --ok:#40d8cd; --ok-soft:#0d3332; --bad:#ff6aa2; --bad-soft:#3d1428; --warn:#ffd060; --warn-soft:#3a2e0d;
+    --row-hover:#242426; --shadow:none; --pop:0 10px 40px rgba(0,0,0,.6),0 0 0 .5px rgba(255,255,255,.1);
+    --seg-on:#636366; --seg-shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --panel:#1c1c1e; --fill:#2c2c2e; --fill-2:#2c2c2e; --text:#f5f5f7; --muted:#98989d; --faint:#636366;
+  --line:#38383a; --sep:rgba(84,84,88,.6);
+  --accent:#7ea2ff; --accent-soft:#1a2547; --wordmark:#ffffff;
+  --ok:#40d8cd; --ok-soft:#0d3332; --bad:#ff6aa2; --bad-soft:#3d1428; --warn:#ffd060; --warn-soft:#3a2e0d;
+  --row-hover:#242426; --shadow:none; --pop:0 10px 40px rgba(0,0,0,.6),0 0 0 .5px rgba(255,255,255,.1);
+  --seg-on:#636366; --seg-shadow:none;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+a{color:var(--accent);text-decoration:none}
+.hidden{display:none !important}
+.dim{color:var(--faint)}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 16px 56px}
+
+/* demo banner */
+.demo-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:9px 14px;font-size:13px;font-weight:500;margin-bottom:18px}
+.demo-bar b{background:var(--warn);color:var(--panel);border-radius:6px;padding:1px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+
+/* header */
+header.top{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.logo{display:block;height:28px;width:auto;color:var(--wordmark)}
+.title{min-width:0}
+.title h1{font-size:22px;line-height:1.15;margin:0;font-weight:700;letter-spacing:-.02em}
+.title p{margin:1px 0 0;color:var(--muted);font-size:13px}
+.spacer{flex:1}
+.btn.stale{background:var(--accent-soft);color:var(--accent);border-radius:999px;font-size:13px;padding:7px 14px}
+@media (max-width:640px){.btn.stale{font-size:12px;padding:6px 10px}}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:0;background:var(--panel);box-shadow:var(--shadow);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);flex:0 0 auto}
+.icon-btn:hover{background:var(--fill)}
+.icon-btn svg{width:17px;height:17px}
+.icon-btn.spin svg{animation:sp .8s linear infinite}
+
+/* buttons & inputs */
+.btn{border:0;background:var(--fill);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:500;color:var(--text);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{filter:brightness(.97)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.12)}
+.btn.link{background:none;padding:6px 4px;color:var(--accent)}
+.badge{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.field-in,.pill-select{border:0;background:var(--panel);border-radius:10px;padding:8px 12px;box-shadow:var(--shadow);min-width:0}
+.field-in:focus,.pill-select:focus,textarea:focus,.form input:focus{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);outline-offset:0}
+.pill-select{appearance:none;-webkit-appearance:none;padding-right:30px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center}
+
+/* toolbar */
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.semnav{display:flex;align-items:center;background:var(--panel);border-radius:10px;box-shadow:var(--shadow);padding:2px}
+.semnav button{border:0;background:none;width:30px;height:32px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:18px;line-height:1}
+.semnav button:hover:not(:disabled){background:var(--fill);color:var(--text)}
+.semnav button:disabled{opacity:.3;cursor:default}
+.semnav select{border:0;background:none;font-weight:600;padding:6px 4px;appearance:none;-webkit-appearance:none;cursor:pointer;text-align:center;text-align-last:center;min-width:120px}
+.search{position:relative;flex:1 1 220px;max-width:320px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--faint);pointer-events:none}
+.search input{width:100%;padding-left:32px}
+.search input::-webkit-search-cancel-button{cursor:pointer}
+.filter-wrap{position:relative}
+.subbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 18px}
+.seg{display:inline-flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{border:0;background:none;border-radius:7px;padding:5px 12px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text);white-space:nowrap}
+.seg button.on{background:var(--seg-on);box-shadow:var(--seg-shadow);font-weight:600}
+.seg button .n{color:var(--muted);font-weight:500;margin-left:4px;font-variant-numeric:tabular-nums}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:3px 4px 3px 10px;font-size:12px;font-weight:500}
+.chip button{border:0;background:none;color:inherit;cursor:pointer;width:18px;height:18px;border-radius:50%;line-height:1;padding:0;font-size:13px}
+.chip button:hover{background:color-mix(in srgb,var(--accent) 15%,transparent)}
+.count{margin-left:auto;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+
+/* popovers */
+.pop{position:absolute;top:calc(100% + 8px);right:0;z-index:30;width:300px;max-width:calc(100vw - 32px);background:var(--panel);border-radius:14px;box-shadow:var(--pop);padding:14px;animation:pop .14s ease-out}
+.pop.left{right:auto;left:0}
+@keyframes pop{from{opacity:0;transform:translateY(-4px) scale(.98)}}
+.pop h4{margin:0 0 10px;font-size:13px;font-weight:600}
+.pop .grp{display:grid;gap:10px}
+.pop.filters{width:380px;padding:16px}
+.fg+.fg{margin-top:14px}
+.fl{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:0;background:var(--fill);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;gap:6px;align-items:center;color:var(--text);transition:background .12s}
+.opt:hover{filter:brightness(.96)}
+.opt span{color:var(--muted);font-size:12px;font-weight:500;font-variant-numeric:tabular-nums}
+.opt.on{background:var(--accent);color:#fff}
+.opt.on span{color:rgba(255,255,255,.75)}
+.opt:disabled{opacity:.4;cursor:default}
+.pop .sep{height:1px;background:var(--sep);margin:12px 0}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;cursor:pointer;padding:3px 0}
+.tog input{appearance:none;-webkit-appearance:none;width:38px;height:23px;border-radius:12px;background:var(--fill);position:relative;cursor:pointer;flex:0 0 auto;transition:background .15s;margin:0}
+.tog input::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.tog input:checked{background:#34c759}
+.tog input:checked::after{transform:translateX(15px)}
+.pop .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px}
+.menu{width:240px;padding:6px}
+.menu button,.menu a{display:flex;width:100%;align-items:center;gap:10px;border:0;background:none;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text);font-size:14px;text-align:left}
+.menu button:hover,.menu a:hover{background:var(--fill)}
+.menu .sep{height:1px;background:var(--sep);margin:5px 8px}
+.menu svg{width:16px;height:16px;color:var(--muted);flex:0 0 auto}
+
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.kpi .l{font-size:12px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:6px}
+.kpi .l i{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.kpi .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:2px;line-height:1.2}
+.kpi .v small{font-size:15px;font-weight:600;color:var(--muted);margin-left:2px}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* table */
+.card{background:var(--panel);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.tablebox{overflow:auto}
+table{border-collapse:collapse;width:100%}
+.main{min-width:640px}
+th,td{padding:10px 14px;text-align:left;white-space:nowrap}
+td{border-top:1px solid var(--sep)}
+th{font-size:12px;color:var(--muted);font-weight:500;cursor:pointer;user-select:none;background:var(--panel);position:sticky;top:0;z-index:1}
+th:hover{color:var(--text)}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+th .ar{margin-left:3px;opacity:0;font-size:10px}
+th.sorted{color:var(--text)}
+th.sorted .ar{opacity:1}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--row-hover)}
+.who{display:flex;align-items:center;gap:11px;min-width:0}
+.av{width:34px;height:34px;border-radius:50%;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px;letter-spacing:0}
+.who .nm{font-weight:600;display:flex;align-items:center;gap:6px}
+.who .sub{color:var(--muted);font-size:12px}
+.ndot{display:inline-flex;align-items:center;gap:2px;color:var(--muted);font-size:11px;font-weight:500}
+.ndot svg{width:12px;height:12px}
+.pts{font-weight:600}
+.proj{display:flex;align-items:center;gap:7px;max-width:230px;font-size:13px}
+.proj i{width:7px;height:7px;border-radius:50%;background:var(--teal);flex:0 0 auto}
+.proj b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.proj.past{color:var(--muted)}
+.proj.past i{background:var(--faint)}
+td .sub{color:var(--muted);font-size:12px;margin-top:1px}
+.proj.never{color:var(--faint)}
+.proj.never i{background:none;border:1.5px solid var(--faint);width:7px;height:7px;box-sizing:border-box}
+.miss{color:var(--bad);font-weight:600}
+.met{display:inline-flex;align-items:center;gap:5px;color:var(--ok);font-weight:500;font-size:13px}
+.met svg{width:14px;height:14px}
+.nomet{color:var(--faint);font-size:13px}
+.bar{position:relative;width:110px;height:6px;border-radius:3px;background:var(--fill);display:inline-block;vertical-align:middle;margin-right:10px;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.bar i.ext{opacity:.35;border-radius:0 3px 3px 0}
+.bar em{position:absolute;top:0;bottom:0;width:1.5px;background:var(--text);opacity:.3}
+.pct{display:inline-block;min-width:40px;text-align:right;font-variant-numeric:tabular-nums;font-weight:500;font-size:13px}
+.empty{padding:48px 16px;text-align:center;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:500;background:var(--fill);color:var(--text);white-space:nowrap}
+.tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.bad{background:var(--bad-soft);color:var(--bad)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.info{background:var(--accent-soft);color:var(--accent)}
+
+/* boot */
+#boot{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.bootbox{width:min(480px,100%);text-align:center}
+.bootbox .logo{height:44px;margin:0 auto 22px}
+.bootbox p{color:var(--muted);margin:6px 0}
+.spinner{width:26px;height:26px;border:2.5px solid var(--fill);border-top-color:var(--muted);border-radius:50%;animation:sp .8s linear infinite;margin:14px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err{color:var(--bad);margin:16px 0 0;white-space:pre-wrap;text-align:left;background:var(--panel);border-radius:12px;padding:14px;box-shadow:var(--shadow);font-size:13px}
+.lock{font-size:12px;color:var(--faint);margin-top:22px}
+
+/* drawer */
+#shade{position:fixed;inset:0;background:rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+#shade.open{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(580px,100%);background:var(--bg);z-index:41;transform:translateX(102%);transition:transform .25s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:var(--pop)}
+#drawer.open{transform:none}
+.dh{padding:18px 20px 0;display:flex;gap:14px;align-items:center}
+.dh .av{width:52px;height:52px;font-size:19px}
+.dh h2{margin:0;font-size:21px;letter-spacing:-.02em;line-height:1.2}
+.dh .sub{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.dtags{display:flex;gap:6px;flex-wrap:wrap;padding:12px 20px 0}
+.dstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin:14px 20px 0;background:var(--sep);border-radius:12px;overflow:hidden}
+.dstats>div{background:var(--panel);padding:10px 12px;min-width:0}
+.dstats .l{font-size:11px;color:var(--muted);font-weight:500}
+.dstats .v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dtabs{padding:14px 20px 0}
+.dtabs .seg{width:100%;display:flex}
+.dtabs .seg button{flex:1}
+.db{padding:16px 20px 32px;overflow:auto;flex:1}
+.db h3{font-size:13px;margin:22px 0 8px;color:var(--muted);font-weight:600}
+.db h3:first-child{margin-top:4px}
+.box{background:var(--panel);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+.box table td,.box table th{padding:7px 8px;font-size:13px;cursor:default;position:static}
+.box table tr:first-child td{border-top:0}
+.box table tbody tr{cursor:default}
+.box table tbody tr:hover td{background:none}
+.box .bar{width:56px}
+.cur td{background:var(--accent-soft) !important}
+td.wrap{white-space:normal;min-width:160px}
+.spark{display:flex;align-items:flex-end;gap:5px;height:96px;padding-top:6px}
+.spark .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;min-width:0}
+.spark .b{width:100%;max-width:26px;border-radius:4px 4px 0 0}
+.spark .b.ext{opacity:.35}
+.spark .t{position:absolute;width:100%;max-width:34px;border-top:1.5px dashed var(--faint)}
+.spark .cur .b:last-child{box-shadow:0 0 0 2px var(--panel),0 0 0 3.5px var(--text)}
+.spark-l{display:flex;gap:5px;font-size:10px;color:var(--muted);margin-top:4px}
+.spark-l span{flex:1;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
+.legend{font-size:11px;color:var(--faint);margin-top:8px}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px}
+.facts .l{font-size:11px;color:var(--muted)}
+.facts .v{font-size:13px;font-weight:500;overflow-wrap:anywhere}
+details.more{margin-top:10px}
+details.more summary{cursor:pointer;color:var(--accent);font-weight:500;font-size:13px;padding:4px 0}
+
+/* forms & records */
+.form{background:var(--panel);border-radius:12px;box-shadow:var(--shadow);padding:14px;display:grid;gap:10px}
+.form .row2{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px}
+.form label.f{display:grid;gap:4px;font-size:12px;color:var(--muted);font-weight:500;min-width:0}
+.form input,.form textarea{border:0;background:var(--fill-2);border-radius:8px;padding:8px 10px;width:100%;min-width:0;color:var(--text)}
+.form textarea{min-height:76px;resize:vertical}
+.form .hint{font-size:12px;color:var(--muted)}
+.form .hint b{color:var(--text);font-weight:600}
+.form .actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.form .kb{font-size:11px;color:var(--faint)}
+.form .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text)}
+.rec{background:var(--panel);border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;margin-top:10px}
+.rec .top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.rec .top b{font-size:14px}
+.rec .txt{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px;font-size:14px}
+.rec .meta{font-size:12px;color:var(--faint);display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.rec .del{margin-left:auto;border:0;background:none;color:var(--faint);cursor:pointer;padding:2px 8px;border-radius:6px;font-size:12px}
+.rec .del:hover,.rec .del.arm{color:var(--bad)}
+.rec .del.arm{background:var(--bad-soft);font-weight:600}
+.none{color:var(--muted);text-align:center;padding:22px 0 6px;font-size:13px}
+@media (max-width:520px){.form .row2{grid-template-columns:1fr}.dstats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* bulk meetings */
+.btn.add{background:var(--panel);box-shadow:var(--shadow);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600}
+.btn.add span{font-size:16px;line-height:1;font-weight:500;margin-right:-1px}
+#bulk{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.28)}
+#bulk .sheet{background:var(--bg);border-radius:16px;box-shadow:var(--pop);width:min(660px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}
+#bulk .bh{display:flex;align-items:center;gap:10px;padding:16px 18px 12px}
+#bulk .bh h3{margin:0;font-size:18px;flex:1}
+#bulk .bbody{padding:0 18px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:12px;min-height:0}
+#bulk .pickbox{background:var(--panel);border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:220px}
+#bulk .pick-head{display:flex;gap:8px;padding:10px;flex-wrap:wrap}
+#bulk .pick-head input,#bulk .pick-head select{border:0;background:var(--fill-2);border-radius:8px;padding:7px 10px;min-width:0;flex:1 1 180px;color:var(--text)}
+#bulk .pick-head select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:28px;
+  background:var(--fill-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center}
+#bulk .pick-filters{padding-top:0;border-bottom:1px solid var(--sep);align-items:center}
+#bulk .pick-filters .seg{flex:0 0 auto}
+#bulk .pick-filters select{flex:1 1 160px}
+#bulk .pick-tools{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--sep)}
+#bulk .pick-list{overflow:auto;max-height:340px}
+#bulk .pick{display:flex;align-items:center;gap:10px;padding:7px 12px;cursor:pointer;border-top:1px solid var(--sep)}
+#bulk .pick:first-child{border-top:0}
+#bulk .pick:hover{background:var(--row-hover)}
+#bulk .pick input{width:17px;height:17px;accent-color:var(--accent);flex:0 0 auto;margin:0}
+#bulk .pick .pn{flex:1;min-width:0;display:flex;flex-direction:column}
+#bulk .pick .pn b{font-weight:600;font-size:14px}
+#bulk .pick .pn small{color:var(--muted);font-size:12px}
+#bulk .bfoot{display:flex;justify-content:flex-end;gap:8px;padding:14px 18px}
+.av.sm{width:28px;height:28px;font-size:11px}
+.btn.sf{background:var(--panel);box-shadow:var(--shadow);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--accent);flex:0 0 auto}
+.btn.sf svg{opacity:.8}
+.btn.sfh{color:#00a1e0;text-decoration:none}
+.btn.sfh .lbl{color:var(--text)}
+#bulk .form .seg{justify-self:start}
+#bulk .form select{border:0;background:var(--fill-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center;
+  border-radius:8px;padding:8px 28px 8px 10px;width:100%;min-width:0;color:var(--text);appearance:none;-webkit-appearance:none;cursor:pointer}
+@media (max-width:640px){.btn.add .lbl{display:none}.btn.add{padding:7px 11px}}
+
+/* modal */
+#modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.28)}
+#modal .sheet{background:var(--panel);border-radius:16px;box-shadow:var(--pop);width:min(620px,100%);max-height:80vh;overflow:auto;padding:18px 20px}
+#modal h3{margin:0 0 12px;font-size:17px}
+#modal ul{list-style:none;margin:0;padding:0}
+#modal li{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:9px 0;border-top:1px solid var(--sep);font-size:13px}
+#modal li:first-child{border-top:0}
+#modal li.fh{border-top:0;padding:14px 0 2px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+#modal li.fh:first-child{padding-top:0}
+#modal li.fh+li{border-top:0}
+#modal li a{color:var(--text);font-weight:500;overflow-wrap:anywhere}
+#modal li .i{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,16px);background:rgba(29,29,31,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;padding:10px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;z-index:60;white-space:pre-wrap;max-width:calc(100% - 32px);font-size:13px;font-weight:500}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.link{pointer-events:auto}
+#toast a{color:#9ec1ff;font-weight:600}
+
+@media (max-width:640px){
+  #filter-pop{position:fixed;left:12px;right:12px;top:auto;bottom:12px;width:auto;max-height:80vh;overflow:auto}
+  header.top .title p{display:none}
+  .search{max-width:none;flex-basis:100%;order:3}
+  .count{width:100%;margin-left:0}
+}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="nxlogo" viewBox="0 0 557 200">
+    <path d="M0 33.3398V166.697C0 185.113 14.9556 200.036 33.4115 200.036C51.8674 200.036 66.823 185.113 66.823 166.697V113.848L9.79364 56.9066C3.28812 50.3799 0 41.8775 0 33.3398Z" fill="#00B2A9"/>
+    <path d="M200.432 166.661V33.3392C200.432 14.9233 185.477 0 167.021 0C148.565 0 133.609 14.9233 133.609 33.3392V86.1881L190.639 143.094C197.18 149.585 200.432 158.123 200.432 166.661Z" fill="#F2AF00"/>
+    <path d="M57.0294 9.77245C56.2516 8.9963 55.4384 8.25543 54.5898 7.54983C54.2009 7.23232 53.7766 6.95008 53.3877 6.66784C52.9281 6.31505 52.4331 5.96225 51.9735 5.60946C51.5138 5.29194 51.0189 5.0097 50.5239 4.72747C50.0642 4.44523 49.64 4.16299 49.1803 3.95131C48.6853 3.70436 48.155 3.4574 47.66 3.21044C47.165 2.99877 46.7054 2.75181 46.2104 2.54013C45.7154 2.32845 45.2205 2.18733 44.7255 2.01094C44.1951 1.83454 43.6648 1.62286 43.1344 1.44646C42.6395 1.30534 42.1445 1.19951 41.6141 1.05839C41.0484 0.917269 40.5181 0.776151 39.9524 0.670312C39.3867 0.564473 38.7856 0.493914 38.1846 0.388076C37.6896 0.317516 37.1946 0.211678 36.6996 0.176398C35.6036 0.0705592 34.5076 0 33.4115 0C32.3155 0 31.1841 0.0705592 30.1234 0.176398C29.6284 0.211678 29.1334 0.317516 28.6384 0.388076C28.0374 0.458635 27.4717 0.529194 26.8706 0.670312C26.3049 0.776151 25.7746 0.952549 25.2089 1.05839C24.7139 1.19951 24.1836 1.30534 23.6886 1.44646C23.1582 1.62286 22.6279 1.79926 22.0976 2.01094C21.6026 2.18733 21.1076 2.36373 20.6126 2.54013C20.1176 2.75181 19.658 2.99877 19.163 3.21044C18.668 3.4574 18.1377 3.66908 17.6427 3.95131C17.1831 4.19827 16.7588 4.48051 16.2992 4.72747C15.8042 5.0097 15.3092 5.29194 14.8496 5.60946C14.3546 5.92697 13.8949 6.31505 13.4353 6.66784C13.0464 6.95008 12.6221 7.23232 12.2332 7.54983C11.3847 8.25543 10.5715 8.96102 9.79364 9.77245C9.01581 10.5839 8.27333 11.36 7.56621 12.2067C7.248 12.5948 6.96515 13.0182 6.6823 13.4062C6.32874 13.8649 5.93982 14.3588 5.62162 14.8174C5.30342 15.2761 5.02057 15.77 4.73772 16.2639C4.45487 16.7225 4.17202 17.1459 3.95988 17.6045C3.71239 18.0984 3.4649 18.6276 3.21741 19.1215C3.00527 19.6155 2.75778 20.0741 2.54564 20.568C2.3335 21.0619 2.19208 21.5558 2.0153 22.0497C1.83852 22.5789 1.62638 23.1081 1.4496 23.6373C1.30818 24.1312 1.20211 24.6252 1.06068 25.1544C0.919259 25.7188 0.777834 26.248 0.671766 26.8125C0.565698 27.377 0.494985 27.9767 0.388917 28.5765C0.318205 29.0704 0.212137 29.5643 0.176781 30.0582C0.0707122 31.1519 0 32.2455 0 33.3392C0 41.8769 3.25276 50.4145 9.79364 56.906L66.823 113.812V33.3392C66.823 24.1312 63.0753 15.8053 57.0294 9.77245Z" fill="#00257A"/>
+    <path d="M190.677 143.093L57.0312 9.77148C63.0771 15.8043 66.8249 24.1303 66.8249 33.3383V113.811L143.442 190.262C156.488 203.28 177.631 203.28 190.677 190.262C203.724 177.244 203.724 156.147 190.677 143.128V143.093Z" fill="#F51776"/>
+    <g fill="currentColor">
+      <path d="M301.232 75.6406H311.804V124.926H301.656L277.72 93.2451V124.926H267.078V75.6406H277.225L301.197 107.463V75.6406H301.232Z"/>
+      <path d="M352.708 91.9754C355.89 95.5034 357.481 100.407 357.481 106.687C357.481 107.816 357.481 108.698 357.411 109.298H330.187C330.788 111.697 331.99 113.567 333.722 114.907C335.455 116.248 337.541 116.918 340.016 116.918C341.819 116.918 343.516 116.565 345.178 115.895C346.839 115.225 348.289 114.202 349.632 112.896L355.36 118.682C353.416 120.834 351.082 122.492 348.324 123.656C345.566 124.821 342.49 125.385 339.132 125.385C335.136 125.385 331.636 124.574 328.666 122.986C325.661 121.399 323.363 119.141 321.736 116.212C320.11 113.32 319.297 109.933 319.297 106.158C319.297 102.383 320.11 98.9255 321.772 95.9973C323.434 93.0691 325.732 90.7759 328.702 89.153C331.672 87.5302 335.066 86.7188 338.849 86.7188C344.965 86.7188 349.597 88.4827 352.779 92.0107L352.708 91.9754ZM347.228 102.877C347.122 100.407 346.344 98.3963 344.824 96.8793C343.304 95.3622 341.324 94.6214 338.813 94.6214C336.445 94.6214 334.5 95.3623 332.909 96.844C331.318 98.3257 330.328 100.337 329.904 102.877H347.193H347.228Z"/>
+      <path d="M358.653 87.0352H371.063L378.064 98.501L385.489 87.0352H397.333L385.276 105.486L398.181 124.925H385.701L378.099 112.542L369.79 124.925H357.805L370.922 105.557L358.724 87.0352H358.653Z"/>
+      <path d="M424.979 122.81C423.565 123.621 422.009 124.256 420.312 124.715C418.615 125.174 416.953 125.421 415.291 125.421C411.72 125.421 408.786 124.327 406.558 122.104C404.295 119.882 403.164 116.812 403.164 112.896V78.3223H413.948V88.7297H424.307V96.2796H413.948V111.062C413.948 112.79 414.301 114.096 414.973 114.978C415.645 115.86 416.599 116.283 417.837 116.283C419.357 116.283 420.948 115.824 422.716 114.872L424.979 122.845V122.81Z"/>
+      <path d="M461.787 91.9754C464.969 95.5034 466.56 100.407 466.56 106.687C466.56 107.816 466.56 108.698 466.489 109.298H439.265C439.866 111.697 441.068 113.567 442.8 114.907C444.533 116.248 446.619 116.918 449.094 116.918C450.897 116.918 452.594 116.565 454.256 115.895C455.917 115.225 457.367 114.202 458.711 112.896L464.438 118.682C462.494 120.834 460.16 122.492 457.402 123.656C454.645 124.821 451.569 125.385 448.21 125.385C444.215 125.385 440.714 124.574 437.744 122.986C434.739 121.399 432.441 119.141 430.815 116.212C429.188 113.32 428.375 109.933 428.375 106.158C428.375 102.383 429.188 98.9255 430.85 95.9973C432.512 93.0691 434.81 90.7759 437.78 89.153C440.75 87.5302 444.144 86.7188 447.927 86.7188C454.044 86.7188 458.675 88.4827 461.857 92.0107L461.787 91.9754ZM456.306 102.877C456.2 100.407 455.422 98.3963 453.902 96.8793C452.382 95.3622 450.402 94.6214 447.892 94.6214C445.523 94.6214 443.578 95.3623 441.987 96.844C440.396 98.3257 439.406 100.337 438.982 102.877H456.271H456.306Z"/>
+      <path d="M489.715 88.5164C491.837 87.2816 494.312 86.6466 497.14 86.6113V96.8071C496.751 96.7719 496.185 96.7366 495.443 96.7366C492.12 96.7366 489.468 97.6538 487.523 99.4531C485.579 101.252 484.589 103.651 484.589 106.685V124.925H473.734V87.0347H484.589V93.8789C485.897 91.5505 487.629 89.7512 489.751 88.5164H489.715Z"/>
+      <path d="M512.663 71.9004C513.759 73.0294 514.325 74.4759 514.325 76.2751C514.325 78.0744 513.759 79.5208 512.663 80.6498C511.567 81.7787 510.117 82.3432 508.385 82.3432C506.652 82.3432 505.273 81.7787 504.177 80.6145C503.081 79.4503 502.516 78.0038 502.516 76.2751C502.516 74.5464 503.081 73.0294 504.177 71.9004C505.273 70.7715 506.688 70.207 508.385 70.207C510.082 70.207 511.531 70.7715 512.663 71.9004ZM503.046 87.0354H513.9V124.926H503.046V87.0354Z"/>
+      <path d="M546.356 124.925V120.48C545.083 122.067 543.422 123.302 541.406 124.149C539.391 124.996 537.057 125.419 534.406 125.419C530.41 125.419 527.228 124.325 524.895 122.138C522.561 119.951 521.359 117.093 521.359 113.6C521.359 110.108 522.632 107.25 525.142 105.274C527.653 103.263 531.224 102.275 535.82 102.205H546.25V101.499C546.25 99.4884 545.578 97.9361 544.235 96.8071C542.891 95.7135 540.947 95.149 538.33 95.149C534.795 95.149 531.047 96.2427 527.052 98.4653L523.658 90.986C526.663 89.469 529.491 88.3753 532.108 87.6697C534.724 86.9641 537.623 86.6113 540.77 86.6113C545.861 86.6113 549.786 87.8108 552.579 90.2098C555.372 92.6089 556.786 95.9251 556.857 100.194L556.928 124.89H546.285L546.356 124.925ZM543.315 116.07C544.977 114.976 545.932 113.635 546.285 111.977V108.591H537.729C535.608 108.591 534.052 108.943 533.027 109.614C532.002 110.284 531.507 111.378 531.507 112.895C531.507 114.412 532.037 115.505 533.098 116.387C534.158 117.269 535.608 117.693 537.446 117.693C539.709 117.693 541.654 117.163 543.315 116.07Z"/>
+    </g>
+  </symbol>
+</svg>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 16 16"><path d="M2 4h12M4.5 8h7M7 12h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-more" viewBox="0 0 16 16"><circle cx="3" cy="8" r="1.4" fill="currentColor"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="13" cy="8" r="1.4" fill="currentColor"/></symbol>
+  <symbol id="i-check" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor" opacity=".15"/><path d="M5 8.2l2 2 4-4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-note" viewBox="0 0 16 16"><path d="M3 2.5h10v8l-3 3H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5.5 6h5M5.5 8.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-sheet" viewBox="0 0 16 16"><rect x="2.5" y="2" width="11" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 6h11M2.5 10h11M7 6v8" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 16 16"><path d="M1.8 4.2c0-.7.5-1.2 1.2-1.2h3l1.5 1.6h5.5c.7 0 1.2.5 1.2 1.2v6c0 .7-.5 1.2-1.2 1.2H3c-.7 0-1.2-.5-1.2-1.2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-export" viewBox="0 0 16 16"><path d="M8 10V2M5 5l3-3 3 3M3 9v4h10V9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 16 16"><path d="M4.6 12.5h7.2a2.7 2.7 0 0 0 .4-5.4 3.8 3.8 0 0 0-7.3-.9 3.2 3.2 0 0 0-.3 6.3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 16 16"><path d="M9 3h4v4M13 3L7.5 8.5M11 9.5V13H3V5h3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-files" viewBox="0 0 16 16"><path d="M4 2h5l3 3v9H4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 2v3h3" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+</svg>
+
+<section id="boot">
+  <div class="bootbox">
+    <svg class="logo" viewBox="0 0 557 200" role="img" aria-label="Nexteria"><use href="#nxlogo"/></svg>
+    <div id="boot-loading"><div class="spinner"></div><p>Načítavam demo dáta…</p></div>
+    <div id="boot-error" class="hidden">
+      <div class="err" id="err"></div>
+      <p style="margin-top:18px"><button class="btn primary" id="retry">Skúsiť znova</button></p>
+    </div>
+    <div class="lock">Demo verzia · všetky dáta sú fiktívne</div>
+  </div>
+</section>
+
+<div class="wrap hidden" id="app">
+  <div class="demo-bar"><b>Demo</b><span>Fiktívne dáta · ukladanie a export sú v demo verzii vypnuté</span></div>
+  <header class="top">
+    <svg class="logo" viewBox="0 0 557 200" role="img" aria-label="Nexteria"><use href="#nxlogo"/></svg>
+    <div class="title"><h1>Študenti</h1><p>Student Relationship Monitoring</p></div>
+    <span class="spacer"></span>
+    <button class="btn stale hidden" id="stale" title="">Nové dáta v priečinku · Načítať</button>
+    <button class="icon-btn" id="reload" title="Načítať znova súbory zo Salesforce" aria-label="Načítať znova súbory zo Salesforce"><svg><use href="#i-refresh"/></svg></button>
+    <a class="btn add sfh" id="sf-btn" href="#" title="Otvoriť Salesforce v novej karte"><svg width="17" height="17"><use href="#i-cloud"/></svg><span class="lbl">Salesforce</span></a>
+    <button class="btn add" id="bulk-btn" title="Zapísať stretnutia viacerým študentom naraz"><span>＋</span><span class="lbl"> Stretnutia</span></button>
+    <div class="filter-wrap">
+      <button class="icon-btn" id="more-btn" title="Viac" aria-label="Viac" aria-haspopup="true"><svg><use href="#i-more"/></svg></button>
+      <div class="pop menu hidden" id="more-pop">
+        <button id="export"><svg><use href="#i-export"/></svg>Exportovať do Tabuliek</button>
+        <div class="sep"></div>
+        <a id="meetings-link" href="#"><svg><use href="#i-sheet"/></svg>Tabuľka Stretnutia</a>
+        <a id="notes-link" href="#"><svg><use href="#i-sheet"/></svg>Tabuľka Poznámky</a>
+        <div class="sep"></div>
+        <a id="dir-salesforce" href="#"><svg><use href="#i-folder"/></svg><span>Salesforce</span></a>
+        <a id="dir-manual" href="#"><svg><use href="#i-folder"/></svg><span>Manuálne info</span></a>
+        <a id="dir-generated" href="#"><svg><use href="#i-folder"/></svg><span>Automaticky generované</span></a>
+        <div class="sep"></div>
+        <button id="files-btn"><svg><use href="#i-files"/></svg><span id="files-label">Načítané súbory</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="semnav">
+      <button id="prev" title="Predchádzajúci semester" aria-label="Predchádzajúci semester">‹</button>
+      <select id="sem" aria-label="Semester"></select>
+      <button id="next" title="Nasledujúci semester" aria-label="Nasledujúci semester">›</button>
+    </div>
+    <label class="search"><svg><use href="#i-search"/></svg><input type="search" class="field-in" id="q" placeholder="Hľadať študenta" aria-label="Hľadať študenta"></label>
+    <select class="pill-select" id="resp" aria-label="Zodpovedná osoba"></select>
+    <div class="filter-wrap">
+      <button class="btn" id="filter-btn" style="background:var(--panel);box-shadow:var(--shadow)" aria-haspopup="true"><svg width="15" height="15"><use href="#i-filter"/></svg>Filtre <span class="badge hidden" id="filter-n"></span></button>
+      <div class="pop filters hidden" id="filter-pop">
+        <div id="pop-groups"></div>
+        <div class="sep" id="pop-sep"></div>
+        <div class="grp" id="pop-toggles"></div>
+        <div class="foot"><button class="btn link" id="clear">Zrušiť filtre</button><button class="btn primary" id="pop-show">Zobraziť</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subbar">
+    <div class="seg" id="views" role="tablist"></div>
+    <div class="chips" id="chips"></div>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <div class="tablebox">
+      <table class="main">
+        <thead><tr id="thead"></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty hidden" id="empty">Žiadni študenti pre zvolený semester a filtre.</div>
+    </div>
+  </div>
+</div>
+
+<aside id="drawer" aria-hidden="true" role="dialog" aria-label="Detail študenta">
+  <div class="dh">
+    <span class="av" id="d-av"></span>
+    <div style="flex:1;min-width:0"><h2 id="d-name"></h2><div class="sub" id="d-sub"></div></div>
+    <a class="btn sf" href="#" title="Otvoriť Salesforce v novej karte">Salesforce<svg width="12" height="12"><use href="#i-ext"/></svg></a>
+    <button class="icon-btn" id="close" aria-label="Zavrieť">✕</button>
+  </div>
+  <div class="dtags" id="d-tags"></div>
+  <div class="dstats" id="d-stats"></div>
+  <div class="dtabs"><div class="seg" id="d-tabs" role="tablist"></div></div>
+  <div class="db" id="d-body"></div>
+</aside>
+<div id="shade"></div>
+<div id="modal" class="hidden"><div class="sheet" role="dialog" aria-label="Načítané súbory"><h3>Načítané súbory</h3><ul id="files"></ul>
+  <div style="text-align:right;margin-top:12px"><button class="btn" id="modal-close">Zavrieť</button></div></div></div>
+<div id="bulk" class="hidden"><div class="sheet" role="dialog" aria-label="Zapísať stretnutia">
+  <div class="bh"><h3>Zapísať stretnutia</h3><button class="icon-btn" id="bulk-close" aria-label="Zavrieť">✕</button></div>
+  <div class="bbody">
+    <div class="form">
+      <div class="seg" id="b-mode" role="tablist"><button data-m="sem" class="on">Len semester</button><button data-m="date">Konkrétny dátum</button></div>
+      <div class="row2">
+        <label class="f" id="b-sem-wrap">Semester<select id="b-semsel"></select></label>
+        <label class="f hidden" id="b-date-wrap">Dátum<input type="date" id="b-date"></label>
+        <label class="f">S kým z NLA tímu<input id="b-with" list="team" placeholder="Nepovinné" autocomplete="off"></label>
+      </div>
+      <div class="hint" id="b-sem"></div>
+    </div>
+    <div class="pickbox">
+      <div class="pick-head">
+        <input type="search" id="b-q" placeholder="Hľadať študenta" aria-label="Hľadať študenta">
+        <select id="b-team" aria-label="Vybrať študentov člena tímu"></select>
+      </div>
+      <div class="pick-head pick-filters">
+        <div class="seg" id="b-city" role="tablist" aria-label="Mesto"></div>
+        <select id="b-status" aria-label="Stav štúdia"></select>
+      </div>
+      <div class="pick-tools"><label class="chk" style="color:var(--text)"><input type="checkbox" id="b-all"> Vybrať všetkých zobrazených</label><span id="b-count"></span></div>
+      <div class="pick-list" id="b-list"></div>
+    </div>
+  </div>
+  <div class="bfoot"><button class="btn" id="b-cancel">Zrušiť</button><button class="btn primary" id="b-save" disabled>Zapísať stretnutia</button></div>
+</div></div>
+<datalist id="team"></datalist>
+<div id="toast" role="status"></div>
+
+<!-- Demo: sample data + mock of the Google Apps Script backend (google.script.run) -->
+<script src="NLA_CRM_data.js"></script>
+<script>
+(() => {
+  // ================= helpers =================
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const norm = s => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[?\uFFFD]/g, "").trim();
+  const fmt = (n, d = 0) => n == null || isNaN(n) ? "—" : n.toLocaleString("sk-SK", {maximumFractionDigits: d, minimumFractionDigits: d});
+  const fmt1 = n => fmt(n, 1).replace(/,0$/, "");
+  const msg = e => (e && e.message) || String(e);
+  const NO_SEM = "(bez semestra)";
+  const run = (fn, ...args) => new Promise((res, rej) =>
+    google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args));
+
+  // ---- DEMO: everything that would write to Google Drive just shows this message ----
+  const DEMO_MSG = window.DEMO_MESSAGE || "Nedostupné v demo verzii · Not available in the demo version";
+  const demoNA = () => toast(DEMO_MSG);
+
+  // Exports sometimes lose diacritics (replaced with '?'): restore the known values
+  const FIXES = [
+    [/\?tudent/g, "Študent"], [/\?tuduje/g, "Študuje"], [/Ko\?ice/g, "Košice"],
+    [/Pred\?asne ukon\?il\/a/g, "Predčasne ukončil/a"], [/Preru\?en[ée] \?t[úu]dium/g, "Prerušené štúdium"],
+    [/Vyl[úu]\?en[ýy]\/[áa]/g, "Vylúčený/á"], [/ukon\?enia \?t[úu]dia/g, "ukončenia štúdia"], [/po\?et/g, "počet"],
+  ];
+  const fix = s => { if (!s || s.indexOf("?") < 0) return s; for (const [re, r] of FIXES) s = s.replace(re, r); return s; };
+
+  const RESP_RE = /zodpoved|mentor|tutor|garant|koordin|kouc|coach|manazer|veduc|buddy|\bnla\b|\btim\b|\bteam\b|osoba|konzultant|sprievod/;
+  const NEG_STATUS = /nezucast|neprisiel|nepritom|ospraved|zrusen|odhlas|odmiet|pozvan|waitlist|no.?show|absent|declin|neucast/;
+  const TITLES = new Set(["bc", "mgr", "ing", "phd", "mudr", "judr", "rndr", "phdr", "doc", "prof", "mba", "msc", "bsc"]);
+  const nameKey = s => norm(s).replace(/[^a-z\s]/g, " ").split(/\s+/).filter(w => w.length > 1 && !TITLES.has(w)).sort().join(" ");
+  const semFromText = s => { const m = String(s).match(/(zimn\S*|letn\S*|\bZS|\bLS)\s*(\d{2,4})\s*\/\s*(\d{2,4})\s*$/i); return m ? m[0].trim() : ""; };
+  // PVP: "Meno - Názov projektu (môže obsahovať čiarky), Semester"
+  function pvpParse(raw) {
+    raw = String(raw).trim();
+    let rest = raw, sem = "";
+    const c = raw.lastIndexOf(",");
+    if (c >= 0 && semKey(raw.slice(c + 1).trim()) < 1e6) { sem = raw.slice(c + 1).trim(); rest = raw.slice(0, c); }
+    else if ((sem = semFromText(raw))) rest = raw.slice(0, raw.lastIndexOf(sem)).replace(/[,\s]+$/, "");
+    const dash = rest.match(/\s[-–]\s/);
+    return {sem, project: (dash ? rest.slice(dash.index + dash[0].length) : rest).trim()};
+  }
+  function headerIndex(rows) {
+    const lim = Math.min(rows.length, 15);
+    const cnt = rows.slice(0, lim).map(r => r.filter(c => String(c).trim()).length);
+    const max = Math.max(0, ...cnt);
+    return cnt.findIndex(c => c >= Math.max(2, Math.ceil(max * 0.6)));
+  }
+
+  const STUDENT_FIELDS = [
+    {key: "email",   label: "E‑mail",       re: /e-?mail|mail/},
+    {key: "last",    label: "Priezvisko",   re: /priezvisk|surname|last ?name|lastname/},
+    {key: "first",   label: "Meno",         re: /krstn|first ?name|firstname|^meno$|: meno$/},
+    {key: "base",    label: "Bodový základ",re: /zaklad|baseline|base|minimum|limit/},
+    {key: "points",  label: "Body",         re: /bod|point|score/},
+    {key: "semester",label: "Semester",     re: /semest|term|obdobie/},
+    {key: "end",     label: "Dátum ukončenia", re: /datum|date|ukon/},
+    {key: "status",  label: "Stav",         re: /stav|status/},
+    {key: "level",   label: "Level",        re: /level|rocnik|uroven/},
+    {key: "city",    label: "Mesto",        re: /mesto|city|pobock|branch/},
+    {key: "resp",    label: "Zodpovedná osoba", re: RESP_RE},
+    {key: "name",    label: "Meno",         re: /^meno$|name|student$/},
+  ];
+  const EVENT_FIELDS = [
+    {key: "email",    re: /e-?mail|mail/},
+    {key: "event",    re: /nazov|prehlad|event ?name|aktivit/},
+    {key: "status",   re: /status|stav/},
+    {key: "earned",   re: /ziskan|earned|obdrz/},
+    {key: "possible", re: /za event|mozn|possible|max/},
+    {key: "semester", re: /semest|term|obdobie/},
+    {key: "name",     re: /student|meno|name|ucastnik$/},
+    {key: "level",    re: /level|rocnik/},
+  ];
+  function mapColumns(header, fields) {
+    const map = {}, used = new Set();
+    for (const f of fields) {
+      for (let i = 0; i < header.length; i++) {
+        if (used.has(i)) continue;
+        if (f.re.test(norm(header[i]))) { map[f.key] = i; used.add(i); break; }
+      }
+    }
+    const extra = header.map((h, i) => [h, i]).filter(([h, i]) => !used.has(i) && h);
+    return {map, extra};
+  }
+  const num = v => { const s = String(v ?? "").replace(/\s/g, "").replace(",", "."); if (s === "") return null; const n = Number(s); return isNaN(n) ? null : n; };
+  const isUnfilled = s => /nevypl|unfilled|not filled|nevyplnen/.test(norm(s));
+  const cleanEvent = s => s.replace(/^Body za\s+/i, "");
+
+  function semKey(s) {
+    const n = norm(s);
+    const m = n.match(/(zimn|letn|winter|summer|\bws|\bss|\bzs|\bls)\D*(\d{2,4})\s*[\/\-]\s*(\d{2,4})/);
+    if (!m) return s === NO_SEM ? -1 : 1e6;
+    let y = +m[2]; if (y < 100) y += 2000;
+    return y * 2 + (/letn|summer|ss|ls/.test(m[1]) ? 1 : 0);
+  }
+  // Winter semester: Sep–Jan, summer: Feb–Aug
+  const pad = n => String(n).padStart(2, "0");
+  const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+  function dateSemKey(iso) {
+    const m = String(iso).match(/^(\d{4})-(\d{2})/); if (!m) return null;
+    const y = +m[1], mo = +m[2];
+    return mo >= 9 ? y * 2 : mo === 1 ? (y - 1) * 2 : (y - 1) * 2 + 1;
+  }
+  function semLabel(k) {
+    const ex = SEMS.find(s => semKey(s) === k); if (ex) return ex;
+    const y = Math.floor(k / 2);
+    return `${k % 2 ? "Letný" : "Zimný"} ${y}/${pad((y + 1) % 100)}`;
+  }
+  // "6. 10. 2025 17:00", "2025-10-06 17:00" or an Excel serial number → timestamp
+  function parseDateTime(v) {
+    const s = String(v ?? "").trim(); if (!s) return null;
+    let m = s.match(/^(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+    if (m) return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)).getTime();
+    m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+    if (m) return new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0)).getTime();
+    if (/^\d+(\.\d+)?$/.test(s) && +s > 20000) return Math.round((+s - 25569) * 864e5);
+    const t = Date.parse(s); return isNaN(t) ? null : t;
+  }
+  const fmtDate = (iso, short) => { const m = String(iso || "").match(/^(\d{4})-(\d{2})-(\d{2})/); if (!m) return iso || ""; return short ? `${+m[3]}. ${+m[2]}.` : `${+m[3]}. ${+m[2]}. ${m[1]}`; };
+  const fmtStamp = s => { const d = s ? new Date(s) : null; return d && !isNaN(d) ? d.toLocaleString("sk-SK", {dateStyle: "short", timeStyle: "short"}) : (s || ""); };
+
+  // avatar
+  const AV_COLORS = ["#00257A", "#00B2A9", "#F51776", "#d99a00", "#5b5fc7", "#2f9e62", "#c4532b", "#7a4fd0"];
+  function avatar(name, cls = "") {
+    const parts = String(name || "?").trim().split(/\s+/);
+    const ini = ((parts[0] || "?")[0] + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
+    let h = 0; for (const ch of norm(name)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return `<span class="av ${cls}" style="background:${AV_COLORS[h % AV_COLORS.length]}">${esc(ini)}</span>`;
+  }
+
+  // ================= state =================
+  let ST = [], EV = [], EVENT_ROWS = [], PVP_ROWS = [], RESP = new Map(), SOURCES = [], PVP_FROM_EVENTS = false;
+  let VOL_ROWS = [], VOL_BY = new Map(), HAS_VOL = false;   // Dobrovoľníctvo (volunteering)
+  let NOTES = [], MEETINGS = [], NOTES_BY = new Map(), MEET_BY = new Map(), USER = "", CAN_DEL_ALL = false, LINKS = {}, DIRS = {};
+  let DATA = [], COLS = {map: {}}, SEMS = [], byStudent = new Map(), TEAM = [];
+  let HAS_EV = false, EV_HAS_FILLED = false, PVP_BY = new Map(), HAS_PVP = false, HAS_RESP = false;
+  const F = {view: "all", q: "", resp: "", city: "", level: "", status: "", pvp: "", vol: "", would: false, hasnote: false};
+  const sort = {key: "name", dir: 1};
+  let OPEN = null, TAB = "overview";
+
+  // ================= loading =================
+  // The real server sends the data as gzip + base64; the demo mock sends plain objects
+  async function unpack(b64) {
+    if (typeof b64 !== "string") return b64;
+    if (typeof DecompressionStream === "undefined") throw new Error("Tento prehliadač je príliš starý – aktualizuj ho (Chrome, Edge, Safari alebo Firefox).");
+    const bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+    return JSON.parse(await new Response(stream).text());
+  }
+
+  // first = opening the app (saved data); otherwise ↻ = re-read the files
+  async function load(first) {
+    const btn = $("reload"); btn.disabled = true; btn.classList.add("spin"); $("stale").disabled = true;
+    if (!first) toast("Načítavam súbory zo Salesforce priečinka…", false, 120000);
+    try {
+      const res = await run(first ? "getData" : "refreshData");
+      const snap = await unpack(res.snapshot);
+      const live = res.live ? await unpack(res.live) : {tables: [], skipped: []};
+      res.tables = mergeSources(snap.tables.concat(live.tables)); res.skipped = snap.skipped.concat(live.skipped);
+      const info = res.snapshotInfo || {};
+      const ch = info.changes || [];
+      $("stale").classList.toggle("hidden", !ch.length);
+      $("stale").title = ch.join("\n");
+      ST = []; EV = []; EVENT_ROWS = []; PVP_ROWS = []; RESP = new Map(); PVP_FROM_EVENTS = false; VOL_ROWS = [];
+      SOURCES = (res.skipped || []).map(s => ({role: "Preskočené", name: s, skip: true}));
+      NOTES = res.notes || []; MEETINGS = res.meetings || [];
+      USER = (res.user || "").toLowerCase(); CAN_DEL_ALL = !!res.canDeleteAll;
+      LINKS = {folder: res.folderUrl, notes: res.notesUrl, meetings: res.meetingsUrl};
+      DIRS = res.folders || {};
+      (res.tables || []).forEach(t => {
+        const n0 = SOURCES.length;
+        classify(t);
+        for (let i = n0; i < SOURCES.length; i++) Object.assign(SOURCES[i], {folder: t.folder, live: !!t.live, note: t.note || ""});
+      });
+      const sfName = DIRS.salesforce ? DIRS.salesforce.name : "Salesforce";
+      if (!ST.length) throw new Error(`V priečinku „${sfName}“ sa nenašla tabuľka študentov (potrebné stĺpce aspoň: Semester, Body).` +
+        (SOURCES.length ? "\n\nČo sa našlo:\n• " + SOURCES.map(s => `${s.name}${s.info ? ": " + s.info : ""} (${s.role})`).join("\n• ") : "\n\nPriečinok je prázdny."));
+      ["salesforce", "manual", "generated"].forEach(k => {
+        const a = $("dir-" + k), dir = DIRS[k];
+        a.classList.toggle("hidden", !dir);
+        if (dir) a.querySelector("span").textContent = dir.name;
+      });
+      rebuild(); showApp();
+      if (!first) toast("Dáta obnovené");
+      if (OPEN && byStudent.has(OPEN)) openStudent(OPEN); else if (OPEN) closeDrawer();
+    } catch (e) {
+      if ($("app").classList.contains("hidden")) showBootError(msg(e)); else toast("Načítanie zlyhalo: " + msg(e));
+    } finally {
+      btn.disabled = false; btn.classList.remove("spin"); $("stale").disabled = false;
+    }
+  }
+
+  // Salesforce folder = static CSV exports (history) + one live Google Sheet (current semester).
+  // A live tab belongs to the files whose name starts with the tab name ("Master_UcastEventBody" →
+  // "Master_UcastEventBody-2026-10-15-20-32-08.csv"). Within such a group every semester is taken from the
+  // newest source that contains it: live tab first, then newer files before older ones – so no row is counted twice.
+  function mergeSources(tables) {
+    const key = s => norm(s).replace(/\.(csv|txt|xlsx)$/, "").replace(/[^a-z0-9]/g, "");
+    // live tab names may carry a suffix: "Master_UcastEventBody_live", "… - live", "… (live)", "…_živé"
+    const liveKey = t => key(String(t.tab && !/^(sheet|harok|hárok|list)\s*\d*$/i.test(t.tab) ? t.tab : t.file || t.name).replace(/[\s_\-–(]*(live|ziv[ée]|živé)\)?\s*$/i, ""));
+    const sf = tables.filter(t => t.folder === "salesforce");
+    const liveKeys = [...new Set(sf.filter(t => t.live).map(liveKey).filter(Boolean))];
+    const groupOf = t => {
+      if (t.live) return liveKey(t);
+      const k = key(t.file || t.name);
+      const hit = liveKeys.filter(lk => k.startsWith(lk)).sort((a, b) => b.length - a.length)[0];
+      return hit || key(String(t.file || t.name).replace(/[-_ ]*\d{4}-\d{2}-\d{2}.*$/, ""));
+    };
+    const groups = new Map();
+    sf.forEach(t => { const g = groupOf(t); if (!groups.has(g)) groups.set(g, []); groups.get(g).push(t); });
+    groups.forEach(list => {
+      if (list.some(t => t.live)) list.forEach(t => { if (t.live) t.note = "živé dáta – aktuálny semester"; });
+      if (list.length < 2) return;
+      list.sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0) || (b.updated || 0) - (a.updated || 0));
+      const claimed = new Map();   // semester key → source that provides it
+      let wholeTaken = false;
+      list.forEach(t => {
+        const rows = t.rows || [];
+        const hi = headerIndex(rows);
+        if (hi < 0) return;
+        const semCol = rows[hi].findIndex(h => /semest|obdobie/.test(norm(h)));
+        if (semCol < 0) {   // no semester column → the newest file wins completely
+          if (wholeTaken) { t.rows = rows.slice(0, hi + 1); t.note = "nahradené novším súborom"; }
+          wholeTaken = true;
+          return;
+        }
+        const mine = new Set(), fromLive = new Set(), fromNewer = new Set();
+        const body = rows.slice(hi + 1).filter(r => {
+          const s = String(r[semCol] ?? "").trim(), k = semKey(s);
+          if (claimed.has(k)) { if (s) (claimed.get(k).live ? fromLive : fromNewer).add(s); return false; }
+          mine.add(k); return true;
+        });
+        mine.forEach(k => claimed.set(k, t));
+        t.rows = rows.slice(0, hi + 1).concat(body);
+        const notes = [t.note];
+        if (fromLive.size) notes.push(`${[...fromLive].join(", ")} sa berie zo živej tabuľky`);
+        if (fromNewer.size) notes.push(`${[...fromNewer].join(", ")} sa berie z novšieho súboru`);
+        t.note = notes.filter(Boolean).join(" · ");
+      });
+    });
+    return tables;
+  }
+
+  function skip(t, reason) { SOURCES.push({role: "Preskočené", name: t.name, url: t.url, info: reason, skip: true}); }
+
+  function classify(t) {
+    const rows = (t.rows || []).map(r => r.map(c => String(c ?? "")));
+    const hi = headerIndex(rows);
+    if (hi < 0 || rows.length - hi < 2) { skip(t, "prázdna tabuľka"); return; }
+    const header = rows[hi].map(h => fix(h.trim()));
+    const nh = header.map(norm);
+    const body = rows.slice(hi + 1).filter(r => r.some(c => c.trim() !== ""));
+    const fname = norm(t.file || t.name);
+
+    if (tryVolunteer(t, nh, body, /dobrovol/.test(fname))) return;
+    if (/pvp|projekt.?v.?praxi/.test(fname) && tryPvp(t, nh, body, true)) return;
+    if ((/rozdelen/.test(fname) || t.folder === "manual") && tryResp(t, header, nh, body, true)) return;
+    const ev = mapColumns(header, EVENT_FIELDS).map;
+    if (ev.email != null && ev.semester != null && ev.event != null && (ev.possible != null || ev.earned != null)) {
+      const g = (r, k) => ev[k] == null ? "" : (r[ev[k]] ?? "").trim();
+      // Combined export (Master_UcastEventBody): also contains Projekt v praxi rows
+      const typeI = nh.findIndex(h => /typ/.test(h));
+      const parentI = nh.findIndex(h => /stretnutie k projektu/.test(h));
+      const combined = typeI >= 0 && parentI >= 0;
+      const isPvpRow = r => typeI >= 0 && /projekt v praxi/.test(norm(r[typeI]));
+      const pvp = combined ? pvpFromEvents(body, g, typeI, parentI, isPvpRow) : {n: 0, isProject: () => false};
+      const pvpN = pvp.n;
+      // Events that have subevents (their name appears in "Súvisiaci event" of another row) → show only the subevents
+      const relI = nh.findIndex(h => /suvisiac/.test(h));
+      const startI = nh.findIndex(h => /zaciatok|start/.test(h));
+      const ekey = s => norm(s).replace(/\s+/g, " ");
+      const parents = new Set(relI >= 0 ? body.map(r => ekey(r[relI] || "")).filter(Boolean) : []);
+      body.forEach(r => {
+        const status = g(r, "status"), earned = num(g(r, "earned")) ?? 0;
+        const possible = ev.possible == null ? earned : (num(g(r, "possible")) ?? 0);
+        const unfilled = status ? isUnfilled(status) : false;
+        // Hidden from the student's event list (still counted for unfilled-feedback points):
+        //  • PvP rows except the project row itself (umbrella + individual meetings)
+        //  • parent events that have subevents
+        //  (rows with unfilled feedback always stay visible, so the +points in the table can be traced)
+        const hidden = !unfilled && ((isPvpRow(r) && !pvp.isProject(r)) || parents.has(ekey(g(r, "event"))));
+        EVENT_ROWS.push({
+          hidden, start: startI >= 0 ? parseDateTime(r[startI]) : null,
+          id: g(r, "email").toLowerCase(), email: g(r, "email"), name: g(r, "name"), level: g(r, "level"),
+          semester: g(r, "semester") || NO_SEM, event: cleanEvent(g(r, "event")), status, earned, possible, unfilled,
+          missed: unfilled ? Math.max(0, possible - earned) : 0,
+        });
+      });
+      EV.push({name: t.name, url: t.url});
+      SOURCES.push({role: combined ? "Eventy + PvP" : "Eventy", name: t.name, url: t.url,
+        info: `${body.length} záznamov` + (combined ? ` · ${pvpN} účastí na Projekte v praxi` : "")});
+      return;
+    }
+    if (tryPvp(t, nh, body, false)) return;
+    const {map, extra} = mapColumns(header, STUDENT_FIELDS);
+    if (map.semester != null && map.points != null) {
+      ST.push({name: t.name, url: t.url, map, extra, rows: body});
+      SOURCES.push({role: "Študenti", name: t.name, url: t.url, info: `${body.length} riadkov`});
+      return;
+    }
+    if (tryResp(t, header, nh, body, false)) return;
+    skip(t, "nerozpoznaná tabuľka – stĺpce: " + header.filter(Boolean).join(" | "));
+  }
+
+  // Dobrovoľníctvo (Master_dobrovolnictvo): Študent | Level | Semester | Body podrobný prehľad: Názov … | Získané body
+  // Only rows whose name mentions "Dobrovoľníctvo" and points > 0 count; students are matched by e-mail or by name.
+  function tryVolunteer(t, nh, body, byName) {
+    const title = nh.findIndex(h => /podrobn|nazov bod|prehlad/.test(h));
+    const pts = nh.findIndex((h, i) => i !== title && /ziskan|^body$|points/.test(h));
+    const sem = nh.findIndex(h => /semest|obdobie/.test(h));
+    const name = nh.findIndex((h, i) => i !== title && /student|ucastnik|^meno|name/.test(h));
+    const email = nh.findIndex(h => /e-?mail/.test(h));
+    if (title < 0 || pts < 0 || sem < 0 || (name < 0 && email < 0)) return false;
+    const isVol = r => /dobrovol/.test(norm(r[title]));
+    if (!byName && !body.some(isVol)) return false;
+    let n = 0;
+    body.forEach(r => {
+      const p = num(r[pts]);
+      if (!isVol(r) || !(p > 0)) return;
+      const s = String(r[sem] || "").trim();
+      VOL_ROWS.push({email: email >= 0 ? String(r[email] || "").trim().toLowerCase() : "", name: name >= 0 ? fix(String(r[name] || "").trim()) : "",
+        sem: s || NO_SEM, sk: semKey(s), points: p, title: fix(String(r[title] || "").trim())});
+      n++;
+    });
+    SOURCES.push({role: "Dobrovoľníctvo", name: t.name, url: t.url, info: `${n} záznamov s bodmi za dobrovoľníctvo`, volSource: true});
+    return true;
+  }
+
+  // Projekt v praxi from the combined event export:
+  //  • rows with type "Projekt v praxi" and empty "Stretnutie k projektu" are umbrella events (e.g. "Projekty v praxi ZS 25/26") → dropped
+  //  • a project = PvP row whose "Stretnutie k projektu" equals one of those umbrella names (e.g. "PvP: Fiktívna firma Alfa_ZS 25/26")
+  //  • rows pointing to a project (its individual meetings) are ignored; declined / invited-only rows don't count
+  function pvpFromEvents(body, g, typeI, parentI, isPvpRow) {
+    PVP_FROM_EVENTS = true;
+    const key = s => norm(s).replace(/\s+/g, " ");
+    const umbrellas = new Set(body.filter(r => isPvpRow(r) && !(r[parentI] || "").trim()).map(r => key(g(r, "event"))));
+    const isProject = r => { const parent = (r[parentI] || "").trim(); return isPvpRow(r) && !!parent && umbrellas.has(key(parent)); };
+    let n = 0;
+    body.forEach(r => {
+      if (!isProject(r)) return;
+      if (NEG_STATUS.test(norm(g(r, "status")))) return;
+      const id = g(r, "email").toLowerCase();
+      if (!id) return;
+      const sem = g(r, "semester") || semFromText(g(r, "event")) || NO_SEM;
+      PVP_ROWS.push({id, sem, sk: semKey(sem), project: fix(g(r, "event"))});
+      n++;
+    });
+    return {n, isProject};
+  }
+
+  // Projekt v praxi (older separate Master PvP export): one entry per student × semester; rows with "stretnutie" are ignored
+  function tryPvp(t, nh, body, byName) {
+    const email = nh.findIndex(h => /e-?mail|mail/.test(h));
+    if (email < 0) return false;
+    // New export format (has "Stretnutie k projektu"): only the project row counts, not its meetings
+    const parentI = nh.findIndex(h => /stretnutie k projektu/.test(h));
+    const typeI = nh.findIndex(h => /typ/.test(h));
+    if (parentI >= 0 && typeI >= 0) {
+      const col = {email, event: nh.findIndex(h => /nazov/.test(h)), status: nh.findIndex(h => /^status$|^stav$/.test(h)), semester: nh.findIndex(h => /semest|obdobie/.test(h))};
+      if (col.event < 0) return false;
+      const g = (r, k) => col[k] >= 0 ? (r[col[k]] || "").trim() : "";
+      const n = pvpFromEvents(body, g, typeI, parentI, r => /projekt v praxi/.test(norm(r[typeI]))).n;
+      SOURCES.push({role: "Projekt v praxi", name: t.name, url: t.url, info: `${n} účastí na projekte`});
+      return true;
+    }
+    const name = nh.findIndex((h, i) => i !== email && /nazov|ucast|event|aktivit|projekt|name/.test(h));
+    if (name < 0) return false;
+    const type = nh.findIndex((h, i) => i !== email && i !== name && /typ/.test(h));
+    const status = nh.findIndex((h, i) => i !== email && i !== name && /status|stav/.test(h));
+    const semc = nh.findIndex(h => /semest|obdobie/.test(h));
+    const isPvp = r => /projekt v praxi|\bpvp\b/.test(norm(r[type]));
+    if (!byName && !(type >= 0 && body.some(isPvp))) return false;
+    let n = 0;
+    body.forEach(r => {
+      if (type >= 0 && !isPvp(r)) return;
+      if (status >= 0 && NEG_STATUS.test(norm(r[status]))) return;
+      const id = (r[email] || "").trim().toLowerCase();
+      if (!id) return;
+      const raw = fix((r[name] || "").trim());
+      if (/stretnuti/.test(norm(raw))) return;
+      const p = pvpParse(raw);
+      const sem = p.sem || (semc >= 0 ? (r[semc] || "").trim() : "") || NO_SEM;
+      PVP_ROWS.push({id, sem, sk: semKey(sem), project: p.project, legacy: true});
+      n++;
+    });
+    SOURCES.push({role: "Projekt v praxi", name: t.name, url: t.url, info: `${n} záznamov o účasti (starý formát)`});
+    return true;
+  }
+
+  // Rozdelenie: who from the NLA team is responsible for which student
+  function addResp(email, name, sem, person) {
+    person = fix(String(person || "").trim());
+    if (!person) return false;
+    const keys = [];
+    const em = String(email || "").match(/[^\s<>(),;]+@[^\s<>(),;]+/);
+    if (em) keys.push(em[0].toLowerCase());
+    const nk = nameKey(String(name || "").replace(/[^\s<>(),;]+@[^\s<>(),;]+/g, ""));
+    if (nk) keys.push("n:" + nk);
+    if (!keys.length) return false;
+    const sk = sem ? semKey(sem) : -1;
+    keys.forEach(k => [k, sk >= 0 && sk < 1e6 ? k + "|" + sk : null].forEach(key => {
+      if (!key) return;
+      if (!RESP.has(key)) RESP.set(key, new Set());
+      RESP.get(key).add(person);
+    }));
+    return true;
+  }
+  function tryResp(t, header, nh, body, byName) {
+    if (!byName && nh.some(h => /\bbod|point|score/.test(h))) return false;
+    const rc = nh.findIndex(h => RESP_RE.test(h));
+    const used = new Set([rc]);
+    const find = re => { const i = nh.findIndex((h, j) => !used.has(j) && re.test(h)); if (i >= 0) used.add(i); return i; };
+    const email = find(/e-?mail|mail/);
+    const last = find(/priezvisk|surname|last ?name/);
+    const first = find(/krstn|first ?name|^meno$/);
+    const full = find(/student|cele meno|meno a priezvisko|^meno|name|ucastnik|clen/);
+    const semc = find(/semest|obdobie/);
+    const g = (r, i) => i >= 0 ? (r[i] || "").trim() : "";
+    if (rc >= 0 && (email >= 0 || last >= 0 || full >= 0)) {
+      let n = 0;
+      body.forEach(r => {
+        const nm = full >= 0 ? g(r, full) : `${g(r, first)} ${g(r, last)}`;
+        if (addResp(g(r, email), nm, g(r, semc), g(r, rc))) n++;
+      });
+      SOURCES.push({role: "Zodpovedné osoby", name: t.name, url: t.url, info: `${n} priradení · stĺpec „${header[rc]}“`});
+      return true;
+    }
+    if (byName && email < 0 && last < 0 && full < 0) {
+      let n = 0;
+      header.forEach((h, j) => {
+        if (!h) return;
+        body.forEach(r => { const v = (r[j] || "").trim(); if (v && addResp(v, v, "", h)) n++; });
+      });
+      if (n) { SOURCES.push({role: "Zodpovedné osoby", name: t.name, url: t.url, info: `${n} priradení · stĺpce = osoby`}); return true; }
+    }
+    return false;
+  }
+  function respFor(d) {
+    const sk = semKey(d.semester);
+    const keys = [d.email ? d.email.toLowerCase() : "", "n:" + nameKey(d.full)].filter(k => k && k !== "n:");
+    for (const k of keys) if (RESP.has(k + "|" + sk)) return [...RESP.get(k + "|" + sk)].join(", ");
+    for (const k of keys) if (RESP.has(k)) return [...RESP.get(k)].join(", ");
+    return d.respCol || "";
+  }
+
+  // ================= model =================
+  function rebuild() {
+    const map = {};
+    ST.forEach(t => Object.keys(t.map).forEach(k => { map[k] = true; }));
+    COLS = {map};
+    DATA = [];
+    ST.forEach(t => {
+      const g = (r, k) => t.map[k] == null ? "" : fix((r[t.map[k]] ?? "").trim());
+      t.rows.forEach((r, i) => {
+        const first = g(r, "first"), last = g(r, "last");
+        const full = (first || last) ? `${first} ${last}`.trim() : g(r, "name");
+        const email = g(r, "email");
+        DATA.push({
+          email, first, last, full: full || email || `${t.name}, riadok ${i + 2}`,
+          sortName: norm(last || full) + " " + norm(first), id: (email || full).toLowerCase(),
+          city: g(r, "city").replace(/^Nexteria:\s*/i, ""), level: g(r, "level"), status: g(r, "status"),
+          end: g(r, "end"), semester: g(r, "semester") || NO_SEM, respCol: g(r, "resp"),
+          points: num(r[t.map.points]), base: t.map.base == null ? null : num(r[t.map.base]),
+          extra: t.extra.map(([h, j]) => [h, fix((r[j] ?? "").trim())]), events: [], src: t.name,
+        });
+      });
+    });
+    dedupeStudents();
+
+    HAS_EV = EV.length > 0; EV_HAS_FILLED = false;
+    if (HAS_EV) {
+      // join by semester key, so "Zimný 25/26" matches "Zimný 2025/26"
+      const idx = new Map(DATA.map(d => [d.id + "|" + semKey(d.semester), d]));
+      const labelBySk = new Map(DATA.map(d => [semKey(d.semester), d.semester]));
+      for (const e of EVENT_ROWS) {
+        if (!e.unfilled) EV_HAS_FILLED = true;
+        const sk = semKey(e.semester);
+        if (labelBySk.has(sk) && sk >= 0 && sk < 1e6) e.semester = labelBySk.get(sk);
+        let d = idx.get(e.id + "|" + sk);
+        if (!d) {
+          const any = DATA.find(x => x.id === e.id);
+          d = {
+            email: e.email, first: any?.first || "", last: any?.last || "", full: any?.full || e.name || e.email,
+            sortName: any?.sortName || norm(e.name.split(" ").slice(-1)[0] || e.name), id: e.id,
+            city: any?.city || "", level: e.level || any?.level || "", status: any?.status || "", end: any?.end || "",
+            semester: e.semester, respCol: any?.respCol || "", points: null, base: null, extra: [], events: [], orphan: true,
+          };
+          DATA.push(d); idx.set(e.id + "|" + sk, d); labelBySk.set(sk, e.semester);
+        }
+        d.events.push(e);
+      }
+    }
+    DATA.forEach(d => {
+      d.pct = d.base ? d.points / d.base : null;
+      d.diff = d.base != null && d.points != null ? d.points - d.base : null;
+      d.unfilledN = d.events.filter(e => e.unfilled).length;
+      d.missed = d.events.reduce((a, e) => a + e.missed, 0);
+      d.potential = HAS_EV ? (d.points ?? 0) + d.missed : null;
+      d.ppct = HAS_EV && d.base ? d.potential / d.base : null;
+    });
+
+    const prevSem = $("sem").value;
+    SEMS = [...new Set(DATA.map(d => d.semester))].sort((a, b) => semKey(a) - semKey(b) || a.localeCompare(b));
+
+    // PVP
+    HAS_PVP = PVP_FROM_EVENTS || SOURCES.some(s => s.role === "Projekt v praxi");
+
+    // Dobrovoľníctvo: one entry per student × semester (points summed)
+    HAS_VOL = SOURCES.some(s => s.volSource);
+    VOL_BY = new Map();
+    const byName = new Map(), byEmail = new Set(DATA.map(d => d.id));
+    DATA.forEach(d => { const k = nameKey(d.full); if (k && !byName.has(k)) byName.set(k, d.id); });
+    let volUnmatched = new Set();
+    VOL_ROWS.forEach(v => {
+      const id = v.email && byEmail.has(v.email) ? v.email : byName.get(nameKey(v.name));
+      if (!id) { volUnmatched.add(v.name || v.email); return; }
+      let m = VOL_BY.get(id);
+      if (!m) VOL_BY.set(id, m = new Map());
+      let e = m.get(v.sk);
+      if (!e) m.set(v.sk, e = {sk: v.sk, sem: v.sk >= 0 && v.sk < 1e6 ? semLabel(v.sk) : v.sem, points: 0, titles: []});
+      e.points += v.points; e.titles.push(v.title);
+    });
+    const volSrc = SOURCES.find(s => s.volSource);
+    if (volSrc && volUnmatched.size) volSrc.note = `${volUnmatched.size} mien sa nepodarilo spárovať so študentmi: ${[...volUnmatched].slice(0, 8).join(", ")}${volUnmatched.size > 8 ? "…" : ""}`;
+    PVP_BY = new Map();
+    if (PVP_FROM_EVENTS) PVP_ROWS = PVP_ROWS.filter(p => !p.legacy);
+    PVP_ROWS.forEach(p => {
+      let m = PVP_BY.get(p.id);
+      if (!m) PVP_BY.set(p.id, m = new Map());
+      const key = p.sk < 1e6 ? p.sk : "x" + p.sem;
+      let e = m.get(key);
+      if (!e) m.set(key, e = {sk: p.sk, sem: p.sk >= 0 && p.sk < 1e6 ? semLabel(p.sk) : p.sem, projects: new Map()});
+      if (p.project && !e.projects.has(p.project.toLowerCase())) e.projects.set(p.project.toLowerCase(), p.project);
+    });
+    HAS_RESP = RESP.size > 0 || map.resp != null;
+    DATA.forEach(d => {
+      const m = PVP_BY.get(d.id);
+      d.pvpN = m ? m.size : 0;
+      const sk = semKey(d.semester);
+      d.pvpNow = !!(m && m.has(sk));
+      d.pvpNowNames = d.pvpNow ? [...m.get(sk).projects.values()].join(" · ") : "";
+      const vm = VOL_BY.get(d.id);
+      d.volN = vm ? vm.size : 0;
+      d.volNow = vm && vm.has(sk) ? vm.get(sk).points : 0;
+      const vpast = vm ? [...vm.values()].filter(e => e.sk < sk && e.sk >= 0).sort((a, b) => b.sk - a.sk)[0] : null;
+      d.volLastSem = vpast ? vpast.sem : "";
+      d.volLastSk = vpast ? vpast.sk : (vm ? 0 : null);
+      const past = m ? [...m.values()].filter(e => e.sk < sk && e.sk >= 0).sort((a, b) => b.sk - a.sk)[0] : null;
+      d.pvpLastSk = past ? past.sk : (m ? 0 : null);   // only later projects → "Zatiaľ nie"
+      d.pvpLastSem = past ? past.sem : "";
+      d.pvpLastNames = past ? [...past.projects.values()].join(" · ") : "";
+      d.resp = respFor(d);
+    });
+    byStudent = new Map();
+    DATA.forEach(d => { if (!byStudent.has(d.id)) byStudent.set(d.id, []); byStudent.get(d.id).push(d); });
+    byStudent.forEach(list => list.sort((a, b) => semKey(a.semester) - semKey(b.semester)));
+    groupRecords();
+
+    $("sem").innerHTML = SEMS.map(s => `<option>${esc(s)}</option>`).join("");
+    const ck = dateSemKey(todayISO());
+    const real = SEMS.filter(s => s !== NO_SEM);
+    $("sem").value = SEMS.includes(prevSem) ? prevSem
+      : real.find(s => semKey(s) === ck) || [...real].reverse().find(s => semKey(s) <= ck) || real[real.length - 1] || SEMS[0];
+
+    buildFilters(); renderFiles();
+    if (!columns().some(c => c.k === sort.key)) { sort.key = "name"; sort.dir = 1; }
+    buildHead(); render();
+  }
+
+  // The points report can contain the same student twice in one semester (e.g. one row with the point base and
+  // one without). Keep one row per student × semester – the one with a point base – and fill its empty fields
+  // from the dropped row. Unfilled-feedback points are joined to the kept row afterwards.
+  function dedupeStudents() {
+    const hasBase = d => d.base != null && d.base > 0 ? 1 : 0;
+    const better = (a, b) => hasBase(a) - hasBase(b) || (a.points ?? -1) - (b.points ?? -1);   // > 0 → a is better
+    const keep = new Map(), dropped = new Map();
+    DATA.forEach(d => {
+      const k = d.id + "|" + semKey(d.semester);
+      const o = keep.get(k);
+      if (!o) { keep.set(k, d); return; }
+      const [win, lose] = better(o, d) >= 0 ? [o, d] : [d, o];
+      ["email", "first", "last", "city", "level", "status", "end", "respCol"].forEach(f => { if (!win[f] && lose[f]) win[f] = lose[f]; });
+      if (win.points == null) win.points = lose.points;
+      keep.set(k, win);
+      dropped.set(lose.src, (dropped.get(lose.src) || 0) + 1);
+    });
+    if (!dropped.size) return;
+    DATA = [...keep.values()];
+    dropped.forEach((n, src) => {
+      const s = SOURCES.find(x => x.role === "Študenti" && x.name === src);
+      if (s) s.note = [s.note, `${n}× ten istý študent v rovnakom semestri – použitý riadok s bodovým základom`].filter(Boolean).join(" · ");
+    });
+  }
+
+  function groupBy(list, cmp) {
+    const m = new Map();
+    list.forEach(x => { const k = String(x.email || "").toLowerCase(); if (!m.has(k)) m.set(k, []); m.get(k).push(x); });
+    m.forEach(l => l.sort(cmp));
+    return m;
+  }
+  function groupRecords() {
+    NOTES_BY = groupBy(NOTES, (a, b) => String(b.created).localeCompare(String(a.created)));
+    MEET_BY = groupBy(MEETINGS, (a, b) => String(b.date).localeCompare(String(a.date)) || String(b.created).localeCompare(String(a.created)));
+    DATA.forEach(d => {
+      d.notesN = (NOTES_BY.get(d.id) || []).length;
+      const sk = semKey(d.semester);
+      const ms = (MEET_BY.get(d.id) || []).filter(m => semKey(m.semester) === sk);
+      d.meetN = ms.length; d.lastMeet = (ms.find(m => m.date) || {}).date || "";
+    });
+    TEAM = [...new Set([...DATA.flatMap(d => d.resp ? d.resp.split(", ") : []), ...MEETINGS.map(m => m.with).filter(Boolean)])]
+      .sort((a, b) => a.localeCompare(b, "sk"));
+    $("team").innerHTML = TEAM.map(t => `<option value="${esc(t)}">`).join("");
+  }
+
+  // ================= filters =================
+  const POP_SELECTS = [
+    {k: "city", label: "Mesto"},
+    {k: "level", label: "Level"},
+    {k: "status", label: "Stav štúdia"},
+  ];
+  const PVP_OPTS = [["now", "Má projekt teraz"], ["notnow", "Nemá projekt teraz"], ["never", "Nikdy nemal projekt"]];
+  const PVP_TEST = {now: d => d.pvpNow, notnow: d => !d.pvpNow, never: d => d.pvpN === 0};
+  const VOL_OPTS = [["now", "Dobrovoľníčil/a teraz"], ["notnow", "Nie v tomto semestri"], ["never", "Nikdy"]];
+  const VOL_TEST = {now: d => d.volNow > 0, notnow: d => !(d.volNow > 0), never: d => d.volN === 0};
+  function toggles() {
+    const t = [];
+    if (HAS_EV && COLS.map.base != null) t.push({k: "would", label: "Splnili by základ, keby vyplnili feedback", short: "Splnili by s feedbackom"});
+    t.push({k: "hasnote", label: "Majú aspoň jednu poznámku", short: "Majú poznámku"});
+    return t;
+  }
+  function views() {
+    const v = [{k: "all", t: "Všetci"}];
+    if (COLS.map.base != null) v.push({k: "below", t: "Pod základom"});
+    v.push({k: "nomeet", t: "Bez stretnutia"});
+    if (HAS_EV) v.push({k: "unf", t: "Nevyplnený feedback"});
+    return v;
+  }
+  const valsOf = k => [...new Set(DATA.map(d => d[k]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "sk"));
+
+  function buildFilters() {
+    // Zodpovedná osoba – always visible
+    const people = [...new Set(DATA.flatMap(d => d.resp ? d.resp.split(", ") : []))].sort((a, b) => a.localeCompare(b, "sk"));
+    $("resp").classList.toggle("hidden", !HAS_RESP);
+    $("resp").innerHTML = `<option value="">Všetky zodpovedné osoby</option><option value="__none">Bez zodpovednej osoby</option>` +
+      people.map(p => `<option>${esc(p)}</option>`).join("");
+    if (F.resp && F.resp !== "__none" && !people.includes(F.resp)) F.resp = "";
+    $("resp").value = F.resp;
+
+    POP_SELECTS.forEach(s => { if (F[s.k] && !valsOf(s.k).includes(F[s.k])) F[s.k] = ""; });
+    if (!HAS_PVP) F.pvp = "";
+    if (!HAS_VOL) F.vol = "";
+    if (!toggles().some(t => t.k === "would")) F.would = false;
+    if (!views().some(v => v.k === F.view)) F.view = "all";
+  }
+
+  // Filter panel: tappable options with live counts for the selected semester
+  function buildPop() {
+    const semRows = DATA.filter(d => d.semester === $("sem").value);
+    const group = (label, k, opts) => `<div class="fg"><div class="fl">${label}</div><div class="opts">${opts.map(([v, t, n]) =>
+      `<button class="opt ${F[k] === v ? "on" : ""}" data-f="${k}" data-v="${esc(v)}" ${!n && F[k] !== v ? "disabled" : ""}>${esc(t)}</button>`).join("")}</div></div>`;
+    let h = "";
+    POP_SELECTS.forEach(s => {
+      const vals = valsOf(s.k);
+      if (vals.length < 2 && !F[s.k]) return;
+      h += group(s.label, s.k, vals.map(v => [v, v, semRows.filter(d => d[s.k] === v).length]));
+    });
+    if (HAS_PVP) h += group("Projekt v praxi", "pvp", PVP_OPTS.map(([v, t]) => [v, t, semRows.filter(PVP_TEST[v]).length]));
+    if (HAS_VOL) h += group("Dobrovoľníctvo", "vol", VOL_OPTS.map(([v, t]) => [v, t, semRows.filter(VOL_TEST[v]).length]));
+    $("pop-groups").innerHTML = h;
+    $("pop-sep").classList.toggle("hidden", !h);
+    $("pop-toggles").innerHTML = toggles().map(t => `<label class="tog">${t.label}<input type="checkbox" data-f="${t.k}" ${F[t.k] ? "checked" : ""}></label>`).join("");
+  }
+
+  function activeChips() {
+    const c = [];
+    POP_SELECTS.forEach(s => { if (F[s.k]) c.push({k: s.k, t: F[s.k]}); });
+    if (F.pvp) c.push({k: "pvp", t: PVP_OPTS.find(o => o[0] === F.pvp)[1]});
+    if (F.vol) c.push({k: "vol", t: "Dobrovoľníctvo: " + VOL_OPTS.find(o => o[0] === F.vol)[1].toLowerCase()});
+    toggles().forEach(t => { if (F[t.k]) c.push({k: t.k, t: t.short || t.label}); });
+    return c;
+  }
+
+  function baseFiltered() {
+    const sem = $("sem").value, q = norm(F.q);
+    return DATA.filter(d => d.semester === sem
+      && (!F.resp || (F.resp === "__none" ? !d.resp : d.resp.split(", ").includes(F.resp)))
+      && (!F.city || d.city === F.city) && (!F.level || d.level === F.level) && (!F.status || d.status === F.status)
+      && (!F.pvp || PVP_TEST[F.pvp](d))
+      && (!F.vol || VOL_TEST[F.vol](d))
+      && (!F.would || (d.diff != null && d.diff < 0 && d.potential >= d.base))
+      && (!F.hasnote || d.notesN > 0)
+      && (!q || norm(`${d.full} ${d.email}`).includes(q)));
+  }
+  const VIEW_TEST = {
+    all: () => true,
+    below: d => d.diff != null && d.diff < 0,
+    nomeet: d => !d.meetN,
+    unf: d => d.unfilledN > 0,
+  };
+
+  // ================= table =================
+  function columns() {
+    const m = COLS.map, c = [{k: "name", t: "Študent", sortv: d => d.sortName}];
+    if (m.base != null) c.push({k: "base", t: "Bodový základ", num: true});
+    c.push({k: "points", t: "Body", num: true});
+    if (HAS_EV) c.push({k: "missed", t: "Body za nevypl. FB", num: true, tip: "Body, ktoré študent získa, keď vyplní chýbajúce feedbacky"});
+    if (m.base != null) c.push({k: "pct", t: "Plnenie", sortv: d => HAS_EV && d.ppct != null ? d.ppct : d.pct,
+      tip: HAS_EV ? "Plná farba = získané body, svetlejšia časť = body za nevyplnené feedbacky. Čiarka = 100 %." : "Body / bodový základ. Čiarka = 100 %."});
+    if (HAS_PVP) c.push({k: "pvp", t: "Projekt v praxi", sortv: d => d.pvpNow ? 2e6 + d.pvpN : d.pvpN ? d.pvpLastSk : null,
+      tip: "Projekt v praxi v zvolenom semestri; ak žiadny, posledný semester s projektom"});
+    if (HAS_VOL) c.push({k: "vol", t: "Dobrovoľníctvo", sortv: d => d.volNow > 0 ? 2e6 + d.volN : d.volN ? d.volLastSk : null,
+      tip: "Dobrovoľníctvo s bodmi > 0: v zvolenom semestri, inak posledný semester; spolu = počet semestrov"});
+    c.push({k: "lastMeet", t: "Stretnutie", tip: "Posledné stretnutie s NLA tímom v zvolenom semestri", sortv: d => d.meetN ? (d.lastMeet || "0") : null});
+    return c;
+  }
+  function buildHead() {
+    $("thead").innerHTML = columns().map(c =>
+      `<th data-k="${c.k}" class="${c.num ? "num " : ""}${sort.key === c.k ? "sorted" : ""}" ${c.tip ? `title="${esc(c.tip)}"` : ""}>${c.t}<span class="ar">${sort.key === c.k ? (sort.dir > 0 ? "▲" : "▼") : ""}</span></th>`).join("");
+  }
+  // Colors: passing the semester = at least 75 % of the point base, rounded up to whole points (e.g. base 50 → 38 b.)
+  //   green ≥ 75 %  ·  orange 50–75 %  ·  pink < 50 %   (the percentage and the 100 % marker stay as they are)
+  const pointsAt = (base, pct) => Math.ceil(base * pct / 100 - 1e-9);
+  const barCol = (pts, base) => pts >= pointsAt(base, 75) ? "var(--bar-ok)" : pts >= pointsAt(base, 50) ? "var(--bar-warn)" : "var(--bar-bad)";
+  function pctCell(d) {
+    if (d.pct == null) return d.base === 0 ? `<span class="dim">bez základu</span>` : `<span class="dim">—</span>`;
+    const W = x => Math.min(x, 1.5) / 1.5 * 100;
+    const p = d.pct, w = W(p);
+    let ext = "", txt = `${fmt(p * 100)} %`;
+    if (d.ppct != null && d.missed > 0) {
+      ext = `<i class="ext" style="left:${w}%;width:${W(d.ppct) - w}%;background:${barCol(d.potential, d.base)}"></i>`;
+      txt = `${fmt(d.ppct * 100)} %`;
+    }
+    return `<span class="bar"><i style="width:${w}%;background:${barCol(d.points || 0, d.base)}"></i>${ext}<em style="left:${100 / 1.5}%"></em></span><span class="pct">${txt}</span>`;
+  }
+
+  function render() {
+    const base = baseFiltered();
+    const vs = views();
+    $("views").innerHTML = vs.map(v => `<button data-v="${v.k}" class="${F.view === v.k ? "on" : ""}" role="tab" aria-selected="${F.view === v.k}">${v.t}${v.k === "all" ? "" : `<span class="n">${base.filter(VIEW_TEST[v.k]).length}</span>`}</button>`).join("");
+    const rows = base.filter(VIEW_TEST[F.view]);
+
+    const cols = columns();
+    const col = cols.find(c => c.k === sort.key) || cols[0];
+    const get = col.sortv || (d => d[col.k]);
+    rows.sort((a, b) => {
+      let x = get(a), y = get(b);
+      if (x === "") x = null; if (y === "") y = null;
+      if (x == null && y == null) return a.sortName.localeCompare(b.sortName, "sk");
+      if (x == null) return 1; if (y == null) return -1;
+      return (typeof x === "number" ? x - y : String(x).localeCompare(String(y), "sk")) * sort.dir || a.sortName.localeCompare(b.sortName, "sk");
+    });
+    $("tbody").innerHTML = rows.map(d => `<tr data-id="${esc(d.id)}">` + cols.map(c => {
+      switch (c.k) {
+        case "name": {
+          const sub = [d.resp, d.level].filter(Boolean).join(" · ");
+          return `<td><div class="who">${avatar(d.full)}<div style="min-width:0"><div class="nm">${esc(d.full)}${d.notesN ? `<span class="ndot" title="${d.notesN} poznámok"><svg><use href="#i-note"/></svg>${d.notesN}</span>` : ""}${d.orphan ? `<span class="tag warn" title="Študent nie je v zozname študentov pre tento semester">len v eventoch</span>` : ""}</div>${sub ? `<div class="sub">${esc(sub)}</div>` : ""}</div></div></td>`;
+        }
+        case "base": return `<td class="num">${fmt(d.base)}</td>`;
+        case "points": return `<td class="num pts">${fmt(d.points)}</td>`;
+        case "missed": return `<td class="num">${d.missed ? `<span class="miss">+${fmt1(d.missed)}</span>` : `<span class="dim">—</span>`}</td>`;
+        case "pct": return `<td>${pctCell(d)}</td>`;
+        case "pvp": {
+          const top = d.pvpNow
+            ? `<span class="proj" title="${esc(d.pvpNowNames)}"><i></i><b>Tento semester</b></span>`
+            : d.pvpLastSem ? `<span class="proj past" title="${esc(d.pvpLastNames)}"><i></i><b>${esc(d.pvpLastSem)}</b></span>`
+            : d.pvpN ? `<span class="proj never" title="Projekt v praxi mal/a až v neskoršom semestri"><i></i><b>Zatiaľ nie</b></span>`
+            : `<span class="proj never"><i></i><b>Nikdy</b></span>`;
+          return `<td>${top}<div class="sub">Spolu ${d.pvpN}×</div></td>`;
+        }
+        case "vol": {
+          const top = d.volNow > 0
+            ? `<span class="proj"><i></i><b>Tento semester</b></span>`
+            : d.volLastSem ? `<span class="proj past"><i></i><b>${esc(d.volLastSem)}</b></span>`
+            : d.volN ? `<span class="proj never" title="Dobrovoľníčil/a až v neskoršom semestri"><i></i><b>Zatiaľ nie</b></span>`
+            : `<span class="proj never"><i></i><b>Nikdy</b></span>`;
+          return `<td>${top}<div class="sub">Spolu ${d.volN}×</div></td>`;
+        }
+        case "lastMeet": return `<td>${d.meetN ? `<span class="met" title="${d.meetN}× v tomto semestri"><svg><use href="#i-check"/></svg>${d.lastMeet ? fmtDate(d.lastMeet, true) : "áno"}${d.meetN > 1 ? ` · ${d.meetN}×` : ""}</span>` : `<span class="nomet">Zatiaľ nie</span>`}</td>`;
+      }
+      return "<td></td>";
+    }).join("") + "</tr>").join("");
+    $("empty").classList.toggle("hidden", rows.length > 0);
+    $("count").textContent = rows.length === 1 ? "1 študent" : rows.length < 5 && rows.length > 0 ? `${rows.length} študenti` : `${rows.length} študentov`;
+
+    const i = SEMS.indexOf($("sem").value);
+    $("prev").disabled = i <= 0; $("next").disabled = i >= SEMS.length - 1;
+
+    buildPop();
+    $("pop-show").textContent = rows.length === 1 ? "Zobraziť 1 študenta" : `Zobraziť ${rows.length} študentov`;
+    const chips = activeChips();
+    $("chips").innerHTML = chips.map(c => `<span class="chip">${esc(c.t)}<button data-x="${c.k}" aria-label="Zrušiť filter">✕</button></span>`).join("");
+    $("filter-n").textContent = chips.length; $("filter-n").classList.toggle("hidden", !chips.length);
+    renderKpis(base);
+    window.__rows = rows;
+  }
+
+  function renderKpis(rows) {
+    const n = rows.length;
+    const pc = (a, b) => b ? `${fmt(a / b * 100)}<small>%</small>` : "—";
+    const k = [];
+    if (COLS.map.base != null) {
+      const wb = rows.filter(d => d.base);
+      k.push({l: "Splnili bodový základ", v: pc(wb.filter(d => d.points >= d.base).length, wb.length), c: "var(--teal)"});
+    }
+    k.push({l: "Mali stretnutie", v: pc(rows.filter(d => d.meetN).length, n), c: "#5b5fc7"});
+    if (HAS_EV) k.push({l: "Nevyplnený feedback", v: fmt(rows.filter(d => d.unfilledN).length), c: "var(--pink)"});
+    if (HAS_PVP) k.push({l: "Projekt v praxi", v: pc(rows.filter(d => d.pvpNow).length, n), c: "var(--yellow)"});
+    const tiles = k.slice(0, 4);
+    $("kpis").style.setProperty("--cols", tiles.length);
+    $("kpis").innerHTML = tiles.map(x => `<div class="kpi"><div class="l"><i style="background:${x.c}"></i>${x.l}</div><div class="v">${x.v}</div></div>`).join("");
+  }
+
+  // ================= drawer =================
+  function openStudent(id) {
+    const list = byStudent.get(id); if (!list) return;
+    OPEN = id;
+    const sem = $("sem").value;
+    const d = list.find(x => x.semester === sem) || list[list.length - 1];
+    const info = list.find(x => !x.orphan) || d;
+    $("d-av").outerHTML = avatar(d.full).replace('class="av ', 'id="d-av" class="av ');
+    $("d-name").textContent = d.full;
+    $("d-sub").textContent = d.email;
+    const statusCls = s => { const n = norm(s); return /studuje|erazm|erasm/.test(n) ? "info" : /absolv/.test(n) ? "ok" : /vyluc|predcas/.test(n) ? "bad" : /prerus/.test(n) ? "warn" : ""; };
+    const tags = [];
+    const resp = d.resp || info.resp;
+    tags.push(resp ? `<span class="tag info">NLA: ${esc(resp)}</span>` : `<span class="tag warn">Bez zodpovednej osoby</span>`);
+    if (info.level) tags.push(`<span class="tag">${esc(info.level)}</span>`);
+    if (info.city) tags.push(`<span class="tag">${esc(info.city)}</span>`);
+    if (info.status) tags.push(`<span class="tag ${statusCls(info.status)}">${esc(info.status)}</span>`);
+    if (HAS_VOL && d.volNow > 0) tags.push(`<span class="tag ok">Dobrovoľníctvo v tomto semestri</span>`);
+    if (HAS_PVP) tags.push(d.pvpNow ? `<span class="tag ok">PVP v tomto semestri</span>` : d.pvpN ? `<span class="tag">PVP ${d.pvpN}×</span>` : `<span class="tag">Bez PVP</span>`);
+    $("d-tags").innerHTML = tags.join("");
+
+    const cur = list.find(x => x.semester === sem);
+    const st = [];
+    if (COLS.map.base != null) st.push(["Bodový základ", fmt(cur?.base)]);
+    st.push(["Body", fmt(cur?.points)]);
+    if (HAS_EV) st.push(["Za nevypl. FB", cur?.missed ? `<span class="miss">+${fmt1(cur.missed)}</span>` : "0"]);
+    if (COLS.map.base != null) st.push(["Plnenie", cur && cur.pct != null ? `${fmt((HAS_EV && cur.ppct != null ? cur.ppct : cur.pct) * 100)} %` : "—"]);
+    $("d-stats").style.gridTemplateColumns = `repeat(${Math.min(st.length, 4)},minmax(0,1fr))`;
+    $("d-stats").innerHTML = st.map(([l, v]) => `<div><div class="l">${l}</div><div class="v">${v}</div></div>`).join("");
+
+    renderTabs(); renderTab();
+    $("drawer").classList.add("open"); $("drawer").setAttribute("aria-hidden", "false"); $("shade").classList.add("open");
+  }
+  function tabsList() {
+    const t = [{k: "overview", t: "Prehľad"},
+      {k: "meetings", t: "Stretnutia", n: (MEET_BY.get(OPEN) || []).length},
+      {k: "notes", t: "Poznámky", n: (NOTES_BY.get(OPEN) || []).length}];
+    if (HAS_EV) t.push({k: "events", t: "Eventy"});
+    return t;
+  }
+  function renderTabs() {
+    const t = tabsList();
+    if (!t.some(x => x.k === TAB)) TAB = "overview";
+    $("d-tabs").innerHTML = t.map(x => `<button data-tab="${x.k}" class="${TAB === x.k ? "on" : ""}" role="tab" aria-selected="${TAB === x.k}">${x.t}${x.n ? `<span class="n">${x.n}</span>` : ""}</button>`).join("");
+  }
+  function renderTab() {
+    const id = OPEN, list = byStudent.get(id) || [], sem = $("sem").value;
+    let h = "";
+    if (TAB === "overview") h = overviewHtml(id, list, sem);
+    else if (TAB === "meetings") h = meetingsHtml(id, list, sem);
+    else if (TAB === "notes") h = notesHtml(id, sem);
+    else if (TAB === "events") h = eventsHtml(list, sem);
+    $("d-body").innerHTML = h;
+    $("d-body").scrollTop = 0;
+  }
+
+  function overviewHtml(id, list, sem) {
+    const hasBase = COLS.map.base != null;
+    const max = Math.max(1, ...list.map(x => Math.max(x.potential ?? x.points ?? 0, x.base || 0)));
+    const spark = `<div class="box"><div class="spark">${list.map(x => {
+      const p = x.points || 0, col = x.base ? barCol(p, x.base) : "var(--accent)";
+      const extH = HAS_EV && x.missed ? x.missed / max * 100 : 0;
+      return `<div class="col ${x.semester === sem ? "cur" : ""}" title="${esc(x.semester)}: ${fmt(x.points)} b.${x.missed ? ` (+${fmt(x.missed)} za nevyplnené FB)` : ""}${x.base != null ? " / základ " + fmt(x.base) : ""}">
+        ${x.base ? `<div class="t" style="bottom:${x.base / max * 100}%"></div>` : ""}
+        ${extH ? `<div class="b ext" style="height:${extH}%;background:${col};border-radius:4px 4px 0 0"></div>` : ""}
+        <div class="b" style="height:${p / max * 100}%;background:${col};${extH ? "border-radius:0;" : ""}"></div></div>`;
+    }).join("")}</div><div class="spark-l">${list.map(x => `<span title="${esc(x.semester)}">${esc(x.semester.replace(/^(\S)\S*\s/, "$1 "))}</span>`).join("")}</div>
+    <div class="legend">Body za semester · čiarkovaná čiara = bodový základ · zvýraznený = zvolený semester</div></div>`;
+
+    const th = t => `<th class="num">${t}</th>`;
+    const table = `<div class="box" style="padding:4px 6px;overflow:auto"><table><thead><tr><th>Semester</th>${hasBase ? th("Základ") : ""}${th("Body")}${HAS_EV ? th("Za FB") : ""}${hasBase ? "<th>Plnenie</th>" : ""}<th>Stretnutie</th></tr></thead><tbody>
+      ${[...list].reverse().map(x => {
+        const ms = (MEET_BY.get(id) || []).filter(m => semKey(m.semester) === semKey(x.semester));
+        return `<tr class="${x.semester === sem ? "cur" : ""}"><td>${esc(x.semester)}</td>
+        ${hasBase ? `<td class="num">${fmt(x.base)}</td>` : ""}<td class="num"><b>${fmt(x.points)}</b></td>
+        ${HAS_EV ? `<td class="num">${x.missed ? `<span class="miss">+${fmt(x.missed)}</span>` : `<span class="dim">—</span>`}</td>` : ""}
+        ${hasBase ? `<td>${pctCell(x)}</td>` : ""}
+        <td>${ms.length ? `<span class="met"><svg><use href="#i-check"/></svg>${ms.length}×</span>` : `<span class="nomet">—</span>`}</td></tr>`;
+      }).join("")}
+    </tbody></table></div>`;
+
+    let pvp = "";
+    if (HAS_PVP) {
+      const l = [...(PVP_BY.get(id) || new Map()).values()].sort((a, b) => b.sk - a.sk);
+      pvp = `<h3>Projekt v praxi</h3>` + (l.length ? `<div class="box" style="padding:4px 6px"><table><tbody>${l.map(e =>
+        `<tr class="${e.sk === semKey(sem) ? "cur" : ""}"><td style="vertical-align:top;width:120px">${esc(e.sem)}</td><td class="wrap">${[...e.projects.values()].map(esc).join("<br>") || "—"}</td></tr>`).join("")}</tbody></table></div>`
+        : `<div class="box none">Zatiaľ žiadny Projekt v praxi.</div>`);
+    }
+
+    let vol = "";
+    if (HAS_VOL) {
+      const l = [...(VOL_BY.get(id) || new Map()).values()].sort((a, b) => b.sk - a.sk);
+      vol = `<h3>Dobrovoľníctvo</h3>` + (l.length ? `<div class="box" style="padding:4px 6px"><table><tbody>${l.map(e =>
+        `<tr class="${e.sk === semKey(sem) ? "cur" : ""}"><td style="width:120px">${esc(e.sem)}</td><td class="wrap" title="${esc(e.titles.join("\n"))}">${esc(e.titles.join(" · "))}</td><td class="num"><b>${fmt1(e.points)}</b> b.</td></tr>`).join("")}</tbody></table></div>`
+        : `<div class="box none">Zatiaľ žiadne dobrovoľníctvo.</div>`);
+    }
+    return `<h3>Vývoj bodov</h3>${spark}<h3>Semestre</h3>${table}${pvp}${vol}`;
+  }
+
+  // ---- meetings ----
+  function meetingsHtml(id, list, sem) {
+    const d = list.find(x => x.semester === sem) || list[list.length - 1];
+    const today = todayISO();
+    const ms = MEET_BY.get(id) || [];
+    return `<div class="form" id="m-form">
+      <div class="row2">
+        <label class="f">Dátum<input type="date" id="m-date" value="${today}" max="${today}"></label>
+        <label class="f">S kým z NLA tímu<input id="m-with" list="team" value="${esc(d.resp ? d.resp.split(", ")[0] : "")}" placeholder="Meno" autocomplete="off"></label>
+      </div>
+      <div class="hint" id="m-sem">${semHint(today)}</div>
+      <label class="f">Poznámka zo stretnutia<textarea id="m-text" maxlength="5000" placeholder="O čom ste sa rozprávali, dohodnuté kroky…"></textarea></label>
+      <div class="actions"><span class="kb">⌘/Ctrl + Enter uloží</span><button class="btn primary" id="m-add">Zapísať stretnutie</button></div>
+    </div>
+    ${ms.length ? ms.map(meetingHtml).join("") : `<div class="none">Zatiaľ žiadne zapísané stretnutie.</div>`}`;
+  }
+  function semHint(iso) {
+    const k = dateSemKey(iso);
+    return k == null ? "Vyber dátum stretnutia." : `Priradí sa k semestru <b>${esc(semLabel(k))}</b>`;
+  }
+  const canDelete = r => CAN_DEL_ALL || (r.author && r.author.toLowerCase() === USER);
+  function meetingHtml(m) {
+    return `<div class="rec"><div class="top"><b>${m.date ? esc(fmtDate(m.date)) : "Bez dátumu"}</b>${m.with ? `<span>s ${esc(m.with)}</span>` : ""}<span class="tag" style="margin-left:auto">${esc(m.semester || "bez semestra")}</span></div>
+      ${m.text ? `<div class="txt">${esc(m.text)}</div>` : ""}
+      <div class="meta"><span>Zapísal/a ${esc(m.author || "neznámy")} · ${esc(fmtStamp(m.created))}</span>
+      ${canDelete(m) ? `<button class="del" data-del-meet="${esc(m.id)}">Zmazať</button>` : ""}</div></div>`;
+  }
+  // DEMO: validates like the real app, then shows "not available" instead of saving
+  function addMeeting() {
+    if (!OPEN) return;
+    if (!$("m-date").value) { $("m-date").focus(); return toast("Zadaj dátum stretnutia"); }
+    if (!$("m-with").value.trim()) { $("m-with").focus(); return toast("Vyplň, s kým bolo stretnutie"); }
+    demoNA();
+  }
+
+  // ---- notes ----
+  function notesHtml(id, sem) {
+    const list = NOTES_BY.get(id) || [];
+    return `<div class="form">
+      <textarea id="n-text" maxlength="5000" placeholder="Napíš poznámku k študentovi…"></textarea>
+      <div class="actions"><span class="kb">⌘/Ctrl + Enter uloží</span>
+      <button class="btn primary" id="n-add">Pridať poznámku</button></div>
+    </div>
+    ${list.length ? list.map(n => `<div class="rec"><div class="txt" style="margin-top:0">${esc(n.text)}</div>
+      <div class="meta"><span>${esc(n.author || "neznámy autor")} · ${esc(fmtStamp(n.created))}</span>
+      ${canDelete(n) ? `<button class="del" data-del-note="${esc(n.id)}">Zmazať</button>` : ""}</div></div>`).join("")
+      : `<div class="none">Zatiaľ žiadne poznámky.</div>`}`;
+  }
+  function addNote() {
+    const ta = $("n-text");
+    if (!OPEN) return;
+    if (!ta.value.trim()) { ta.focus(); return; }
+    demoNA();
+  }
+
+  function deleteRecord(btn) {
+    if (!btn.classList.contains("arm")) {
+      btn.classList.add("arm"); btn.textContent = "Naozaj zmazať?";
+      setTimeout(() => { if (btn.isConnected && btn.classList.contains("arm")) { btn.classList.remove("arm"); btn.textContent = "Zmazať"; } }, 3000);
+      return;
+    }
+    btn.classList.remove("arm"); btn.textContent = "Zmazať";
+    demoNA();
+  }
+
+  // ---- events ----
+  function eventsTable(events) {
+    if (!events.length) return `<div class="box none">Žiadne záznamy o eventoch.</div>`;
+    // Points only for attended events (Feedback vyplnený / Zúčastnený); every other status shows 0
+    const earns = e => !e.status || /vyplnen|zucast/.test(norm(e.status));
+    const cls = e => e.unfilled ? "bad" : earns(e) ? "ok" : /prihlas/.test(norm(e.status)) ? "info" : "";
+    // chronological by "Event: Začiatok eventu"; events without a date go last
+    events = [...events].sort((a, b) => (a.start ?? Infinity) - (b.start ?? Infinity));
+    return `<div class="box" style="padding:4px 6px"><table><thead><tr><th>Event</th>${EV_HAS_FILLED ? "<th>Stav</th>" : ""}<th class="num">Body</th></tr></thead><tbody>
+      ${events.map(e => `<tr><td class="wrap">${esc(e.event)}</td>${EV_HAS_FILLED ? `<td><span class="tag ${cls(e)}">${esc(e.status || "—")}</span></td>` : ""}
+        <td class="num">${e.unfilled ? `<span class="miss" title="Body za nevyplnený feedback">+${fmt1(e.possible - e.earned)}</span>` : (earns(e) ? fmt1(e.earned || e.possible) : `<span class="dim">0</span>`)}</td></tr>`).join("")}
+    </tbody></table></div>`;
+  }
+  function eventsHtml(list, sem) {
+    const vis = x => x.events.filter(e => !e.hidden);
+    const cur = list.find(x => x.semester === sem);
+    const others = list.filter(x => x.semester !== sem && vis(x).length).reverse();
+    return `<h3>${EV_HAS_FILLED ? "Eventy" : "Eventy s nevyplneným feedbackom"} · ${esc(sem)}</h3>${eventsTable(cur ? vis(cur) : [])}` +
+      (others.length ? `<details class="more"><summary>Ostatné semestre (${others.reduce((a, x) => a + vis(x).length, 0)})</summary>${others.map(x =>
+        `<h3>${esc(x.semester)}</h3>${eventsTable(vis(x))}`).join("")}</details>` : "");
+  }
+
+  function closeDrawer() { OPEN = null; $("drawer").classList.remove("open"); $("drawer").setAttribute("aria-hidden", "true"); $("shade").classList.remove("open"); }
+
+  // ================= misc UI =================
+  function renderFiles() {
+    const order = ["Študenti", "Eventy", "Projekt v praxi", "Zodpovedné osoby", "Preskočené"];
+    const item = s => `<li><span class="tag ${s.skip ? "" : "info"}">${esc(s.role)}</span>${s.live ? `<span class="tag ok">živé</span>` : ""}
+      ${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>` : `<span>${esc(s.name)}</span>`}
+      ${s.info || s.note ? `<span class="i">${esc([s.info, s.note].filter(Boolean).join(" · "))}</span>` : ""}</li>`;
+    const groups = [
+      ["salesforce", DIRS.salesforce ? DIRS.salesforce.name : "Salesforce"],
+      ["manual", DIRS.manual ? DIRS.manual.name : "Manuálne info"],
+      ["", "Ostatné"],
+    ];
+    const list = [...SOURCES].sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role));
+    $("files").innerHTML = groups.map(([k, label]) => {
+      const g = list.filter(s => (s.folder === "salesforce" || s.folder === "manual" ? s.folder : "") === k);
+      if (!g.length && !k) return "";
+      return `<li class="fh">${esc(label)}</li>` + (g.length ? g.map(item).join("") : `<li><span class="i">Prázdny priečinok</span></li>`);
+    }).join("");
+    const used = list.filter(s => !s.skip).length;
+    $("files-label").textContent = `Načítané súbory (${used})`;
+  }
+  function showApp() { $("boot").classList.add("hidden"); $("app").classList.remove("hidden"); }
+  function showBootError(text) {
+    $("boot").classList.remove("hidden"); $("app").classList.add("hidden");
+    $("boot-loading").classList.add("hidden"); $("boot-error").classList.remove("hidden");
+    $("err").textContent = text;
+  }
+  let toastT;
+  function toast(text, html, ms) {
+    const t = $("toast");
+    if (html) t.innerHTML = text; else t.textContent = text;
+    t.classList.toggle("link", !!html); t.classList.add("show");
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), ms || (html ? 10000 : 3500));
+  }
+  function closePops(except) { ["filter-pop", "more-pop"].forEach(id => { if (id !== except) $(id).classList.add("hidden"); }); }
+  function togglePop(id) { const p = $(id); const open = p.classList.contains("hidden"); closePops(id); p.classList.toggle("hidden", !open); }
+
+  function exportSheet() { closePops(); demoNA(); }
+
+  // ================= events =================
+  $("retry").onclick = () => { $("boot-error").classList.add("hidden"); $("boot-loading").classList.remove("hidden"); load(true); };
+  $("reload").onclick = () => load(false);
+  $("stale").onclick = () => load(false);
+  $("export").onclick = exportSheet;
+
+  // DEMO: links to Salesforce, Google Sheets and Drive folders are not available
+  document.addEventListener("click", e => {
+    const a = e.target.closest("#sf-btn, .btn.sf, #notes-link, #meetings-link, #dir-salesforce, #dir-manual, #dir-generated");
+    if (!a) return;
+    e.preventDefault(); e.stopPropagation(); closePops(); demoNA();
+  }, true);
+
+  // ---- bulk meetings ("+ Stretnutia") ----
+  const BULK = {sel: new Set(), visible: [], mode: "sem", city: "", status: ""};
+  // target semester: from the date, or chosen directly in "Len semester" mode
+  function bulkSem() {
+    if (BULK.mode === "sem") return $("b-semsel").value;
+    const k = dateSemKey($("b-date").value);
+    return k == null ? $("sem").value : semLabel(k);
+  }
+  function bulkRows() {
+    const sk = semKey(bulkSem());
+    let rows = DATA.filter(d => semKey(d.semester) === sk);
+    if (!rows.length) rows = DATA.filter(d => d.semester === $("sem").value);   // semester not in the data yet → current list
+    return rows.sort((a, b) => a.sortName.localeCompare(b.sortName, "sk"));
+  }
+  function bulkTarget() {
+    const s = bulkSem();
+    $("b-sem").innerHTML = BULK.mode === "sem"
+      ? `Stretnutie sa zapíše bez dátumu do semestra <b>${esc(s)}</b>`
+      : ($("b-date").value ? semHint($("b-date").value) : "Vyber dátum stretnutia.");
+    const ids = new Set(bulkRows().map(d => d.id));
+    BULK.sel.forEach(id => { if (!ids.has(id)) BULK.sel.delete(id); });
+    const people = [...new Set(bulkRows().flatMap(d => d.resp ? d.resp.split(", ") : []))].sort((a, b) => a.localeCompare(b, "sk"));
+    $("b-team").innerHTML = `<option value="">Vybrať študentov člena tímu…</option>` + people.map(p => `<option>${esc(p)}</option>`).join("");
+    $("b-team").classList.toggle("hidden", !people.length);
+    const rows = bulkRows(), uniq = k => [...new Set(rows.map(d => d[k]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "sk"));
+    const cities = uniq("city"), statuses = uniq("status");
+    if (BULK.city && !cities.includes(BULK.city)) BULK.city = "";
+    if (BULK.status && !statuses.includes(BULK.status)) BULK.status = "";
+    $("b-city").innerHTML = [["", "Všetky mestá"], ...cities.map(c => [c, c])].map(([v, t]) =>
+      `<button data-c="${esc(v)}" class="${BULK.city === v ? "on" : ""}">${esc(t)}</button>`).join("");
+    $("b-city").classList.toggle("hidden", cities.length < 2);
+    $("b-status").innerHTML = `<option value="">Všetky stavy štúdia</option>` + statuses.map(s => `<option ${BULK.status === s ? "selected" : ""}>${esc(s)}</option>`).join("");
+    $("b-status").classList.toggle("hidden", statuses.length < 2);
+    renderPick();
+  }
+  function setBulkMode(m) {
+    BULK.mode = m;
+    $("b-mode").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.m === m));
+    $("b-date-wrap").classList.toggle("hidden", m !== "date");
+    $("b-sem-wrap").classList.toggle("hidden", m !== "sem");
+    bulkTarget();
+  }
+  const plural = (n, one, few, many) => n === 1 ? one : n > 1 && n < 5 ? few : many;
+  function openBulk() {
+    closePops();
+    BULK.sel = new Set();
+    const today = todayISO();
+    $("b-date").value = today; $("b-date").max = today;
+    $("b-with").value = F.resp && F.resp !== "__none" ? F.resp : "";
+    $("b-q").value = "";
+    $("b-semsel").innerHTML = [...SEMS].filter(s => s !== NO_SEM).reverse().map(s => `<option>${esc(s)}</option>`).join("");
+    $("b-semsel").value = $("sem").value;
+    BULK.city = ""; BULK.status = "";
+    setBulkMode("sem");
+    $("bulk").classList.remove("hidden");
+    setTimeout(() => $("b-q").focus(), 50);
+  }
+  function closeBulk() { $("bulk").classList.add("hidden"); }
+  function renderPick() {
+    const q = norm($("b-q").value);
+    BULK.visible = bulkRows().filter(d => (!q || norm(`${d.full} ${d.email}`).includes(q))
+      && (!BULK.city || d.city === BULK.city) && (!BULK.status || d.status === BULK.status));
+    $("b-list").innerHTML = BULK.visible.length ? BULK.visible.map(d => `<label class="pick"><input type="checkbox" data-id="${esc(d.id)}" ${BULK.sel.has(d.id) ? "checked" : ""}>
+      ${avatar(d.full, "sm")}<span class="pn"><b>${esc(d.full)}</b><small>${esc([d.resp, d.level, d.city, d.status].filter(Boolean).join(" · "))}</small></span>
+      ${d.meetN ? `<span class="tag ok" title="Stretnutia v tomto semestri">už ${d.meetN}×</span>` : ""}</label>`).join("")
+      : `<div class="none">Nikto nezodpovedá hľadaniu.</div>`;
+    updateBulk();
+  }
+  function updateBulk() {
+    const n = BULK.sel.size;
+    $("b-count").textContent = n ? `Vybraných: ${n}` : "Nikto nie je vybraný";
+    $("b-save").disabled = !n;
+    $("b-save").textContent = n ? `Zapísať ${n} ${plural(n, "stretnutie", "stretnutia", "stretnutí")}` : "Zapísať stretnutia";
+    $("b-all").checked = BULK.visible.length > 0 && BULK.visible.every(d => BULK.sel.has(d.id));
+  }
+  // DEMO: validates like the real app, then shows "not available" instead of saving
+  function saveBulk() {
+    if (BULK.mode === "date" && !$("b-date").value) { $("b-date").focus(); return toast("Zadaj dátum stretnutia alebo prepni na „Len semester“"); }
+    if (!BULK.sel.size) return;
+    demoNA();
+  }
+  $("bulk-btn").onclick = openBulk;
+  $("bulk-close").onclick = closeBulk; $("b-cancel").onclick = closeBulk;
+  $("bulk").addEventListener("click", e => { if (e.target.id === "bulk") closeBulk(); });
+  $("b-q").addEventListener("input", renderPick);
+  $("b-date").addEventListener("input", bulkTarget);
+  $("b-semsel").addEventListener("change", bulkTarget);
+  $("b-city").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return;
+    BULK.city = b.dataset.c; $("b-city").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); renderPick(); });
+  $("b-status").addEventListener("change", e => { BULK.status = e.target.value; renderPick(); });
+  $("b-mode").addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (b) setBulkMode(b.dataset.m); });
+  $("b-list").addEventListener("change", e => {
+    const id = e.target.dataset.id; if (!id) return;
+    if (e.target.checked) BULK.sel.add(id); else BULK.sel.delete(id);
+    updateBulk();
+  });
+  $("b-all").addEventListener("change", e => { BULK.visible.forEach(d => e.target.checked ? BULK.sel.add(d.id) : BULK.sel.delete(d.id)); renderPick(); });
+  $("b-team").addEventListener("change", e => {
+    const p = e.target.value; if (!p) return;
+    bulkRows().forEach(d => { if (d.resp && d.resp.split(", ").includes(p) && (!BULK.city || d.city === BULK.city) && (!BULK.status || d.status === BULK.status)) BULK.sel.add(d.id); });
+    if (!$("b-with").value.trim()) $("b-with").value = p;
+    e.target.value = ""; renderPick();
+  });
+  $("b-save").onclick = saveBulk;
+
+  $("files-btn").onclick = () => { closePops(); $("modal").classList.remove("hidden"); };
+  $("modal-close").onclick = () => $("modal").classList.add("hidden");
+  $("modal").addEventListener("click", e => { if (e.target.id === "modal") $("modal").classList.add("hidden"); });
+  $("filter-btn").onclick = e => { e.stopPropagation(); togglePop("filter-pop"); };
+  $("more-btn").onclick = e => { e.stopPropagation(); togglePop("more-pop"); };
+  document.addEventListener("click", e => { if (!e.target.closest(".pop") && !e.target.closest("#filter-btn,#more-btn")) closePops(); });
+
+  $("sem").addEventListener("change", () => { render(); if (OPEN) openStudent(OPEN); });
+  const step = n => { const i = SEMS.indexOf($("sem").value) + n; if (i >= 0 && i < SEMS.length) { $("sem").value = SEMS[i]; $("sem").dispatchEvent(new Event("change")); } };
+  $("prev").onclick = () => step(-1); $("next").onclick = () => step(1);
+  $("q").addEventListener("input", () => { F.q = $("q").value; render(); });
+  $("resp").addEventListener("change", () => { F.resp = $("resp").value; render(); });
+  $("filter-pop").addEventListener("change", e => {
+    const k = e.target.dataset.f; if (!k) return;
+    F[k] = e.target.checked; render();
+  });
+  $("filter-pop").addEventListener("click", e => {
+    e.stopPropagation();
+    const o = e.target.closest(".opt[data-f]");
+    if (o) { const k = o.dataset.f, v = o.dataset.v; F[k] = F[k] === v ? "" : v; render(); }
+    if (e.target.closest("#pop-show")) closePops();
+  });
+  $("clear").onclick = () => {
+    POP_SELECTS.forEach(s => F[s.k] = ""); F.pvp = ""; F.vol = ""; F.would = false; F.hasnote = false;
+    buildFilters(); render();
+  };
+  $("chips").addEventListener("click", e => {
+    const b = e.target.closest("[data-x]"); if (!b) return;
+    const k = b.dataset.x; F[k] = typeof F[k] === "boolean" ? false : "";
+    buildFilters(); render();
+  });
+  $("views").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) { F.view = b.dataset.v; render(); } });
+  $("thead").addEventListener("click", e => {
+    const th = e.target.closest("th"); if (!th) return;
+    const k = th.dataset.k;
+    if (sort.key === k) sort.dir *= -1; else { sort.key = k; sort.dir = ["base", "points", "missed", "pct", "lastMeet", "pvp", "vol"].includes(k) ? -1 : 1; }
+    buildHead(); render();
+  });
+  $("tbody").addEventListener("click", e => { const tr = e.target.closest("tr"); if (tr) openStudent(tr.dataset.id); });
+
+  $("d-tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { TAB = b.dataset.tab; renderTabs(); renderTab(); } });
+  $("d-body").addEventListener("click", e => {
+    if (e.target.id === "m-add") addMeeting();
+    if (e.target.id === "n-add") addNote();
+    const dm = e.target.closest("[data-del-meet]"); if (dm) deleteRecord(dm);
+    const dn = e.target.closest("[data-del-note]"); if (dn) deleteRecord(dn);
+  });
+  $("d-body").addEventListener("input", e => { if (e.target.id === "m-date") $("m-sem").innerHTML = semHint(e.target.value); });
+  $("d-body").addEventListener("keydown", e => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      if (e.target.closest("#m-form")) { e.preventDefault(); addMeeting(); }
+      else if (e.target.id === "n-text") { e.preventDefault(); addNote(); }
+    }
+  });
+  $("close").onclick = closeDrawer; $("shade").onclick = closeDrawer;
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      if (!$("bulk").classList.contains("hidden")) return closeBulk();
+      if (!$("modal").classList.contains("hidden")) return $("modal").classList.add("hidden");
+      if (!$("filter-pop").classList.contains("hidden") || !$("more-pop").classList.contains("hidden")) return closePops();
+      return closeDrawer();
+    }
+    if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement?.tagName) || $("app").classList.contains("hidden") || OPEN || !$("bulk").classList.contains("hidden")) return;
+    if (e.key === "ArrowLeft") step(-1); if (e.key === "ArrowRight") step(1);
+  });
+
+  load(true);
+})();
+</script>
+</body>
+</html>
