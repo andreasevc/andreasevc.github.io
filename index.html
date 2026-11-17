@@ -174,6 +174,7 @@
             gap: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); backdrop-filter: blur(15px); min-width: 450px;
         }
 
+        .secret-link, .secret-link:hover { cursor: default; text-decoration: none; display: block; }
         .contact-photo { width: 110px; height: 110px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; }
         .contact-info h4 { font-family: var(--mono); color: var(--accent-green); margin-bottom: 8px; }
         .contact-info p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 4px; }
@@ -480,7 +481,8 @@
     <div id="contact">
         <div id="map"></div>
         <div class="contact-overlay">
-            <img src="fotky_makovec.jpg" alt="Andrea" class="contact-photo">
+            <!-- secret link: the photo opens the wedding page -->
+            <a href="Wedding.html" class="secret-link" aria-label="Andrea"><img src="fotky_makovec.jpg" alt="Andrea" class="contact-photo"></a>
             <div class="contact-info">
                 <h4>get_in_touch()</h4>
                 <p><i class="fa fa-map-marker"></i> Devínska Nová Ves, Bratislava</p>
