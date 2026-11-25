@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# local tool settings
+.claude/
+
+# raw data and work files: never publish
+Gallup/
+*.xlsx
+*.xls
+*.csv
+~$*
